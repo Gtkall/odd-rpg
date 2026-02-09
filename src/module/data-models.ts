@@ -8,7 +8,10 @@
  * ODD RPG rules are fleshed out.
  */
 
-const { HTMLField, NumberField, SchemaField } = foundry.data.fields;
+import { ATTRIBUTES, DICE_TYPES, DEFAULT_DIE } from "./config";
+
+const { HTMLField, NumberField, SchemaField, StringField } =
+  foundry.data.fields;
 
 /* ========================================================================== */
 /*  Actor Data Models                                                         */
@@ -22,7 +25,18 @@ export class CharacterDataModel extends foundry.abstract.TypeDataModel<
   Actor.Implementation
 > {
   static override defineSchema(): CharacterDataModel.Schema {
+    // Build attribute fields from config — each is a dice-value string.
+    const attributeFields: Record<string, any> = {};
+    for (const key of Object.keys(ATTRIBUTES)) {
+      attributeFields[key] = new StringField({
+        required: true,
+        initial: DEFAULT_DIE,
+        choices: Object.keys(DICE_TYPES),
+      });
+    }
+
     return {
+      attributes: new SchemaField(attributeFields),
       health: new SchemaField({
         value: new NumberField({
           required: true,

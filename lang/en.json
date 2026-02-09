@@ -10,7 +10,22 @@
     },
     "Attributes": {
       "health": "Health",
-      "level": "Level"
+      "level": "Level",
+      "str": "Strength",
+      "cun": "Cunning",
+      "agi": "Agility",
+      "int": "Intelligence",
+      "dex": "Dexterity",
+      "wil": "Willpower",
+      "vit": "Vitality",
+      "per": "Personality"
+    },
+    "Dice": {
+      "d4": "d4",
+      "d6": "d6",
+      "d8": "d8",
+      "d10": "d10",
+      "d12": "d12"
     },
     "Sheet": {
       "Tabs": {

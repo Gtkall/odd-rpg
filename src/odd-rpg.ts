@@ -5,6 +5,7 @@
  * system-wide configuration with FoundryVTT.
  */
 
+import { ODD } from "./module/config.js";
 import { OddActor, OddItem } from "./module/documents.js";
 import { OddActorSheet, OddItemSheet } from "./module/sheets.js";
 import {
@@ -20,6 +21,9 @@ import {
 
 Hooks.once("init", () => {
   console.log("ODD RPG | Initialising the ODD RPG game system");
+
+  // ---- System configuration ----
+  (CONFIG as any).ODD = ODD;
 
   // ---- Custom Document implementations ----
   (CONFIG as any).Actor.documentClass = OddActor;

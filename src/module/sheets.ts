@@ -5,6 +5,8 @@
  * and handle user interaction.
  */
 
+import { ATTRIBUTES, DICE_TYPES } from "./config";
+
 /**
  * Character sheet for ODD RPG Actors.
  */
@@ -32,6 +34,10 @@ export class OddActorSheet extends ActorSheet {
     // Expose system data at the top level for template convenience.
     context.system = actorData.system;
     context.flags = actorData.flags;
+
+    // Attribute config for the template.
+    context.attributeConfig = ATTRIBUTES;
+    context.diceTypes = DICE_TYPES;
 
     // Separate owned items by type for the template.
     context.items =

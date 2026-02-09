@@ -181,6 +181,38 @@
 }
 
 /* -------------------------------------------------------------------------- */
+/*  Attributes Grid                                                           */
+/* -------------------------------------------------------------------------- */
+
+.odd-rpg .attributes-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem 1.5rem;
+    padding: 0.5rem 0;
+}
+
+.odd-rpg .attributes-grid .form-group {
+    margin-bottom: 0;
+}
+
+.odd-rpg .attribute-select {
+    flex: 1;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--odd-color-border);
+    border-radius: 4px;
+    font-family: var(--odd-font-primary);
+    font-size: 0.9rem;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color 0.15s;
+}
+
+.odd-rpg .attribute-select:focus {
+    outline: none;
+    border-color: var(--odd-color-accent);
+}
+
+/* -------------------------------------------------------------------------- */
 /*  Hints                                                                     */
 /* -------------------------------------------------------------------------- */
 
