@@ -1,0 +1,24 @@
+{
+  "ODD": {
+    "ActorType": {
+      "character": "Character"
+    },
+    "ItemType": {
+      "item": "Item",
+      "feature": "Feature",
+      "spell": "Spell"
+    },
+    "Attributes": {
+      "health": "Health",
+      "level": "Level"
+    },
+    "Sheet": {
+      "Tabs": {
+        "attributes": "Attributes",
+        "items": "Items",
+        "spells": "Spells",
+        "biography": "Biography"
+      }
+    }
+  }
+}
