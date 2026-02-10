@@ -1,12 +1,14 @@
 {
   "compilerOptions": {
-    "types": ["@league-of-foundry-developers/foundry-vtt-types"],
+    "types": ["fvtt-types"],
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "outDir": "dist",
     "noEmit": true,
+    "incremental": true,
+    "tsBuildInfoFile": "./dist/.tsbuildinfo",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,

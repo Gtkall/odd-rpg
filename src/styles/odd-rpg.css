@@ -7,10 +7,10 @@
 /* -------------------------------------------------------------------------- */
 
 :root {
-    --odd-color-primary: #4a5568;
-    --odd-color-accent: #e53e3e;
-    --odd-color-bg: #f7fafc;
-    --odd-color-border: #cbd5e0;
+    --odd-color-primary: #e0e0e0;
+    --odd-color-accent: #ff6b6b;
+    --odd-color-bg: #1a1a1a;
+    --odd-color-border: #444;
     --odd-font-primary: "Signika", sans-serif;
 }
 
@@ -173,7 +173,8 @@
 
 .odd-rpg .form-group label {
     font-weight: 600;
-    min-width: 100px;
+    min-width: 120px;
+    color: var(--odd-color-primary);
 }
 
 .odd-rpg .form-group input {
@@ -202,7 +203,8 @@
     border-radius: 4px;
     font-family: var(--odd-font-primary);
     font-size: 0.9rem;
-    background: #fff;
+    background: #2a2a2a;
+    color: var(--odd-color-primary);
     cursor: pointer;
     transition: border-color 0.15s;
 }

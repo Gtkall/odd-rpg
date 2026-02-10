@@ -1,0 +1,11 @@
+{{!-- Attributes Tab --}}
+<div class="attributes-grid">
+  {{#each attributeConfig as |label key|}}
+  <div class="attribute form-group">
+    <label>{{localize label}}</label>
+    <select name="system.attributes.{{key}}" class="attribute-select">
+      {{selectOptions ../diceTypes selected=(lookup ../system.attributes key) localize=true}}
+    </select>
+  </div>
+  {{/each}}
+</div>

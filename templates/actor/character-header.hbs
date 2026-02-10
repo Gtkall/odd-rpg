@@ -1,0 +1,25 @@
+{{!-- Character Header --}}
+<header class="sheet-header">
+  <img class="profile-img" src="{{actor.img}}" data-edit="img"
+       title="{{actor.name}}" height="100" width="100" />
+  <div class="header-fields">
+    <h1 class="charname">
+      <input name="name" type="text" value="{{actor.name}}" placeholder="Character Name" />
+    </h1>
+    <div class="resource health">
+      <label>HP</label>
+      <div class="resource-bar">
+        <input type="number" name="system.health.value"
+               value="{{system.health.value}}" data-dtype="Number" />
+        <span class="separator">/</span>
+        <input type="number" name="system.health.max"
+               value="{{system.health.max}}" data-dtype="Number" />
+      </div>
+    </div>
+    <div class="resource level">
+      <label>Level</label>
+      <input type="number" name="system.level"
+             value="{{system.level}}" data-dtype="Number" />
+    </div>
+  </div>
+</header>
