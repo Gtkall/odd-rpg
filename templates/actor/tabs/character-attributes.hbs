@@ -3,7 +3,7 @@
   <div class="attributes-grid">
     {{#each attributeConfig as |label key|}}
     <div class="attribute form-group">
-      <label>{{localize label}}</label>
+      <label class="rollable" data-roll-attribute="{{key}}">{{localize label}}</label>
       <select name="system.attributes.{{key}}" class="attribute-select">
         {{selectOptions ../attributeDiceTypes selected=(lookup ../system.attributes key) localize=true}}
       </select>

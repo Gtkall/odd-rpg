@@ -5,9 +5,9 @@
     <h3>{{localize (lookup ../skillCategoryLabels categoryKey)}}</h3>
     {{#each category as |label skillKey|}}
     <div class="skill form-group">
-      <label>{{localize label}}</label>
-      <select name="system.skills.{{../categoryKey}}.{{skillKey}}" class="skill-select">
-        {{selectOptions ../../diceTypes selected=(lookup (lookup ../../system.skills ../categoryKey) skillKey) localize=true}}
+      <label class="rollable" data-roll-skill="{{skillKey}}" data-roll-category="{{categoryKey}}">{{localize label}}</label>
+      <select name="system.skills.{{categoryKey}}.{{skillKey}}" class="skill-select">
+        {{selectOptions ../../diceTypes selected=(lookup (lookup ../../system.skills categoryKey) skillKey) localize=true}}
       </select>
     </div>
     {{/each}}

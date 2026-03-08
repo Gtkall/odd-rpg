@@ -139,6 +139,25 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
       });
     });
 
+    // Dice pool: click attribute/skill labels to append dice to chat input
+    html.querySelectorAll("[data-roll-attribute]").forEach((el) => {
+      el.addEventListener("click", (ev: Event) => {
+        const key = (ev.currentTarget as HTMLElement).dataset.rollAttribute!;
+        const die = (this.document.system as any).attributes[key];
+        if (die) this._appendDieToChat(die);
+      });
+    });
+
+    html.querySelectorAll("[data-roll-skill]").forEach((el) => {
+      el.addEventListener("click", (ev: Event) => {
+        const target = ev.currentTarget as HTMLElement;
+        const category = target.dataset.rollCategory!;
+        const skill = target.dataset.rollSkill!;
+        const die = (this.document.system as any).skills[category]?.[skill];
+        if (die) this._appendDieToChat(die);
+      });
+    });
+
     // Only allow editing for owners
     if (!this.isEditable) return;
 
@@ -153,7 +172,7 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
       });
     });
 
-    // Edit owned item
+    // Edit owned item (must be editable)
     html.querySelectorAll(".item-edit").forEach((el) => {
       el.addEventListener("click", (ev: Event) => {
         const li = (ev.currentTarget as HTMLElement).closest(
@@ -166,6 +185,26 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
         }
       });
     });
+  }
+  /**
+   * Append a die to the chat message input, building a dice pool formula.
+   * First click starts "/r d8", subsequent clicks append "+d10", "+d6", etc.
+   */
+  _appendDieToChat(die: string): void {
+    const chatInput = document.querySelector("#chat-message") as HTMLTextAreaElement | null;
+    if (!chatInput) return;
+
+    const current = chatInput.value.trim();
+    if (current.startsWith("/r ")) {
+      chatInput.value = `${current}+${die}`;
+    } else if (current === "") {
+      chatInput.value = `/r ${die}`;
+    } else {
+      // There's existing non-roll text; don't clobber it
+      chatInput.value = `${current} /r ${die}`;
+    }
+
+    chatInput.focus();
   }
 }
 
