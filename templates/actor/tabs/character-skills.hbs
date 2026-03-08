@@ -1,0 +1,16 @@
+{{!-- Skills Tab --}}
+<section class="tab skills-container {{ tab.cssClass }}" data-group="{{ tab.group }}" data-tab="{{ tab.id }}">
+  {{#each skillConfig as |category categoryKey|}}
+  <div class="skill-category">
+    <h3>{{localize (lookup ../skillCategoryLabels categoryKey)}}</h3>
+    {{#each category as |label skillKey|}}
+    <div class="skill form-group">
+      <label>{{localize label}}</label>
+      <select name="system.skills.{{../categoryKey}}.{{skillKey}}" class="skill-select">
+        {{selectOptions ../../diceTypes selected=(lookup (lookup ../../system.skills ../categoryKey) skillKey) localize=true}}
+      </select>
+    </div>
+    {{/each}}
+  </div>
+  {{/each}}
+</section>

@@ -1,0 +1,30 @@
+{{!-- Statistics Tab --}}
+<section class="tab {{ tab.cssClass }}" data-group="{{ tab.group }}" data-tab="{{ tab.id }}">
+  <div class="statistics-grid">
+    <div class="form-group">
+      <label>{{localize "ODD.Statistics.movementRate"}}</label>
+      <input type="number" name="system.statistics.movementRate"
+             value="{{system.statistics.movementRate}}" data-dtype="Number" />
+    </div>
+    <div class="form-group">
+      <label>{{localize "ODD.Statistics.composureThreshold"}}</label>
+      <input type="number" name="system.statistics.composureThreshold"
+             value="{{system.statistics.composureThreshold}}" data-dtype="Number" />
+    </div>
+    <div class="form-group">
+      <label>{{localize "ODD.Statistics.healingRate"}}</label>
+      <input type="number" name="system.statistics.healingRate"
+             value="{{system.statistics.healingRate}}" data-dtype="Number" />
+    </div>
+    <div class="form-group">
+      <label>{{localize "ODD.Statistics.magicPoints"}}</label>
+      <div class="resource-bar">
+        <input type="number" name="system.statistics.magicPoints.value"
+               value="{{system.statistics.magicPoints.value}}" data-dtype="Number" />
+        <span class="separator">/</span>
+        <input type="number" name="system.statistics.magicPoints.max"
+               value="{{system.statistics.magicPoints.max}}" data-dtype="Number" />
+      </div>
+    </div>
+  </div>
+</section>

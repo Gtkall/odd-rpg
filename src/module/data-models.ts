@@ -3,12 +3,10 @@
  *
  * Defines the TypeDataModel schemas for all Actor and Item sub-types.
  * These schemas determine what data is stored on each document's `system` field.
- *
- * Placeholder attributes are intentionally minimal — expand these as the
- * ODD RPG rules are fleshed out.
  */
 
-import { ATTRIBUTES, DICE_TYPES, DEFAULT_DIE } from "./config";
+import { ATTRIBUTES, SKILLS, ATTRIBUTE_DICE_TYPES, DICE_TYPES, DEFAULT_DIE } from "./config";
+import { OddActorSheet, OddItemSheet } from "./sheets";
 
 const { HTMLField, NumberField, SchemaField, StringField } =
   foundry.data.fields;
@@ -19,53 +17,82 @@ const { HTMLField, NumberField, SchemaField, StringField } =
 
 /**
  * Character — the primary player-controlled Actor type.
+ *
+ * Schema mirrors the ODD RPG character sheet:
+ * - Base info: player name, XP
+ * - Attributes: 8 dice-pool attributes (str, agi, dex, vit, cun, int, wil, per)
+ * - Skills: 6 categories (combat, physical, knowledge, social, mental, special)
+ * - Statistics: movement rate, composure threshold, healing rate, magic points
+ * - Biography: free-form HTML
  */
 export class CharacterDataModel extends foundry.abstract.TypeDataModel<
   CharacterDataModel.Schema,
   Actor.Implementation
 > {
+  static sheetClass = OddActorSheet;
+
   static override defineSchema(): CharacterDataModel.Schema {
-    // Build attribute fields from config — each is a dice-value string.
+    // --- Attribute fields (each a die-value string) ---
     const attributeFields: Record<string, any> = {};
     for (const key of Object.keys(ATTRIBUTES)) {
       attributeFields[key] = new StringField({
         required: true,
         initial: DEFAULT_DIE,
-        choices: Object.keys(DICE_TYPES),
+        choices: Object.keys(ATTRIBUTE_DICE_TYPES),
       });
     }
 
+    // --- Skill fields (grouped by category, each a die-value or "" for untrained) ---
+    const skillCategoryFields: Record<string, any> = {};
+    for (const [category, skills] of Object.entries(SKILLS)) {
+      const categorySkills: Record<string, any> = {};
+      for (const skillKey of Object.keys(skills)) {
+        categorySkills[skillKey] = new StringField({
+          required: true,
+          blank: true,
+          initial: "",
+          choices: Object.keys(DICE_TYPES),
+        });
+      }
+      skillCategoryFields[category] = new SchemaField(categorySkills);
+    }
+
     return {
+      // Base character info
+      playerName: new StringField({ required: true, blank: true, initial: "" }),
+      xp: new SchemaField({
+        value: new NumberField({ required: true, integer: true, min: 0, initial: 0 }),
+        max: new NumberField({ required: true, integer: true, min: 0, initial: 0 }),
+      }),
+
+      // Attributes
       attributes: new SchemaField(attributeFields),
-      health: new SchemaField({
-        value: new NumberField({
-          required: true,
-          integer: true,
-          min: 0,
-          initial: 10,
-        }),
-        max: new NumberField({
-          required: true,
-          integer: true,
-          min: 0,
-          initial: 10,
+
+      // Skills
+      skills: new SchemaField(skillCategoryFields),
+
+      // Statistics
+      statistics: new SchemaField({
+        movementRate: new NumberField({ required: true, integer: true, min: 0, initial: 4 }),
+        composureThreshold: new NumberField({ required: true, integer: true, min: 0, initial: 10 }),
+        healingRate: new NumberField({ required: true, integer: true, min: 0, initial: 4 }),
+        magicPoints: new SchemaField({
+          value: new NumberField({ required: true, integer: true, min: 0, initial: 0 }),
+          max: new NumberField({ required: true, integer: true, min: 0, initial: 0 }),
         }),
       }),
-      level: new NumberField({
-        required: true,
-        integer: true,
-        min: 1,
-        initial: 1,
-      }),
+
+      // Biography
       biography: new HTMLField({ required: true, blank: true }),
     } as CharacterDataModel.Schema;
   }
 
   override prepareDerivedData(this: any): void {
     super.prepareDerivedData();
-    const health = this.health;
-    health.value = Math.min(health.value, health.max);
-    health.value = Math.max(0, health.value);
+
+    // Clamp magic points within range
+    const mp = this.statistics.magicPoints;
+    mp.value = Math.clamp(mp.value, 0, mp.max);
   }
 }
 
@@ -95,6 +122,8 @@ class BaseItemDataModel extends foundry.abstract.TypeDataModel<
  * Generic Item (equipment, consumable, etc.)
  */
 export class ItemDataModel extends BaseItemDataModel {
+  static sheetClass = OddItemSheet;
+
   static override defineSchema() {
     return {
       ...super.defineSchema(),
@@ -117,10 +146,11 @@ export class ItemDataModel extends BaseItemDataModel {
  * Feature — a special ability or trait.
  */
 export class FeatureDataModel extends BaseItemDataModel {
+  static sheetClass = OddItemSheet;
+
   static override defineSchema() {
     return {
       ...super.defineSchema(),
-      // Placeholder — add activation costs, usage limits, etc. later.
     };
   }
 }
@@ -129,6 +159,8 @@ export class FeatureDataModel extends BaseItemDataModel {
  * Spell — a castable magical effect.
  */
 export class SpellDataModel extends BaseItemDataModel {
+  static sheetClass = OddItemSheet;
+
   static override defineSchema() {
     return {
       ...super.defineSchema(),

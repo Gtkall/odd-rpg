@@ -5,7 +5,13 @@
  * and handle user interaction.
  */
 
-import { ATTRIBUTES, DICE_TYPES } from "./config";
+import {
+  ATTRIBUTES,
+  ATTRIBUTE_DICE_TYPES,
+  DICE_TYPES,
+  SKILLS,
+  SKILL_CATEGORIES,
+} from "./config";
 
 const { ActorSheetV2, ItemSheetV2 } = foundry.applications.sheets;
 const { HandlebarsApplicationMixin } = foundry.applications.api;
@@ -13,12 +19,17 @@ const { HandlebarsApplicationMixin } = foundry.applications.api;
 /**
  * Character sheet for ODD RPG Actors.
  */
-export class OddActorSheet extends (HandlebarsApplicationMixin(ActorSheetV2) as typeof ActorSheetV2) {
+export class OddActorSheet extends (HandlebarsApplicationMixin(
+  ActorSheetV2,
+) as typeof ActorSheetV2) {
   static override DEFAULT_OPTIONS = {
     classes: ["odd-rpg", "sheet", "actor", "character"],
     position: {
-      width: 600,
-      height: 680,
+      width: 720,
+      height: 720,
+    },
+    window: {
+      resizable: true,
     },
   };
 
@@ -31,6 +42,14 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(ActorSheetV2) as 
     },
     attributes: {
       template: "systems/odd-rpg/templates/actor/tabs/character-attributes.hbs",
+      scrollable: [""],
+    },
+    statistics: {
+      template: "systems/odd-rpg/templates/actor/tabs/character-statistics.hbs",
+      scrollable: [""],
+    },
+    skills: {
+      template: "systems/odd-rpg/templates/actor/tabs/character-skills.hbs",
       scrollable: [""],
     },
     items: {
@@ -47,29 +66,35 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(ActorSheetV2) as 
     },
   };
 
-  static override TABS = {
-    primary: {
-      initial: "attributes",
-      tabs: [
-        { id: "attributes", label: "Attributes" },
-        { id: "items", label: "Items" },
-        { id: "spells", label: "Spells" },
-        { id: "biography", label: "Biography" },
-      ],
-    },
-  };
+  static TABS = [
+    { tab: "attributes", label: "Attributes" },
+    { tab: "statistics", label: "Statistics" },
+    { tab: "skills", label: "Skills" },
+  ];
 
   override tabGroups = {
     primary: "attributes",
   };
 
+  _getTabs(): Record<string, any> {
+    return (this.constructor as typeof OddActorSheet).TABS.reduce(
+      (tabs: Record<string, any>, { tab, ...config }) => {
+        tabs[tab] = {
+          ...config,
+          id: tab,
+          group: "primary",
+          active: this.tabGroups.primary === tab,
+          cssClass: this.tabGroups.primary === tab ? "active" : "",
+        };
+        return tabs;
+      },
+      {},
+    );
+  }
+
   override async _prepareContext(options: any) {
     const context = await super._prepareContext(options);
     const actor = this.document;
-
-    // Attribute config for the template
-    const attributeConfig = ATTRIBUTES;
-    const diceTypes = DICE_TYPES;
 
     // Separate owned items by type for the template
     const items = actor.items.filter((i: any) => i.type === "item");
@@ -81,26 +106,20 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(ActorSheetV2) as 
       actor,
       system: actor.system,
       flags: actor.flags,
-      attributeConfig,
-      diceTypes,
+      attributeConfig: ATTRIBUTES,
+      attributeDiceTypes: ATTRIBUTE_DICE_TYPES,
+      diceTypes: DICE_TYPES,
+      skillConfig: SKILLS,
+      skillCategoryLabels: SKILL_CATEGORIES,
       items,
       features,
       spells,
+      tabs: this._getTabs(),
     };
   }
 
   async _preparePartContext(partId: string, context: any) {
-    switch (partId) {
-      case "nav":
-        // Prepare tabs with active state
-        const TABS = (this.constructor as typeof OddActorSheet).TABS;
-        context.tabs = TABS.primary.tabs.map((tab: any) => ({
-          ...tab,
-          active: this.tabGroups.primary === tab.id,
-        }));
-        break;
-    }
-
+    context.tab = context.tabs[partId];
     return context;
   }
 
@@ -108,7 +127,7 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(ActorSheetV2) as 
     const html = this.element;
 
     // Wire up tab navigation
-    html.querySelectorAll('.sheet-tabs [data-tab]').forEach((el) => {
+    html.querySelectorAll(".sheet-tabs [data-tab]").forEach((el) => {
       el.addEventListener("click", (ev: Event) => {
         ev.preventDefault();
         const target = ev.currentTarget as HTMLElement;
@@ -123,7 +142,9 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(ActorSheetV2) as 
     // Delete owned item
     html.querySelectorAll(".item-delete").forEach((el) => {
       el.addEventListener("click", (ev: Event) => {
-        const li = (ev.currentTarget as HTMLElement).closest(".item") as HTMLElement;
+        const li = (ev.currentTarget as HTMLElement).closest(
+          ".item",
+        ) as HTMLElement;
         const itemId = li?.dataset.itemId;
         if (itemId) this.document.deleteEmbeddedDocuments("Item", [itemId]);
       });
@@ -132,7 +153,9 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(ActorSheetV2) as 
     // Edit owned item
     html.querySelectorAll(".item-edit").forEach((el) => {
       el.addEventListener("click", (ev: Event) => {
-        const li = (ev.currentTarget as HTMLElement).closest(".item") as HTMLElement;
+        const li = (ev.currentTarget as HTMLElement).closest(
+          ".item",
+        ) as HTMLElement;
         const itemId = li?.dataset.itemId;
         if (itemId) {
           const item = this.document.items.get(itemId);
@@ -146,7 +169,9 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(ActorSheetV2) as 
 /**
  * Sheet for ODD RPG Items.
  */
-export class OddItemSheet extends (HandlebarsApplicationMixin(ItemSheetV2) as typeof ItemSheetV2) {
+export class OddItemSheet extends (HandlebarsApplicationMixin(
+  ItemSheetV2,
+) as typeof ItemSheetV2) {
   static override DEFAULT_OPTIONS = {
     classes: ["odd-rpg", "sheet", "item"],
     position: {
@@ -155,7 +180,7 @@ export class OddItemSheet extends (HandlebarsApplicationMixin(ItemSheetV2) as ty
     },
   };
 
-  static override PARTS = {
+  static PARTS = {
     sheet: {
       template: "systems/odd-rpg/templates/item/item-sheet.hbs",
     },

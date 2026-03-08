@@ -121,6 +121,10 @@
     border-bottom-color: var(--odd-color-accent);
 }
 
+.odd-rpg .tab:not(.active) {
+    display: none;
+}
+
 /* -------------------------------------------------------------------------- */
 /*  Item Lists                                                                */
 /* -------------------------------------------------------------------------- */
@@ -209,9 +213,108 @@
     transition: border-color 0.15s;
 }
 
-.odd-rpg .attribute-select:focus {
+.odd-rpg .attribute-select:focus,
+.odd-rpg .skill-select:focus {
     outline: none;
     border-color: var(--odd-color-accent);
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Header                                                                    */
+/* -------------------------------------------------------------------------- */
+
+.odd-rpg .header-row {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.odd-rpg .header-row .resource {
+    flex: 1;
+}
+
+.odd-rpg .header-row input[type="text"] {
+    flex: 1;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Statistics Grid                                                           */
+/* -------------------------------------------------------------------------- */
+
+.odd-rpg .statistics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem 1.5rem;
+    padding: 0.5rem 0;
+}
+
+.odd-rpg .statistics-grid .form-group {
+    margin-bottom: 0;
+}
+
+.odd-rpg .statistics-grid .resource-bar input {
+    width: 50px;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Tab Sections                                                              */
+/* -------------------------------------------------------------------------- */
+
+.odd-rpg .tab-section {
+    margin-bottom: 1rem;
+}
+
+.odd-rpg .tab-section h2 {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--odd-color-border);
+    padding-bottom: 0.25rem;
+    margin: 0 0 0.5rem;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Skills                                                                    */
+/* -------------------------------------------------------------------------- */
+
+.odd-rpg .skills-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem 1.5rem;
+    padding: 0.5rem 0;
+}
+
+.odd-rpg .skill-category h3 {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--odd-color-border);
+    padding-bottom: 0.2rem;
+    margin: 0 0 0.4rem;
+    color: var(--odd-color-accent);
+}
+
+.odd-rpg .skill.form-group {
+    margin-bottom: 0.25rem;
+}
+
+.odd-rpg .skill.form-group label {
+    min-width: 90px;
+    font-weight: normal;
+    font-size: 0.85rem;
+}
+
+.odd-rpg .skill-select {
+    flex: 1;
+    padding: 0.15rem 0.35rem;
+    border: 1px solid var(--odd-color-border);
+    border-radius: 4px;
+    font-family: var(--odd-font-primary);
+    font-size: 0.85rem;
+    background: #2a2a2a;
+    color: var(--odd-color-primary);
+    cursor: pointer;
+    transition: border-color 0.15s;
 }
 
 /* -------------------------------------------------------------------------- */

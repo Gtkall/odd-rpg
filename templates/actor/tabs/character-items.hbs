@@ -1,4 +1,5 @@
 {{!-- Items Tab --}}
+<section class="tab {{ tab.cssClass }}" data-group="{{ tab.group }}" data-tab="{{ tab.id }}">
 <ol class="item-list">
   {{#each items}}
   <li class="item flexrow" data-item-id="{{this._id}}">
@@ -13,3 +14,4 @@
   </li>
   {{/each}}
 </ol>
+</section>

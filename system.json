@@ -29,9 +29,15 @@
       }
     },
     "Item": {
-      "item": {},
-      "feature": {},
-      "spell": {}
+      "item": {
+        "htmlFields": ["description"]
+      },
+      "feature": {
+        "htmlFields": ["description"]
+      },
+      "spell": {
+        "htmlFields": ["description"]
+      }
     }
   },
   "socket": false,
@@ -40,8 +46,8 @@
     "distance": 5,
     "units": "ft"
   },
-  "primaryTokenAttribute": "health",
-  "secondaryTokenAttribute": null,
+  "primaryTokenAttribute": "xp",
+  "secondaryTokenAttribute": "statistics.magicPoints",
   "url": "https://github.com/Gtkall/odd-rpg",
   "manifest": "https://github.com/Gtkall/odd-rpg/releases/latest/download/system.json",
   "download": "https://github.com/Gtkall/odd-rpg/releases/latest/download/odd-rpg.zip"

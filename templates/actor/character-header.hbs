@@ -6,20 +6,22 @@
     <h1 class="charname">
       <input name="name" type="text" value="{{actor.name}}" placeholder="Character Name" />
     </h1>
-    <div class="resource health">
-      <label>HP</label>
-      <div class="resource-bar">
-        <input type="number" name="system.health.value"
-               value="{{system.health.value}}" data-dtype="Number" />
-        <span class="separator">/</span>
-        <input type="number" name="system.health.max"
-               value="{{system.health.max}}" data-dtype="Number" />
+    <div class="header-row">
+      <div class="resource player-name">
+        <label>{{localize "ODD.Base.playerName"}}</label>
+        <input type="text" name="system.playerName"
+               value="{{system.playerName}}" placeholder="Player Name" />
       </div>
-    </div>
-    <div class="resource level">
-      <label>Level</label>
-      <input type="number" name="system.level"
-             value="{{system.level}}" data-dtype="Number" />
+      <div class="resource xp">
+        <label>{{localize "ODD.Base.xp"}}</label>
+        <div class="resource-bar">
+          <input type="number" name="system.xp.value"
+                 value="{{system.xp.value}}" data-dtype="Number" />
+          <span class="separator">/</span>
+          <input type="number" name="system.xp.max"
+                 value="{{system.xp.max}}" data-dtype="Number" />
+        </div>
+      </div>
     </div>
   </div>
 </header>

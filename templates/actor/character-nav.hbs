@@ -1,6 +1,6 @@
 {{!-- Tab Navigation --}}
 <nav class="sheet-tabs tabs" data-group="primary">
   {{#each tabs}}
-  <a class="item {{#if active}}active{{/if}}" data-group="primary" data-tab="{{id}}">{{label}}</a>
+  <a class="item {{cssClass}}" data-group="{{group}}" data-tab="{{id}}">{{label}}</a>
   {{/each}}
 </nav>

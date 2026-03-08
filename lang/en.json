@@ -9,8 +9,6 @@
       "spell": "Spell"
     },
     "Attributes": {
-      "health": "Health",
-      "level": "Level",
       "str": "Strength",
       "cun": "Cunning",
       "agi": "Agility",
@@ -20,7 +18,54 @@
       "vit": "Vitality",
       "per": "Personality"
     },
+    "SkillCategories": {
+      "combat": "Combat",
+      "physical": "Physical",
+      "knowledge": "Knowledge",
+      "social": "Social",
+      "mental": "Mental",
+      "special": "Special"
+    },
+    "Skills": {
+      "archery": "Archery",
+      "melee": "Melee",
+      "reflexes": "Reflexes",
+      "shooting": "Shooting",
+      "unarmed": "Unarmed",
+      "animals": "Animals",
+      "athletics": "Athletics",
+      "endurance": "Endurance",
+      "stealth": "Stealth",
+      "vehicles": "Vehicles",
+      "academics": "Academics",
+      "medicine": "Medicine",
+      "occult": "Occult",
+      "science": "Science",
+      "technology": "Technology",
+      "charm": "Charm",
+      "coercion": "Coercion",
+      "deception": "Deception",
+      "empathy": "Empathy",
+      "persuasion": "Persuasion",
+      "art": "Art",
+      "investigation": "Investigation",
+      "perception": "Perception",
+      "resolve": "Resolve",
+      "tactics": "Tactics",
+      "mana": "Mana"
+    },
+    "Statistics": {
+      "movementRate": "Movement Rate",
+      "composureThreshold": "Composure Threshold",
+      "healingRate": "Healing Rate",
+      "magicPoints": "Magic Points"
+    },
+    "Base": {
+      "playerName": "Player",
+      "xp": "XP"
+    },
     "Dice": {
+      "none": "—",
       "d4": "d4",
       "d6": "d6",
       "d8": "d8",
@@ -30,6 +75,7 @@
     "Sheet": {
       "Tabs": {
         "attributes": "Attributes",
+        "skills": "Skills",
         "items": "Items",
         "spells": "Spells",
         "biography": "Biography"

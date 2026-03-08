@@ -1,11 +1,13 @@
 {{!-- Attributes Tab --}}
-<div class="attributes-grid">
-  {{#each attributeConfig as |label key|}}
-  <div class="attribute form-group">
-    <label>{{localize label}}</label>
-    <select name="system.attributes.{{key}}" class="attribute-select">
-      {{selectOptions ../diceTypes selected=(lookup ../system.attributes key) localize=true}}
-    </select>
+<section class="tab {{ tab.cssClass }}" data-group="{{ tab.group }}" data-tab="{{ tab.id }}">
+  <div class="attributes-grid">
+    {{#each attributeConfig as |label key|}}
+    <div class="attribute form-group">
+      <label>{{localize label}}</label>
+      <select name="system.attributes.{{key}}" class="attribute-select">
+        {{selectOptions ../attributeDiceTypes selected=(lookup ../system.attributes key) localize=true}}
+      </select>
+    </div>
+    {{/each}}
   </div>
-  {{/each}}
-</div>
+</section>
