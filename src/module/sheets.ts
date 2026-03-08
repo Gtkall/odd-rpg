@@ -28,6 +28,9 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
       width: 720,
       height: 720,
     },
+    form: {
+      submitOnChange: true,
+    },
     window: {
       resizable: true,
     },
@@ -177,6 +180,9 @@ export class OddItemSheet extends (HandlebarsApplicationMixin(
     position: {
       width: 480,
       height: 400,
+    },
+    form: {
+      submitOnChange: true,
     },
   };
 
