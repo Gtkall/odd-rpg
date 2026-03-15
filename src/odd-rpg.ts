@@ -14,6 +14,9 @@ import {
   SpellDataModel,
 } from "./module/data-models.js";
 
+const loadTemplates = foundry.applications.handlebars.loadTemplates;
+const DocumentSheetConfig = foundry.applications.apps.DocumentSheetConfig;
+
 /* -------------------------------------------------------------------------- */
 /*  Initialization                                                            */
 /* -------------------------------------------------------------------------- */
@@ -49,7 +52,6 @@ Hooks.once("init", () => {
   };
 
   // ---- Register sheets (discovered from data models) ----
-  const DocumentSheetConfig = foundry.applications.apps.DocumentSheetConfig;
   DocumentSheetConfig.unregisterSheet(Actor, "core", foundry.appv1.sheets.ActorSheet);
   DocumentSheetConfig.unregisterSheet(Item, "core", foundry.appv1.sheets.ItemSheet);
 
