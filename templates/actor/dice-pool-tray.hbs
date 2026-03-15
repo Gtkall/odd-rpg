@@ -1,7 +1,7 @@
 <div class="dice-pool-chips">
   {{#if dicePool.length}}
     {{#each dicePool}}
-      <span class="pool-chip">
+      <span class="pool-chip" data-id="{{id}}" title="Click to remove">
         <span class="chip-label">{{label}}</span>
         <span class="chip-die">{{die}}</span>
       </span>

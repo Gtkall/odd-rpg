@@ -387,8 +387,9 @@
     border: 1px solid var(--odd-color-accent);
     border-radius: 3px;
     padding: 0.15rem 0.4rem;
-    cursor: default;
+    cursor: pointer;
     line-height: 1.2;
+    transition: background 0.1s, border-color 0.1s;
 }
 
 .odd-rpg .chip-label {
@@ -402,6 +403,11 @@
     font-size: 0.8rem;
     font-weight: 600;
     color: var(--odd-color-accent);
+}
+
+.odd-rpg .pool-chip:hover {
+    background: #3a1a1a;
+    border-color: #ff4444;
 }
 
 .odd-rpg .dice-pool-actions {

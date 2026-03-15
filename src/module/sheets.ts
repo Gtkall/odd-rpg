@@ -127,7 +127,7 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
   }
 
   /** Accumulated dice pool entries waiting to be rolled. */
-  _dicePool: Array<{ label: string; die: string }> = [];
+  _dicePool: Array<{ id: string; label: string; die: string }> = [];
 
   override async _onRender(_context: any, _options: any) {
     const html = this.element;
@@ -208,7 +208,13 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
   }
   /** Add a die entry to the pool and refresh the tray. */
   async _addToDicePool(label: string, die: string): Promise<void> {
-    this._dicePool.push({ label, die });
+    this._dicePool.push({ id: crypto.randomUUID(), label, die });
+    await this._updateDicePoolTray();
+  }
+
+  /** Remove a single entry by id and refresh the tray. */
+  async _removeFromDicePool(id: string): Promise<void> {
+    this._dicePool = this._dicePool.filter((e) => e.id !== id);
     await this._updateDicePoolTray();
   }
 
@@ -230,6 +236,12 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
 
     tray.querySelector(".dice-pool-roll-btn")?.addEventListener("click", () => this._rollDicePool());
     tray.querySelector(".dice-pool-clear-btn")?.addEventListener("click", () => this._clearDicePool());
+    tray.querySelectorAll(".pool-chip").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        const id = (chip as HTMLElement).dataset.id;
+        if (id) this._removeFromDicePool(id);
+      });
+    });
   }
 
   /** Roll all pooled dice and post a chat message with an expandable breakdown. */
