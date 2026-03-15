@@ -96,6 +96,27 @@ export class CharacterDataModel extends foundry.abstract.TypeDataModel<
   }
 }
 
+/** TypeScript shape of a character's `system` object, mirroring `CharacterDataModel`. */
+export interface CharacterSystemData {
+  playerName: string;
+  xp: { value: number; max: number };
+  attributes: Record<string, string>;
+  skills: Record<string, Record<string, string>>;
+  statistics: {
+    movementRate: number;
+    composureThreshold: number;
+    healingRate: number;
+    magicPoints: { value: number; max: number };
+  };
+  biography: string;
+  health: { value: number; max: number };
+}
+
+/** TypeScript shape shared by all item `system` objects. */
+export interface BaseItemSystemData {
+  description: string;
+}
+
 export namespace CharacterDataModel {
   export type Schema = any;
 }

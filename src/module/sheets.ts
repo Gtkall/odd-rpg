@@ -12,6 +12,7 @@ import {
   SKILLS,
   SKILL_CATEGORIES,
 } from "./config";
+import type { CharacterSystemData } from "./data-models";
 
 const { ActorSheetV2, ItemSheetV2 } = foundry.applications.sheets;
 const { HandlebarsApplicationMixin } = foundry.applications.api;
@@ -126,6 +127,10 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
     return context;
   }
 
+  private get characterSystem(): CharacterSystemData {
+    return this.document.system as unknown as CharacterSystemData;
+  }
+
   /** Accumulated dice pool entries waiting to be rolled. */
   _dicePool: Array<{ id: string; label: string; die: string }> = [];
 
@@ -157,9 +162,9 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
     html.querySelectorAll("[data-roll-attribute]").forEach((el) => {
       el.addEventListener("click", (ev: Event) => {
         const key = (ev.currentTarget as HTMLElement).dataset.rollAttribute!;
-        const die = (this.document.system as any).attributes[key];
+        const die = this.characterSystem.attributes[key];
         if (die) {
-          const label = game.i18n?.localize((ATTRIBUTES as any)[key]) ?? key;
+          const label = game.i18n?.localize(ATTRIBUTES[key]) ?? key;
           this._addToDicePool(label, die);
         }
       });
@@ -170,9 +175,9 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
         const target = ev.currentTarget as HTMLElement;
         const category = target.dataset.rollCategory!;
         const skill = target.dataset.rollSkill!;
-        const die = (this.document.system as any).skills[category]?.[skill];
+        const die = this.characterSystem.skills[category]?.[skill];
         if (die) {
-          const label = game.i18n?.localize((SKILLS as any)[category]?.[skill]) ?? skill;
+          const label = game.i18n?.localize(SKILLS[category]?.[skill]) ?? skill;
           this._addToDicePool(label, die);
         }
       });
