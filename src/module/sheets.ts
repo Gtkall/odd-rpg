@@ -8,9 +8,12 @@
 import {
   ATTRIBUTES,
   ATTRIBUTE_DICE_TYPES,
+  ATTRIBUTE_LAYOUT,
+  COMMON_ROLLS,
   DICE_TYPES,
   SKILLS,
   SKILL_CATEGORIES,
+  SKILL_LAYOUT,
 } from "./config";
 import type { CharacterSystemData } from "./data-models";
 
@@ -26,8 +29,8 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
   static override DEFAULT_OPTIONS = {
     classes: ["odd-rpg", "sheet", "actor", "character"],
     position: {
-      width: 720,
-      height: 720,
+      width: Math.round(Math.min(window.innerWidth * 0.55, 920)),
+      height: Math.round(Math.min(window.innerHeight * 0.85, 1080)),
     },
     form: {
       submitOnChange: true,
@@ -44,40 +47,28 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
     nav: {
       template: "systems/odd-rpg/templates/actor/character-nav.hbs",
     },
-    attributes: {
-      template: "systems/odd-rpg/templates/actor/tabs/character-attributes.hbs",
-      scrollable: [""],
+    character: {
+      template: "systems/odd-rpg/templates/actor/tabs/character-main.hbs",
+      scrollable: [".character-main"],
     },
-    statistics: {
-      template: "systems/odd-rpg/templates/actor/tabs/character-statistics.hbs",
-      scrollable: [""],
+    combat: {
+      template: "systems/odd-rpg/templates/actor/tabs/character-combat.hbs",
+      scrollable: [".character-combat"],
     },
-    skills: {
-      template: "systems/odd-rpg/templates/actor/tabs/character-skills.hbs",
-      scrollable: [""],
-    },
-    items: {
-      template: "systems/odd-rpg/templates/actor/tabs/character-items.hbs",
-      scrollable: [""],
-    },
-    spells: {
-      template: "systems/odd-rpg/templates/actor/tabs/character-spells.hbs",
-      scrollable: [""],
-    },
-    biography: {
-      template: "systems/odd-rpg/templates/actor/tabs/character-biography.hbs",
-      scrollable: [""],
+    talentsFlaws: {
+      template: "systems/odd-rpg/templates/actor/tabs/character-talents-flaws.hbs",
+      scrollable: [".character-talents-flaws"],
     },
   };
 
   static TABS = [
-    { tab: "attributes", label: "Attributes" },
-    { tab: "statistics", label: "Statistics" },
-    { tab: "skills", label: "Skills" },
+    { tab: "character", label: "ODD.Sheet.Tabs.character" },
+    { tab: "combat", label: "ODD.Sheet.Tabs.combat" },
+    { tab: "talentsFlaws", label: "ODD.Sheet.Tabs.talentsFlaws" },
   ];
 
   override tabGroups = {
-    primary: "attributes",
+    primary: "character",
   };
 
   _getTabs(): Record<string, any> {
@@ -99,11 +90,44 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
   override async _prepareContext(options: any) {
     const context = await super._prepareContext(options);
     const actor = this.document;
+    const system = this.characterSystem;
 
-    // Separate owned items by type for the template
-    const items = actor.items.filter((i: any) => i.type === "item");
-    const features = actor.items.filter((i: any) => i.type === "feature");
-    const spells = actor.items.filter((i: any) => i.type === "spell");
+    // Attribute pairs for the 2-column layout, driven by ATTRIBUTE_LAYOUT config
+    const attributeLayout = ATTRIBUTE_LAYOUT.map(([left, right]) => ({ left, right }));
+
+    // Skill rows for the 3-column layout, driven by SKILL_LAYOUT config
+    const skillLayout = SKILL_LAYOUT.map((row) =>
+      row.map((catKey) => ({
+        key: catKey,
+        label: SKILL_CATEGORIES[catKey],
+        skills: Object.entries(SKILLS[catKey]).map(([skillKey, labelKey]) => ({
+          key: skillKey,
+          category: catKey,
+          label: labelKey,
+        })),
+      })),
+    );
+
+    // Common rolls with computed formulas from current attribute/skill values
+    const commonRolls = COMMON_ROLLS.map((roll) => {
+      const sources = roll.sources.map((src) => {
+        const die =
+          src.type === "attribute"
+            ? system.attributes[src.key]
+            : system.skills[src.category]?.[src.key] ?? "";
+        const labelKey =
+          src.type === "attribute"
+            ? ATTRIBUTES[src.key]
+            : SKILLS[src.category]?.[src.key] ?? src.key;
+        return { die, label: game.i18n?.localize(labelKey) ?? labelKey };
+      });
+      return {
+        key: roll.key,
+        label: roll.label,
+        formula: sources.filter((s) => s.die).map((s) => s.die).join("+"),
+        sourceLabels: sources.map((s) => s.label).join(" + "),
+      };
+    });
 
     return {
       ...context,
@@ -115,9 +139,9 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
       diceTypes: DICE_TYPES,
       skillConfig: SKILLS,
       skillCategoryLabels: SKILL_CATEGORIES,
-      items,
-      features,
-      spells,
+      attributeLayout,
+      skillLayout,
+      commonRolls,
       tabs: this._getTabs(),
     };
   }

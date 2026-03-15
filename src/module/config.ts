@@ -95,6 +95,66 @@ export const ATTRIBUTE_DICE_TYPES: Record<string, string> = Object.freeze({
 /** Default die assigned to new characters. */
 export const DEFAULT_DIE = "d6";
 
+/* ========================================================================== */
+/*  Layout & Roll Configuration                                               */
+/* ========================================================================== */
+
+/** Attribute key pairs defining the 2-column layout on the character sheet. */
+export const ATTRIBUTE_LAYOUT: ReadonlyArray<readonly [string, string]> = Object.freeze([
+  ["str", "cun"],
+  ["agi", "int"],
+  ["dex", "wil"],
+  ["vit", "per"],
+]);
+
+/** Skill category rows defining the 3-column layout on the character sheet.
+ *  Each inner tuple is one row of three category keys. */
+export const SKILL_LAYOUT: ReadonlyArray<readonly [string, string, string]> = Object.freeze([
+  ["combat", "knowledge", "mental"],
+  ["physical", "social", "special"],
+]);
+
+export type RollSource =
+  | { type: "attribute"; key: string }
+  | { type: "skill"; category: string; key: string };
+
+export interface CommonRollDef {
+  key: string;
+  /** i18n label key */
+  label: string;
+  sources: RollSource[];
+}
+
+/** Pre-defined common rolls shown on the character sheet.
+ *  Each roll is a pool of attributes and/or skills; talent bonuses are added at runtime. */
+export const COMMON_ROLLS: ReadonlyArray<CommonRollDef> = Object.freeze([
+  {
+    key: "awareness",
+    label: "ODD.Rolls.awareness",
+    sources: [
+      { type: "attribute", key: "cun" },
+      { type: "skill", category: "mental", key: "perception" },
+    ],
+  },
+  {
+    key: "fear",
+    label: "ODD.Rolls.fear",
+    sources: [
+      { type: "attribute", key: "wil" },
+      { type: "skill", category: "mental", key: "resolve" },
+    ],
+  },
+  {
+    key: "selfControl",
+    label: "ODD.Rolls.selfControl",
+    sources: [
+      { type: "attribute", key: "int" },
+      { type: "attribute", key: "wil" },
+      { type: "skill", category: "mental", key: "resolve" },
+    ],
+  },
+]);
+
 /** Aggregate config object attached to CONFIG.ODD at init. */
 export const ODD = Object.freeze({
   attributes: ATTRIBUTES,

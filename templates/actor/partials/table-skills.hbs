@@ -1,0 +1,25 @@
+{{!-- Skills table --}}
+<div class="skills-panel">
+  <h3 class="panel-header">{{localize "ODD.Sections.skills"}}</h3>
+  {{#each skillLayout}}
+  <div class="skill-row-group">
+    {{#each this}}
+    <div class="skill-category">
+      <div class="category-header">{{localize label}}</div>
+      {{#each skills}}
+      <div class="skill-row">
+        <span class="skill-name rollable"
+              data-roll-skill="{{key}}"
+              data-roll-category="{{category}}">{{localize label}}</span>
+        <select name="system.skills.{{category}}.{{key}}" class="skill-select">
+          {{selectOptions ../../../diceTypes
+            selected=(lookup (lookup ../../../system.skills category) key)
+            localize=true}}
+        </select>
+      </div>
+      {{/each}}
+    </div>
+    {{/each}}
+  </div>
+  {{/each}}
+</div>

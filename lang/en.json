@@ -72,13 +72,22 @@
       "d10": "d10",
       "d12": "d12"
     },
+    "Sections": {
+      "attributes": "Attributes",
+      "statistics": "Statistics",
+      "skills": "Skills",
+      "rolls": "Common Rolls"
+    },
+    "Rolls": {
+      "awareness": "Awareness",
+      "fear": "Fear",
+      "selfControl": "Self-Control"
+    },
     "Sheet": {
       "Tabs": {
-        "attributes": "Attributes",
-        "skills": "Skills",
-        "items": "Items",
-        "spells": "Spells",
-        "biography": "Biography"
+        "character": "Character",
+        "combat": "Combat",
+        "talentsFlaws": "Talents & Flaws"
       }
     }
   }

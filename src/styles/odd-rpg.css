@@ -513,3 +513,217 @@
     text-align: right;
     color: #c0392b;
 }
+
+/* -------------------------------------------------------------------------- */
+/*  Character Main Tab                                                        */
+/* -------------------------------------------------------------------------- */
+
+.odd-rpg .character-main,
+.odd-rpg .character-combat,
+.odd-rpg .character-talents-flaws {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+/* ── Panel headers (Attributes / Statistics / Skills / Common Rolls) ── */
+.odd-rpg .panel-header {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    text-align: center;
+    padding: 0.25rem 0;
+    margin: 0 0 0.35rem;
+    border-bottom: 1px solid var(--odd-color-border);
+    color: #aaa;
+}
+
+/* ── Attributes + Statistics row ── */
+.odd-rpg .attr-stats-row {
+    display: flex;
+    border-bottom: 1px solid var(--odd-color-border);
+}
+
+.odd-rpg .attributes-panel {
+    flex: 0 0 62%;
+    border-right: 1px solid var(--odd-color-border);
+    padding: 0.25rem 0.75rem 0.5rem;
+}
+
+.odd-rpg .statistics-panel {
+    flex: 1;
+    padding: 0.25rem 0.75rem 0.5rem;
+}
+
+/* Scoped under .character-main to avoid conflict with old attributes-grid rule */
+.odd-rpg .character-main .attributes-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.odd-rpg .character-main .attribute-pair {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto;
+    align-items: center;
+    gap: 0.15rem 0.5rem;
+    padding: 0.2rem 0;
+}
+
+.odd-rpg .attr-label {
+    text-align: right;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: color 0.1s;
+}
+
+.odd-rpg .attr-label:hover {
+    color: var(--odd-color-accent);
+}
+
+.odd-rpg .attr-select {
+    width: 3.6rem;
+    font-size: 0.82rem;
+}
+
+/* Scoped under .character-main to avoid conflict with old statistics-grid rule */
+.odd-rpg .character-main .statistics-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.odd-rpg .character-main .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.2rem 0;
+    gap: 0.4rem;
+}
+
+.odd-rpg .character-main .stat-row label {
+    font-size: 0.8rem;
+    color: #ccc;
+    flex: 1;
+}
+
+.odd-rpg .character-main .stat-row input {
+    width: 3rem;
+    text-align: center;
+    font-size: 0.82rem;
+}
+
+.odd-rpg .character-main .stat-row .resource-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.1rem;
+}
+
+.odd-rpg .character-main .stat-row .resource-bar input {
+    width: 2.2rem;
+}
+
+/* ── Skills + Common Rolls row ── */
+.odd-rpg .skills-rolls-row {
+    display: flex;
+    flex: 1;
+}
+
+.odd-rpg .skills-panel {
+    flex: 0 0 76%;
+    border-right: 1px solid var(--odd-color-border);
+    padding: 0.25rem 0.5rem 0.5rem;
+}
+
+.odd-rpg .rolls-panel {
+    flex: 1;
+    padding: 0.25rem 0.6rem 0.5rem;
+}
+
+.odd-rpg .skill-row-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.odd-rpg .skill-row-group:last-child {
+    margin-bottom: 0;
+}
+
+.odd-rpg .category-header {
+    font-weight: 600;
+    font-size: 0.72rem;
+    text-align: right;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #999;
+    padding: 0.1rem 0 0.3rem;
+    margin-bottom: 0.1rem;
+    border-bottom: 1px solid #2d2d2d;
+}
+
+.odd-rpg .skill-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.12rem 0;
+    gap: 0.2rem;
+}
+
+.odd-rpg .skill-name {
+    font-size: 0.78rem;
+    flex: 1;
+    text-align: right;
+    cursor: pointer;
+    transition: color 0.1s;
+}
+
+.odd-rpg .skill-name:hover {
+    color: var(--odd-color-accent);
+}
+
+.odd-rpg .skill-select {
+    width: 3.2rem;
+    font-size: 0.75rem;
+}
+
+/* ── Common Rolls panel ── */
+.odd-rpg .roll-entry {
+    padding: 0.35rem 0;
+    text-align: center;
+}
+
+.odd-rpg .roll-entry + .roll-entry {
+    border-top: 1px solid #2a2a2a;
+}
+
+.odd-rpg .roll-name {
+    font-weight: 700;
+    font-size: 0.82rem;
+}
+
+.odd-rpg .roll-formula {
+    font-size: 0.85rem;
+    color: var(--odd-color-accent);
+    margin: 0.1rem 0 0.05rem;
+}
+
+.odd-rpg .roll-sources {
+    font-size: 0.68rem;
+    color: #777;
+    font-style: italic;
+    line-height: 1.3;
+}
+
+/* ── Misc ── */
+.odd-rpg .tab-placeholder {
+    color: #666;
+    font-style: italic;
+    padding: 1rem;
+    text-align: center;
+}

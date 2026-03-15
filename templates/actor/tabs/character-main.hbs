@@ -1,0 +1,14 @@
+{{!-- Character Main Tab --}}
+<section class="tab character-main {{ tab.cssClass }}" data-group="{{ tab.group }}" data-tab="{{ tab.id }}">
+
+  <div class="attr-stats-row">
+    {{> "systems/odd-rpg/templates/actor/partials/table-attributes.hbs"}}
+    {{> "systems/odd-rpg/templates/actor/partials/table-statistics.hbs"}}
+  </div>
+
+  <div class="skills-rolls-row">
+    {{> "systems/odd-rpg/templates/actor/partials/table-skills.hbs"}}
+    {{> "systems/odd-rpg/templates/actor/partials/table-rolls.hbs"}}
+  </div>
+
+</section>

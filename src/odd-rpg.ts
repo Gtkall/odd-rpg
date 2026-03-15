@@ -26,7 +26,16 @@ Hooks.once("init", () => {
 
   // ---- Preload Handlebars templates ----
   loadTemplates([
+    // Partials (registered by path so {{> "path"}} works in templates)
+    "systems/odd-rpg/templates/actor/partials/table-attributes.hbs",
+    "systems/odd-rpg/templates/actor/partials/table-statistics.hbs",
+    "systems/odd-rpg/templates/actor/partials/table-skills.hbs",
+    "systems/odd-rpg/templates/actor/partials/table-rolls.hbs",
+    // Tabs
     "systems/odd-rpg/templates/actor/dice-pool-tray.hbs",
+    "systems/odd-rpg/templates/actor/tabs/character-main.hbs",
+    "systems/odd-rpg/templates/actor/tabs/character-combat.hbs",
+    "systems/odd-rpg/templates/actor/tabs/character-talents-flaws.hbs",
     "systems/odd-rpg/templates/chat/dice-pool-roll.hbs",
   ]);
 
