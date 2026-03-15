@@ -21,6 +21,12 @@ import {
 Hooks.once("init", () => {
   console.log("ODD RPG | Initialising the ODD RPG game system");
 
+  // ---- Preload Handlebars templates ----
+  loadTemplates([
+    "systems/odd-rpg/templates/actor/dice-pool-tray.hbs",
+    "systems/odd-rpg/templates/chat/dice-pool-roll.hbs",
+  ]);
+
   // ---- System configuration ----
   (CONFIG as any).ODD = ODD;
 

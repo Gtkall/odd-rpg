@@ -350,3 +350,160 @@
     border-bottom: 1px solid var(--odd-color-border);
     padding-bottom: 0.25rem;
 }
+
+/* -------------------------------------------------------------------------- */
+/*  Dice Pool Tray                                                            */
+/* -------------------------------------------------------------------------- */
+
+.odd-rpg .dice-pool-tray {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.4rem 0.5rem;
+    background: #111;
+    border-bottom: 1px solid var(--odd-color-border);
+    flex-wrap: wrap;
+}
+
+.odd-rpg .dice-pool-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    flex: 1;
+    align-items: center;
+}
+
+.odd-rpg .pool-empty {
+    font-size: 0.75rem;
+    color: #666;
+    font-style: italic;
+}
+
+.odd-rpg .pool-chip {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    background: #2a2a2a;
+    border: 1px solid var(--odd-color-accent);
+    border-radius: 3px;
+    padding: 0.15rem 0.4rem;
+    cursor: default;
+    line-height: 1.2;
+}
+
+.odd-rpg .chip-label {
+    font-size: 0.65rem;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.odd-rpg .chip-die {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--odd-color-accent);
+}
+
+.odd-rpg .dice-pool-actions {
+    display: flex;
+    gap: 0.35rem;
+    align-self: center;
+    flex-shrink: 0;
+}
+
+.odd-rpg .dice-pool-actions button {
+    padding: 0.2rem 0.6rem;
+    font-size: 0.75rem;
+    font-family: var(--odd-font-primary);
+    font-weight: 600;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+
+.odd-rpg .dice-pool-roll-btn {
+    background: var(--odd-color-accent);
+    border: 1px solid var(--odd-color-accent);
+    color: #111;
+}
+
+.odd-rpg .dice-pool-clear-btn {
+    background: transparent;
+    border: 1px solid var(--odd-color-border);
+    color: var(--odd-color-primary);
+}
+
+.odd-rpg .dice-pool-actions button:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Dice Pool Chat Message                                                    */
+/* -------------------------------------------------------------------------- */
+
+.odd-dice-pool-result {
+    padding: 0.25rem 0;
+    color: #222;
+}
+
+.odd-dice-pool-result .roll-total {
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-align: center;
+    line-height: 1;
+    padding: 0.25rem 0;
+    color: #c0392b;
+}
+
+.odd-dice-pool-result .roll-breakdown {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.odd-dice-pool-result .roll-breakdown summary {
+    cursor: pointer;
+    color: #666;
+    font-style: italic;
+    padding: 0.15rem 0;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.odd-dice-pool-result .roll-breakdown summary:hover {
+    color: #222;
+}
+
+.odd-dice-pool-result .breakdown-list {
+    list-style: none;
+    margin: 0.35rem 0 0;
+    padding: 0;
+    border-top: 1px solid #ddd;
+}
+
+.odd-dice-pool-result .breakdown-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.2rem 0.1rem;
+    border-bottom: 1px solid #eee;
+    font-size: 0.82rem;
+}
+
+.odd-dice-pool-result .source-label {
+    flex: 1;
+    color: #333;
+}
+
+.odd-dice-pool-result .die-type {
+    color: #888;
+    min-width: 2rem;
+    text-align: center;
+}
+
+.odd-dice-pool-result .die-result {
+    font-weight: bold;
+    min-width: 1.5rem;
+    text-align: right;
+    color: #c0392b;
+}

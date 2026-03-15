@@ -126,6 +126,9 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
     return context;
   }
 
+  /** Accumulated dice pool entries waiting to be rolled. */
+  _dicePool: Array<{ label: string; die: string }> = [];
+
   override async _onRender(_context: any, _options: any) {
     const html = this.element;
 
@@ -139,12 +142,26 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
       });
     });
 
-    // Dice pool: click attribute/skill labels to append dice to chat input
+    // Inject dice pool tray after the nav (once per sheet lifetime)
+    if (!html.querySelector(".dice-pool-tray")) {
+      const nav = html.querySelector(".sheet-tabs");
+      if (nav) {
+        const tray = document.createElement("div");
+        tray.className = "dice-pool-tray";
+        nav.after(tray);
+      }
+    }
+    await this._updateDicePoolTray();
+
+    // Dice pool: click attribute/skill labels to add dice to the pool
     html.querySelectorAll("[data-roll-attribute]").forEach((el) => {
       el.addEventListener("click", (ev: Event) => {
         const key = (ev.currentTarget as HTMLElement).dataset.rollAttribute!;
         const die = (this.document.system as any).attributes[key];
-        if (die) this._appendDieToChat(die);
+        if (die) {
+          const label = game.i18n?.localize((ATTRIBUTES as any)[key]) ?? key;
+          this._addToDicePool(label, die);
+        }
       });
     });
 
@@ -154,7 +171,10 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
         const category = target.dataset.rollCategory!;
         const skill = target.dataset.rollSkill!;
         const die = (this.document.system as any).skills[category]?.[skill];
-        if (die) this._appendDieToChat(die);
+        if (die) {
+          const label = game.i18n?.localize((SKILLS as any)[category]?.[skill]) ?? skill;
+          this._addToDicePool(label, die);
+        }
       });
     });
 
@@ -186,25 +206,65 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
       });
     });
   }
-  /**
-   * Append a die to the chat message input, building a dice pool formula.
-   * First click starts "/r d8", subsequent clicks append "+d10", "+d6", etc.
-   */
-  _appendDieToChat(die: string): void {
-    const chatInput = document.querySelector("#chat-message") as HTMLTextAreaElement | null;
-    if (!chatInput) return;
+  /** Add a die entry to the pool and refresh the tray. */
+  async _addToDicePool(label: string, die: string): Promise<void> {
+    this._dicePool.push({ label, die });
+    await this._updateDicePoolTray();
+  }
 
-    const current = chatInput.value.trim();
-    if (current.startsWith("/r ")) {
-      chatInput.value = `${current}+${die}`;
-    } else if (current === "") {
-      chatInput.value = `/r ${die}`;
-    } else {
-      // There's existing non-roll text; don't clobber it
-      chatInput.value = `${current} /r ${die}`;
-    }
+  /** Clear all dice from the pool and refresh the tray. */
+  async _clearDicePool(): Promise<void> {
+    this._dicePool = [];
+    await this._updateDicePoolTray();
+  }
 
-    chatInput.focus();
+  /** Rebuild the tray DOM to reflect the current pool state. */
+  async _updateDicePoolTray(): Promise<void> {
+    const tray = this.element?.querySelector(".dice-pool-tray");
+    if (!tray) return;
+
+    tray.innerHTML = await foundry.applications.handlebars.renderTemplate(
+      "systems/odd-rpg/templates/actor/dice-pool-tray.hbs",
+      { dicePool: this._dicePool },
+    );
+
+    tray.querySelector(".dice-pool-roll-btn")?.addEventListener("click", () => this._rollDicePool());
+    tray.querySelector(".dice-pool-clear-btn")?.addEventListener("click", () => this._clearDicePool());
+  }
+
+  /** Roll all pooled dice and post a chat message with an expandable breakdown. */
+  async _rollDicePool(): Promise<void> {
+    if (this._dicePool.length === 0) return;
+
+    const formula = this._dicePool.map((e) => e.die).join("+");
+    const roll = new Roll(formula);
+    await roll.evaluate();
+
+    const breakdown = this._dicePool.map(({ label, die }, i) => ({
+      label,
+      die,
+      result: roll.dice[i]?.total ?? "?",
+    }));
+
+    const content = await foundry.applications.handlebars.renderTemplate(
+      "systems/odd-rpg/templates/chat/dice-pool-roll.hbs",
+      {
+        total: roll.total,
+        formula,
+        diceCount: this._dicePool.length,
+        diceWord: this._dicePool.length === 1 ? "die" : "dice",
+        breakdown,
+      },
+    );
+
+    await (ChatMessage as any).create({
+      speaker: (ChatMessage as any).getSpeaker({ actor: this.document }),
+      content,
+      rolls: [roll],
+    });
+
+    this._dicePool = [];
+    this._updateDicePoolTray();
   }
 }
 

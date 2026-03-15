@@ -1,0 +1,16 @@
+{{!-- Dice Pool Roll Chat Message --}}
+<div class="odd-dice-pool-result">
+  <div class="roll-total">{{total}}</div>
+  <details class="roll-breakdown">
+    <summary>{{diceCount}} {{diceWord}} — {{formula}}</summary>
+    <ul class="breakdown-list">
+      {{#each breakdown}}
+      <li class="breakdown-row">
+        <span class="source-label">{{this.label}}</span>
+        <span class="die-type">{{this.die}}</span>
+        <span class="die-result">{{this.result}}</span>
+      </li>
+      {{/each}}
+    </ul>
+  </details>
+</div>

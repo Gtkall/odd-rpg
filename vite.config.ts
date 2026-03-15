@@ -25,6 +25,7 @@ export default defineConfig({
       targets: [
         { src: "system.json", dest: "." },
         { src: "templates/actor/*", dest: "templates/actor" },
+        { src: "templates/chat/*", dest: "templates/chat" },
         { src: "templates/item/*", dest: "templates/item" },
         { src: "lang/*", dest: "lang" },
         { src: "src/styles/*", dest: "styles" },
