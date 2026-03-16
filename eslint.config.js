@@ -1,7 +1,8 @@
+import { defineConfig } from "eslint";
 import tseslint from "typescript-eslint";
 import sonarjs from "eslint-plugin-sonarjs";
 
-export default tseslint.config(
+export default defineConfig(
   // --- Ignored paths ---
   { ignores: ["dist/**", "node_modules/**"] },
 
@@ -9,8 +10,8 @@ export default tseslint.config(
   {
     files: ["src/**/*.ts"],
     extends: [
-      ...tseslint.configs.recommendedTypeChecked,
-      ...tseslint.configs.stylisticTypeChecked,
+      tseslint.configs.recommendedTypeChecked,
+      tseslint.configs.stylisticTypeChecked,
       sonarjs.configs.recommended,
     ],
     languageOptions: {
