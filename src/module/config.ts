@@ -100,7 +100,7 @@ export const DEFAULT_DIE = "d6";
 /* ========================================================================== */
 
 /** Attribute key pairs defining the 2-column layout on the character sheet. */
-export const ATTRIBUTE_LAYOUT: ReadonlyArray<readonly [string, string]> = Object.freeze([
+export const ATTRIBUTE_LAYOUT: readonly (readonly [string, string])[] = Object.freeze([
   ["str", "cun"],
   ["agi", "int"],
   ["dex", "wil"],
@@ -109,7 +109,7 @@ export const ATTRIBUTE_LAYOUT: ReadonlyArray<readonly [string, string]> = Object
 
 /** Skill category rows defining the 3-column layout on the character sheet.
  *  Each inner tuple is one row of three category keys. */
-export const SKILL_LAYOUT: ReadonlyArray<readonly [string, string, string]> = Object.freeze([
+export const SKILL_LAYOUT: readonly (readonly [string, string, string])[] = Object.freeze([
   ["combat", "knowledge", "mental"],
   ["physical", "social", "special"],
 ]);
@@ -127,7 +127,7 @@ export interface CommonRollDef {
 
 /** Pre-defined common rolls shown on the character sheet.
  *  Each roll is a pool of attributes and/or skills; talent bonuses are added at runtime. */
-export const COMMON_ROLLS: ReadonlyArray<CommonRollDef> = Object.freeze([
+export const COMMON_ROLLS: readonly CommonRollDef[] = Object.freeze([
   {
     key: "awareness",
     label: "ODD.Rolls.awareness",

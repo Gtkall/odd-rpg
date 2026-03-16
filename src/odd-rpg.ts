@@ -22,10 +22,10 @@ const DocumentSheetConfig = foundry.applications.apps.DocumentSheetConfig;
 /* -------------------------------------------------------------------------- */
 
 Hooks.once("init", () => {
-  console.log("ODD RPG | Initialising the ODD RPG game system");
+  console.warn("ODD RPG | Initialising the ODD RPG game system");
 
   // ---- Preload Handlebars templates ----
-  loadTemplates([
+  void loadTemplates([
     // Partials (registered by path so {{> "path"}} works in templates)
     "systems/odd-rpg/templates/actor/partials/table-attributes.hbs",
     "systems/odd-rpg/templates/actor/partials/table-statistics.hbs",
@@ -93,5 +93,5 @@ Hooks.once("init", () => {
 /* -------------------------------------------------------------------------- */
 
 Hooks.once("ready", () => {
-  console.log("ODD RPG | System ready");
+  console.warn("ODD RPG | System ready");
 });

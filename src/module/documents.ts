@@ -58,7 +58,7 @@ export class OddItem extends Item {
     const content = `
       <div class="odd-chat-item">
         <h3>${this.name}</h3>
-        <p>${this.itemSystem.description ?? ""}</p>
+        <p>${this.itemSystem.description}</p>
       </div>
     `;
     await ChatMessage.implementation.create({ content } as any); // ChatMessage types incomplete in v13 stubs

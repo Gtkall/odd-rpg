@@ -26,7 +26,7 @@ const { HandlebarsApplicationMixin } = foundry.applications.api;
 export class OddActorSheet extends (HandlebarsApplicationMixin(
   ActorSheetV2,
 ) as typeof ActorSheetV2) {
-  static override DEFAULT_OPTIONS = {
+  static override readonly DEFAULT_OPTIONS = {
     classes: ["odd-rpg", "sheet", "actor", "character"],
     position: {
       width: Math.round(Math.min(window.innerWidth * 0.55, 920)),
@@ -40,7 +40,7 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
     },
   };
 
-  static override PARTS = {
+  static readonly PARTS = {
     header: {
       template: "systems/odd-rpg/templates/actor/character-header.hbs",
     },
@@ -61,7 +61,7 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
     },
   };
 
-  static TABS = [
+  static override readonly TABS = [
     { tab: "character", label: "ODD.Sheet.Tabs.character" },
     { tab: "combat", label: "ODD.Sheet.Tabs.combat" },
     { tab: "talentsFlaws", label: "ODD.Sheet.Tabs.talentsFlaws" },
@@ -114,12 +114,12 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
         const die =
           src.type === "attribute"
             ? system.attributes[src.key]
-            : system.skills[src.category]?.[src.key] ?? "";
+            : (system.skills[src.category][src.key] ?? "");
         const labelKey =
           src.type === "attribute"
             ? ATTRIBUTES[src.key]
-            : SKILLS[src.category]?.[src.key] ?? src.key;
-        return { die, label: game.i18n?.localize(labelKey) ?? labelKey };
+            : (SKILLS[src.category][src.key] ?? src.key);
+        return { die, label: game.i18n!.localize(labelKey) };
       });
       return {
         key: roll.key,
@@ -146,6 +146,7 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await -- Foundry API requires async signature
   async _preparePartContext(partId: string, context: any) {
     context.tab = context.tabs[partId];
     return context;
@@ -156,7 +157,7 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
   }
 
   /** Accumulated dice pool entries waiting to be rolled. */
-  _dicePool: Array<{ id: string; label: string; die: string }> = [];
+  _dicePool: { id: string; label: string; die: string }[] = [];
 
   override async _onRender(_context: any, _options: any) {
     const html = this.element;
@@ -188,8 +189,8 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
         const key = (ev.currentTarget as HTMLElement).dataset.rollAttribute!;
         const die = this.characterSystem.attributes[key];
         if (die) {
-          const label = game.i18n?.localize(ATTRIBUTES[key]) ?? key;
-          this._addToDicePool(label, die);
+          const label = game.i18n!.localize(ATTRIBUTES[key]);
+          void this._addToDicePool(label, die);
         }
       });
     });
@@ -199,10 +200,10 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
         const target = ev.currentTarget as HTMLElement;
         const category = target.dataset.rollCategory!;
         const skill = target.dataset.rollSkill!;
-        const die = this.characterSystem.skills[category]?.[skill];
+        const die = this.characterSystem.skills[category][skill];
         if (die) {
-          const label = game.i18n?.localize(SKILLS[category]?.[skill]) ?? skill;
-          this._addToDicePool(label, die);
+          const label = game.i18n!.localize(SKILLS[category][skill]);
+          void this._addToDicePool(label, die);
         }
       });
     });
@@ -213,24 +214,21 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
     // Delete owned item
     html.querySelectorAll(".item-delete").forEach((el) => {
       el.addEventListener("click", (ev: Event) => {
-        const li = (ev.currentTarget as HTMLElement).closest(
-          ".item",
-        ) as HTMLElement;
-        const itemId = li?.dataset.itemId;
-        if (itemId) this.document.deleteEmbeddedDocuments("Item", [itemId]);
+        const li = (ev.currentTarget as HTMLElement).closest<HTMLElement>(".item")!;
+        const itemId = li.dataset.itemId;
+        if (itemId) void this.document.deleteEmbeddedDocuments("Item", [itemId]);
       });
     });
 
     // Edit owned item (must be editable)
     html.querySelectorAll(".item-edit").forEach((el) => {
       el.addEventListener("click", (ev: Event) => {
-        const li = (ev.currentTarget as HTMLElement).closest(
-          ".item",
-        ) as HTMLElement;
-        const itemId = li?.dataset.itemId;
+        const li = (ev.currentTarget as HTMLElement).closest<HTMLElement>(".item")!;
+        const itemId = li.dataset.itemId;
         if (itemId) {
           const item = this.document.items.get(itemId);
-          item?.sheet?.render(true);
+          // eslint-disable-next-line sonarjs/deprecation -- fvtt-types stubs don't model v13 render(options) overload
+          void item?.sheet?.render(true);
         }
       });
     });
@@ -255,7 +253,7 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
 
   /** Rebuild the tray DOM to reflect the current pool state. */
   async _updateDicePoolTray(): Promise<void> {
-    const tray = this.element?.querySelector(".dice-pool-tray");
+    const tray = this.element.querySelector(".dice-pool-tray");
     if (!tray) return;
 
     tray.innerHTML = await foundry.applications.handlebars.renderTemplate(
@@ -263,12 +261,12 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
       { dicePool: this._dicePool },
     );
 
-    tray.querySelector(".dice-pool-roll-btn")?.addEventListener("click", () => this._rollDicePool());
-    tray.querySelector(".dice-pool-clear-btn")?.addEventListener("click", () => this._clearDicePool());
+    tray.querySelector(".dice-pool-roll-btn")?.addEventListener("click", () => { void this._rollDicePool(); });
+    tray.querySelector(".dice-pool-clear-btn")?.addEventListener("click", () => { void this._clearDicePool(); });
     tray.querySelectorAll(".pool-chip").forEach((chip) => {
       chip.addEventListener("click", () => {
         const id = (chip as HTMLElement).dataset.id;
-        if (id) this._removeFromDicePool(id);
+        if (id) void this._removeFromDicePool(id);
       });
     });
   }
@@ -305,7 +303,7 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
     });
 
     this._dicePool = [];
-    this._updateDicePoolTray();
+    void this._updateDicePoolTray();
   }
 }
 
@@ -315,7 +313,7 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
 export class OddItemSheet extends (HandlebarsApplicationMixin(
   ItemSheetV2,
 ) as typeof ItemSheetV2) {
-  static override DEFAULT_OPTIONS = {
+  static override readonly DEFAULT_OPTIONS = {
     classes: ["odd-rpg", "sheet", "item"],
     position: {
       width: 480,
@@ -326,7 +324,7 @@ export class OddItemSheet extends (HandlebarsApplicationMixin(
     },
   };
 
-  static PARTS = {
+  static readonly PARTS = {
     sheet: {
       template: "systems/odd-rpg/templates/item/item-sheet.hbs",
     },

@@ -29,10 +29,11 @@ export class CharacterDataModel extends foundry.abstract.TypeDataModel<
   CharacterDataModel.Schema,
   Actor.Implementation
 > {
-  static sheetClass = OddActorSheet;
+  static readonly sheetClass = OddActorSheet;
 
   static override defineSchema(): CharacterDataModel.Schema {
     // --- Attribute fields (each a die-value string) ---
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const attributeFields: Record<string, any> = {};
     for (const key of Object.keys(ATTRIBUTES)) {
       attributeFields[key] = new StringField({
@@ -43,8 +44,10 @@ export class CharacterDataModel extends foundry.abstract.TypeDataModel<
     }
 
     // --- Skill fields (grouped by category, each a die-value or "" for untrained) ---
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const skillCategoryFields: Record<string, any> = {};
     for (const [category, skills] of Object.entries(SKILLS)) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const categorySkills: Record<string, any> = {};
       for (const skillKey of Object.keys(skills)) {
         categorySkills[skillKey] = new StringField({
@@ -87,6 +90,7 @@ export class CharacterDataModel extends foundry.abstract.TypeDataModel<
     } as CharacterDataModel.Schema;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   override prepareDerivedData(this: any): void {
     super.prepareDerivedData();
 
@@ -117,8 +121,10 @@ export interface BaseItemSystemData {
   description: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace CharacterDataModel {
-  export type Schema = any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, sonarjs/redundant-type-aliases
+  export type Schema = any; // Foundry's schema types are not expressible without any
 }
 
 /* ========================================================================== */
@@ -129,7 +135,7 @@ export namespace CharacterDataModel {
  * Base class for all Item sub-types, providing shared fields.
  */
 class BaseItemDataModel extends foundry.abstract.TypeDataModel<
-  any,
+  any, // Foundry schema types are not expressible without any
   Item.Implementation
 > {
   static override defineSchema() {
@@ -143,7 +149,7 @@ class BaseItemDataModel extends foundry.abstract.TypeDataModel<
  * Generic Item (equipment, consumable, etc.)
  */
 export class ItemDataModel extends BaseItemDataModel {
-  static sheetClass = OddItemSheet;
+  static readonly sheetClass = OddItemSheet;
 
   static override defineSchema() {
     return {
@@ -167,7 +173,7 @@ export class ItemDataModel extends BaseItemDataModel {
  * Feature — a special ability or trait.
  */
 export class FeatureDataModel extends BaseItemDataModel {
-  static sheetClass = OddItemSheet;
+  static readonly sheetClass = OddItemSheet;
 
   static override defineSchema() {
     return {
@@ -180,7 +186,7 @@ export class FeatureDataModel extends BaseItemDataModel {
  * Spell — a castable magical effect.
  */
 export class SpellDataModel extends BaseItemDataModel {
-  static sheetClass = OddItemSheet;
+  static readonly sheetClass = OddItemSheet;
 
   static override defineSchema() {
     return {
