@@ -208,6 +208,14 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
       });
     });
 
+    // Common rolls: clicking the roll name immediately rolls all sources
+    html.querySelectorAll("[data-common-roll]").forEach((el) => {
+      el.addEventListener("click", () => {
+        const key = (el as HTMLElement).dataset.commonRoll!;
+        void this._rollCommonRoll(key);
+      });
+    });
+
     // Only allow editing for owners
     if (!this.isEditable) return;
 
@@ -274,12 +282,38 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
   /** Roll all pooled dice and post a chat message with an expandable breakdown. */
   async _rollDicePool(): Promise<void> {
     if (this._dicePool.length === 0) return;
+    await this._executeRoll(this._dicePool);
+    this._dicePool = [];
+    void this._updateDicePoolTray();
+  }
 
-    const formula = this._dicePool.map((e) => e.die).join("+");
+  /** Roll a predefined common roll by config key and post to chat. */
+  async _rollCommonRoll(key: string): Promise<void> {
+    const def = COMMON_ROLLS.find((r) => r.key === key);
+    if (!def) return;
+    const system = this.characterSystem;
+    const entries = def.sources
+      .map((src) => ({
+        label: game.i18n!.localize(
+          src.type === "attribute" ? ATTRIBUTES[src.key] : SKILLS[src.category][src.key],
+        ),
+        die: src.type === "attribute"
+          ? system.attributes[src.key]
+          : (system.skills[src.category][src.key] ?? ""),
+      }))
+      .filter((e) => e.die); // skip untrained skills
+    await this._executeRoll(entries);
+  }
+
+  /** Evaluate a set of labelled dice, post a breakdown chat message. */
+  private async _executeRoll(entries: { label: string; die: string }[]): Promise<void> {
+    if (entries.length === 0) return;
+
+    const formula = entries.map((e) => e.die).join("+");
     const roll = new Roll(formula);
     await roll.evaluate();
 
-    const breakdown = this._dicePool.map(({ label, die }, i) => ({
+    const breakdown = entries.map(({ label, die }, i) => ({
       label,
       die,
       result: roll.dice[i]?.total ?? "?",
@@ -290,20 +324,17 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
       {
         total: roll.total,
         formula,
-        diceCount: this._dicePool.length,
-        diceWord: this._dicePool.length === 1 ? "die" : "dice",
+        diceCount: entries.length,
+        diceWord: entries.length === 1 ? "die" : "dice",
         breakdown,
       },
     );
 
-    await (ChatMessage as any).create({
-      speaker: (ChatMessage as any).getSpeaker({ actor: this.document }),
+    await (ChatMessage as any).create({ // eslint-disable-line @typescript-eslint/no-explicit-any
+      speaker: (ChatMessage as any).getSpeaker({ actor: this.document }), // eslint-disable-line @typescript-eslint/no-explicit-any
       content,
       rolls: [roll],
     });
-
-    this._dicePool = [];
-    void this._updateDicePoolTray();
   }
 }
 

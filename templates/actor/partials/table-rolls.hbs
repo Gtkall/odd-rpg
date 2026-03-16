@@ -3,7 +3,7 @@
   <h3 class="panel-header">{{localize "ODD.Sections.rolls"}}</h3>
   {{#each commonRolls}}
   <div class="roll-entry">
-    <div class="roll-name">{{localize label}}</div>
+    <div class="roll-name rollable" data-common-roll="{{key}}">{{localize label}}</div>
     {{#if formula}}
     <div class="roll-formula">{{formula}}</div>
     {{/if}}
