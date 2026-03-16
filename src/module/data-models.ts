@@ -5,10 +5,13 @@
  * These schemas determine what data is stored on each document's `system` field.
  */
 
-import { ATTRIBUTES, SKILLS, ATTRIBUTE_DICE_TYPES, DICE_TYPES, DEFAULT_DIE } from "./config";
+import {
+  ATTRIBUTES, SKILLS, ATTRIBUTE_DICE_TYPES, DICE_TYPES, DEFAULT_DIE,
+  STRAIN_VALUES, STRAIN_DEFAULT_SLOT_COUNT, STRAIN_MAX_FORTITUDE_SLOTS,
+} from "./config";
 import { OddActorSheet, OddItemSheet } from "./sheets";
 
-const { HTMLField, NumberField, SchemaField, StringField } =
+const { ArrayField, HTMLField, NumberField, SchemaField, StringField } =
   foundry.data.fields;
 
 /* ========================================================================== */
@@ -85,6 +88,15 @@ export class CharacterDataModel extends foundry.abstract.TypeDataModel<
         }),
       }),
 
+      // Strain
+      strain: new SchemaField({
+        slots: new ArrayField(
+          new StringField({ required: true, blank: true, initial: "", choices: Object.keys(STRAIN_VALUES) }),
+          { initial: Array(STRAIN_MAX_FORTITUDE_SLOTS + STRAIN_DEFAULT_SLOT_COUNT).fill("") as string[] },
+        ),
+        fortitudeSlots: new NumberField({ required: true, integer: true, min: 0, max: STRAIN_MAX_FORTITUDE_SLOTS, initial: 0 }),
+      }),
+
       // Biography
       biography: new HTMLField({ required: true, blank: true }),
     } as CharacterDataModel.Schema;
@@ -111,6 +123,10 @@ export interface CharacterSystemData {
     composureThreshold: number;
     healingRate: number;
     magicPoints: { value: number; max: number };
+  };
+  strain: {
+    slots: string[];
+    fortitudeSlots: number;
   };
   biography: string;
   health: { value: number; max: number };

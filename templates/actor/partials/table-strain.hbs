@@ -1,0 +1,28 @@
+{{!-- Strain tracker --}}
+<div class="strain-panel">
+  <div class="strain-header">
+    <h3 class="panel-header">{{localize "ODD.Sections.strain"}}</h3>
+    <span class="stamina-roll-hint">{{localize "ODD.Sections.staminaRoll"}}: <em>{{localize "ODD.Strain.staminaSources"}}</em></span>
+  </div>
+
+  <div class="strain-row">
+    {{#each strainSlots}}
+    <div class="strain-slot {{#if isLocked}}is-locked{{/if}} {{#if isFortSlot}}is-fort{{/if}}">
+      {{#if isLocked}}
+        {{!-- Hidden input keeps the array index in the form submission --}}
+        <input type="hidden" name="system.strain.slots.{{index}}" value="">
+        <div class="slot-locked"></div>
+      {{else}}
+        <select name="system.strain.slots.{{index}}" class="slot-select">
+          {{selectOptions ../strainValues selected=value localize=true}}
+        </select>
+      {{/if}}
+      <div class="slot-label">{{label}}</div>
+      {{!-- Always render penalty cell so columns stay aligned --}}
+      <div class="slot-penalty">{{#if fatiguePenalty}}{{fatiguePenalty}}{{/if}}</div>
+    </div>
+    {{/each}}
+  </div>
+
+  <div class="strain-penalty-label">{{localize "ODD.Strain.fatiguePenalty"}}</div>
+</div>

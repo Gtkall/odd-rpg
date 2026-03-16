@@ -709,6 +709,122 @@
     line-height: 1.3;
 }
 
+/* -------------------------------------------------------------------------- */
+/*  Strain Tracker                                                            */
+/* -------------------------------------------------------------------------- */
+
+.odd-rpg .strain-panel {
+    padding: 0.4rem 0.5rem 0.5rem;
+    border-top: 1px solid var(--odd-color-border);
+}
+
+.odd-rpg .strain-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 0.35rem;
+}
+
+.odd-rpg .stamina-roll-hint {
+    font-size: 0.72rem;
+    color: #888;
+}
+
+.odd-rpg .stamina-roll-hint em {
+    color: #aaa;
+}
+
+.odd-rpg .strain-row {
+    display: flex;
+    gap: 0.25rem;
+    align-items: flex-end;
+}
+
+.odd-rpg .strain-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1rem;
+    width: 3rem;
+    flex-shrink: 0;
+}
+
+/* Locked Fort slot — solid dark block, same height as a select */
+.odd-rpg .strain-slot.is-locked .slot-locked {
+    width: 100%;
+    height: 1.65rem;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 3px;
+}
+
+.odd-rpg .slot-select {
+    width: 100%;
+    font-size: 0.75rem;
+    padding: 0.2rem 0.1rem;
+    text-align: center;
+    border: 1px solid #3a3a3a;
+    border-radius: 3px;
+    background: #1e3a2a;
+    color: #7ecfa0;
+    cursor: pointer;
+    font-family: var(--odd-font-primary);
+}
+
+/* Active Fort slots get a blue-teal tint matching the PDF */
+.odd-rpg .strain-slot.is-fort .slot-select {
+    background: #1a2e3a;
+    color: #7eb8cf;
+    border-color: #2a4a5a;
+}
+
+.odd-rpg .slot-select:focus {
+    outline: none;
+    border-color: var(--odd-color-accent);
+}
+
+/* Per-value coloring — select background reflects current selection */
+.odd-rpg .slot-select:has(option[value=""]:checked)  { background: #1e3a2a; color: #7ecfa0; border-color: #2e5a3a; }
+.odd-rpg .slot-select:has(option[value="F"]:checked)  { background: #1a3050; color: #7eb8d8; border-color: #2a4a6a; }
+.odd-rpg .slot-select:has(option[value="E"]:checked)  { background: #1a2060; color: #8090d8; border-color: #2a3080; }
+.odd-rpg .slot-select:has(option[value="A"]:checked)  { background: #333;    color: #aaa;    border-color: #555;    }
+.odd-rpg .slot-select:has(option[value="BL"]:checked) { background: #4a0808; color: #d07070; border-color: #7a1010; }
+
+/* Option-level colors shown in the open dropdown */
+.odd-rpg .slot-select option[value=""]  { background: #1e3a2a; color: #7ecfa0; }
+.odd-rpg .slot-select option[value="F"]  { background: #1a3050; color: #7eb8d8; }
+.odd-rpg .slot-select option[value="E"]  { background: #1a2060; color: #8090d8; }
+.odd-rpg .slot-select option[value="A"]  { background: #333;    color: #aaa;    }
+.odd-rpg .slot-select option[value="BL"] { background: #4a0808; color: #d07070; }
+
+.odd-rpg .slot-label {
+    font-size: 0.6rem;
+    color: #888;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.odd-rpg .strain-slot.is-locked .slot-label {
+    color: #555;
+}
+
+/* Penalty die lives inside each slot column — always renders to keep columns aligned */
+.odd-rpg .slot-penalty {
+    height: 0.85rem;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #c0392b;
+    text-align: center;
+}
+
+/* Small caption below the entire slot row */
+.odd-rpg .strain-penalty-label {
+    font-size: 0.62rem;
+    color: #888;
+    margin-top: 0.05rem;
+    padding-left: 0.1rem;
+}
+
 /* ── Misc ── */
 .odd-rpg .tab-placeholder {
     color: #666;

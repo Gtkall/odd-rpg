@@ -14,6 +14,10 @@ import {
   SKILLS,
   SKILL_CATEGORIES,
   SKILL_LAYOUT,
+  STRAIN_DEFAULT_SLOT_COUNT,
+  STRAIN_FATIGUE_PENALTIES,
+  STRAIN_MAX_FORTITUDE_SLOTS,
+  STRAIN_VALUES,
 } from "./config";
 import type { CharacterSystemData } from "./data-models";
 
@@ -129,6 +133,30 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
       };
     });
 
+    // Strain: always render all 10 slots; locked = Fort slots not yet unlocked by talent.
+    const { strain } = system;
+    const lockedFortSlots = STRAIN_MAX_FORTITUDE_SLOTS - strain.fortitudeSlots;
+    const strainSlots = Array.from(
+      { length: STRAIN_MAX_FORTITUDE_SLOTS + STRAIN_DEFAULT_SLOT_COUNT },
+      (_, i) => {
+        const isFortSlot = i < STRAIN_MAX_FORTITUDE_SLOTS;
+        const isLocked   = isFortSlot && i < lockedFortSlots;
+        const baseIndex  = isFortSlot ? null : i - STRAIN_MAX_FORTITUDE_SLOTS;
+        return {
+          index: i,
+          value: isLocked ? "" : (strain.slots[i] ?? ""),
+          isLocked,
+          isFortSlot,
+          label: isFortSlot
+            ? `Fort ${STRAIN_MAX_FORTITUDE_SLOTS - i}`
+            : String(baseIndex! + 1),
+          fatiguePenalty: baseIndex !== null && baseIndex >= 2
+            ? (STRAIN_FATIGUE_PENALTIES[baseIndex] ?? null)
+            : null,
+        };
+      },
+    );
+
     return {
       ...context,
       actor,
@@ -142,6 +170,8 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
       attributeLayout,
       skillLayout,
       commonRolls,
+      strainSlots,
+      strainValues: STRAIN_VALUES,
       tabs: this._getTabs(),
     };
   }

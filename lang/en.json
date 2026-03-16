@@ -76,7 +76,18 @@
       "attributes": "Attributes",
       "statistics": "Statistics",
       "skills": "Skills",
-      "rolls": "Common Rolls"
+      "rolls": "Common Rolls",
+      "strain": "Strain",
+      "staminaRoll": "Stamina Roll"
+    },
+    "Strain": {
+      "none": "—",
+      "fatigue": "F",
+      "exhaustion": "E",
+      "armor": "A",
+      "bleeding": "BL",
+      "fatiguePenalty": "Fatigue Penalty",
+      "staminaSources": "Vitality + Willpower + Endurance"
     },
     "Rolls": {
       "awareness": "Awareness",

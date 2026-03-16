@@ -31,6 +31,7 @@ Hooks.once("init", () => {
     "systems/odd-rpg/templates/actor/partials/table-statistics.hbs",
     "systems/odd-rpg/templates/actor/partials/table-skills.hbs",
     "systems/odd-rpg/templates/actor/partials/table-rolls.hbs",
+    "systems/odd-rpg/templates/actor/partials/table-strain.hbs",
     // Tabs
     "systems/odd-rpg/templates/actor/dice-pool-tray.hbs",
     "systems/odd-rpg/templates/actor/tabs/character-main.hbs",
