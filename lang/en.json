@@ -87,7 +87,9 @@
       "armor": "A",
       "bleeding": "BL",
       "fatiguePenalty": "Fatigue Penalty",
-      "staminaSources": "Vitality + Willpower + Endurance"
+      "staminaSources": "Vitality + Willpower + Endurance",
+      "fortitudeManualOverride": "Manual",
+      "fortitudeOverrideHint": "Manually unlock Fortitude slots (bypasses game-rule calculations)"
     },
     "Rolls": {
       "awareness": "Awareness",

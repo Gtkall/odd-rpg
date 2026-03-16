@@ -11,7 +11,7 @@ import {
 } from "./config";
 import { OddActorSheet, OddItemSheet } from "./sheets";
 
-const { ArrayField, HTMLField, NumberField, SchemaField, StringField } =
+const { ArrayField, BooleanField, HTMLField, NumberField, SchemaField, StringField } =
   foundry.data.fields;
 
 /* ========================================================================== */
@@ -95,6 +95,11 @@ export class CharacterDataModel extends foundry.abstract.TypeDataModel<
           { initial: Array(STRAIN_MAX_FORTITUDE_SLOTS + STRAIN_DEFAULT_SLOT_COUNT).fill("") as string[] },
         ),
         fortitudeSlots: new NumberField({ required: true, integer: true, min: 0, max: STRAIN_MAX_FORTITUDE_SLOTS, initial: 0 }),
+        fortitudeManualOverride: new BooleanField({ required: true, initial: false }),
+        fortitudeManualSlots: new ArrayField(
+          new BooleanField({ required: true, initial: false }),
+          { initial: Array(STRAIN_MAX_FORTITUDE_SLOTS).fill(false) as boolean[] },
+        ),
       }),
 
       // Biography
@@ -127,6 +132,8 @@ export interface CharacterSystemData {
   strain: {
     slots: string[];
     fortitudeSlots: number;
+    fortitudeManualOverride: boolean;
+    fortitudeManualSlots: boolean[];
   };
   biography: string;
   health: { value: number; max: number };

@@ -140,7 +140,11 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
       { length: STRAIN_MAX_FORTITUDE_SLOTS + STRAIN_DEFAULT_SLOT_COUNT },
       (_, i) => {
         const isFortSlot = i < STRAIN_MAX_FORTITUDE_SLOTS;
-        const isLocked   = isFortSlot && i < lockedFortSlots;
+        const isLocked = isFortSlot && (
+          strain.fortitudeManualOverride
+            ? !(strain.fortitudeManualSlots[i] ?? false)
+            : i < lockedFortSlots
+        );
         const baseIndex  = isFortSlot ? null : i - STRAIN_MAX_FORTITUDE_SLOTS;
         return {
           index: i,
@@ -172,6 +176,7 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
       commonRolls,
       strainSlots,
       strainValues: STRAIN_VALUES,
+      strainFortitudeManualOverride: strain.fortitudeManualOverride,
       tabs: this._getTabs(),
     };
   }
@@ -248,6 +253,19 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
 
     // Only allow editing for owners
     if (!this.isEditable) return;
+
+    // Fortitude manual slot toggle (🔒/🔓 per Fort slot)
+    html.querySelectorAll("[data-fort-slot-toggle]").forEach((el) => {
+      el.addEventListener("click", (ev: Event) => {
+        ev.preventDefault();
+        const i = parseInt((ev.currentTarget as HTMLElement).dataset.fortSlotToggle!, 10);
+        const current = this.characterSystem.strain.fortitudeManualSlots;
+        const updated = [...current];
+        updated[i] = !updated[i];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- fvtt-types stubs don't model system.* dot-paths
+        void this.document.update({ "system.strain.fortitudeManualSlots": updated } as any);
+      });
+    });
 
     // Delete owned item
     html.querySelectorAll(".item-delete").forEach((el) => {
