@@ -200,20 +200,18 @@
     margin-bottom: 0;
 }
 
-.odd-rpg .attribute-select {
-    flex: 1;
-    padding: 0.25rem 0.5rem;
+.odd-rpg .attr-select,
+.odd-rpg .skill-select {
     border: 1px solid var(--odd-color-border);
     border-radius: 4px;
     font-family: var(--odd-font-primary);
-    font-size: 0.9rem;
     background: #2a2a2a;
     color: var(--odd-color-primary);
     cursor: pointer;
     transition: border-color 0.15s;
 }
 
-.odd-rpg .attribute-select:focus,
+.odd-rpg .attr-select:focus,
 .odd-rpg .skill-select:focus {
     outline: none;
     border-color: var(--odd-color-accent);
@@ -304,18 +302,6 @@
     font-size: 0.85rem;
 }
 
-.odd-rpg .skill-select {
-    flex: 1;
-    padding: 0.15rem 0.35rem;
-    border: 1px solid var(--odd-color-border);
-    border-radius: 4px;
-    font-family: var(--odd-font-primary);
-    font-size: 0.85rem;
-    background: #2a2a2a;
-    color: var(--odd-color-primary);
-    cursor: pointer;
-    transition: border-color 0.15s;
-}
 
 /* -------------------------------------------------------------------------- */
 /*  Rollable Labels                                                           */
@@ -588,6 +574,13 @@
 .odd-rpg .attr-select {
     width: 3.6rem;
     font-size: 0.82rem;
+    padding: 0.25rem 0.4rem;
+}
+
+.odd-rpg .skill-select {
+    width: 3.2rem;
+    font-size: 0.75rem;
+    padding: 0.15rem 0.35rem;
 }
 
 /* Scoped under .character-main to avoid conflict with old statistics-grid rule */
@@ -687,10 +680,6 @@
     color: var(--odd-color-accent);
 }
 
-.odd-rpg .skill-select {
-    width: 3.2rem;
-    font-size: 0.75rem;
-}
 
 /* ── Common Rolls panel ── */
 .odd-rpg .roll-entry {
