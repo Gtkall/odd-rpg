@@ -1,0 +1,16 @@
+<div class="dice-pool-chips">
+  {{#if dicePool.length}}
+    {{#each dicePool}}
+      <span class="pool-chip" data-id="{{id}}" title="Click to remove">
+        <span class="chip-label">{{label}}</span>
+        <span class="chip-die">{{die}}</span>
+      </span>
+    {{/each}}
+  {{else}}
+    <span class="pool-empty">Click attributes or skills to build a pool</span>
+  {{/if}}
+</div>
+<div class="dice-pool-actions">
+  <button type="button" class="dice-pool-roll-btn" {{#unless dicePool.length}}disabled{{/unless}}>Roll</button>
+  <button type="button" class="dice-pool-clear-btn" {{#unless dicePool.length}}disabled{{/unless}}>Clear</button>
+</div>

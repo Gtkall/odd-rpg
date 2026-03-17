@@ -1,0 +1,897 @@
+/* ============================================================================
+   ODD RPG — System Styles
+   ============================================================================ */
+
+/* -------------------------------------------------------------------------- */
+/*  Variables                                                                 */
+/* -------------------------------------------------------------------------- */
+
+:root {
+    --odd-color-primary: #e0e0e0;
+    --odd-color-accent: #ff6b6b;
+    --odd-color-bg: #1a1a1a;
+    --odd-color-border: #444;
+    --odd-font-primary: "Signika", sans-serif;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Sheet Layout                                                              */
+/* -------------------------------------------------------------------------- */
+
+.odd-rpg.sheet {
+    font-family: var(--odd-font-primary);
+    color: var(--odd-color-primary);
+}
+
+.odd-rpg .sheet-header {
+    display: flex;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    border-bottom: 2px solid var(--odd-color-border);
+    margin-bottom: 0.5rem;
+}
+
+.odd-rpg .sheet-header .profile-img {
+    border: 2px solid var(--odd-color-border);
+    border-radius: 4px;
+    object-fit: cover;
+    flex: 0 0 100px;
+}
+
+.odd-rpg .sheet-header .header-fields {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.odd-rpg .charname input {
+    font-size: 1.5rem;
+    font-weight: bold;
+    border: none;
+    border-bottom: 1px solid var(--odd-color-border);
+    width: 100%;
+    margin: 0;
+    padding: 0 0 2px;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Resources                                                                 */
+/* -------------------------------------------------------------------------- */
+
+.odd-rpg .resource {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.odd-rpg .resource label {
+    font-weight: 600;
+    min-width: 50px;
+}
+
+.odd-rpg .resource-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.odd-rpg .resource-bar input {
+    width: 50px;
+    text-align: center;
+}
+
+.odd-rpg .resource-bar .separator {
+    font-weight: bold;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Tabs                                                                      */
+/* -------------------------------------------------------------------------- */
+
+.odd-rpg .sheet-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid var(--odd-color-border);
+    margin-bottom: 0.5rem;
+}
+
+.odd-rpg .sheet-tabs .item {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    color: var(--odd-color-primary);
+    opacity: 0.6;
+    transition:
+        opacity 0.15s,
+        border-color 0.15s;
+}
+
+.odd-rpg .sheet-tabs .item:hover {
+    opacity: 0.85;
+}
+
+.odd-rpg .sheet-tabs .item.active {
+    opacity: 1;
+    border-bottom-color: var(--odd-color-accent);
+}
+
+.odd-rpg .tab:not(.active) {
+    display: none;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Item Lists                                                                */
+/* -------------------------------------------------------------------------- */
+
+.odd-rpg .item-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.odd-rpg .item-list .item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0;
+    border-bottom: 1px solid var(--odd-color-border);
+}
+
+.odd-rpg .item-list .item-name {
+    flex: 1;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.odd-rpg .item-controls {
+    display: flex;
+    gap: 0.35rem;
+}
+
+.odd-rpg .item-controls a {
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.15s;
+}
+
+.odd-rpg .item-controls a:hover {
+    opacity: 1;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Form Groups                                                               */
+/* -------------------------------------------------------------------------- */
+
+.odd-rpg .form-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.odd-rpg .form-group label {
+    font-weight: 600;
+    min-width: 120px;
+    color: var(--odd-color-primary);
+}
+
+.odd-rpg .form-group input {
+    flex: 1;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Attributes Grid                                                           */
+/* -------------------------------------------------------------------------- */
+
+.odd-rpg .attributes-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem 1.5rem;
+    padding: 0.5rem 0;
+}
+
+.odd-rpg .attributes-grid .form-group {
+    margin-bottom: 0;
+}
+
+.odd-rpg .attr-select,
+.odd-rpg .skill-select {
+    border: 1px solid var(--odd-color-border);
+    border-radius: 4px;
+    font-family: var(--odd-font-primary);
+    background: #2a2a2a;
+    color: var(--odd-color-primary);
+    cursor: pointer;
+    transition: border-color 0.15s;
+}
+
+.odd-rpg .attr-select:focus,
+.odd-rpg .skill-select:focus {
+    outline: none;
+    border-color: var(--odd-color-accent);
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Header                                                                    */
+/* -------------------------------------------------------------------------- */
+
+.odd-rpg .header-row {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.odd-rpg .header-row .resource {
+    flex: 1;
+}
+
+.odd-rpg .header-row input[type="text"] {
+    flex: 1;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Statistics Grid                                                           */
+/* -------------------------------------------------------------------------- */
+
+.odd-rpg .statistics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem 1.5rem;
+    padding: 0.5rem 0;
+}
+
+.odd-rpg .statistics-grid .form-group {
+    margin-bottom: 0;
+}
+
+.odd-rpg .statistics-grid .resource-bar input {
+    width: 50px;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Tab Sections                                                              */
+/* -------------------------------------------------------------------------- */
+
+.odd-rpg .tab-section {
+    margin-bottom: 1rem;
+}
+
+.odd-rpg .tab-section h2 {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--odd-color-border);
+    padding-bottom: 0.25rem;
+    margin: 0 0 0.5rem;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Skills                                                                    */
+/* -------------------------------------------------------------------------- */
+
+.odd-rpg .skills-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem 1.5rem;
+    padding: 0.5rem 0;
+}
+
+.odd-rpg .skill-category h3 {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--odd-color-border);
+    padding-bottom: 0.2rem;
+    margin: 0 0 0.4rem;
+    color: var(--odd-color-accent);
+}
+
+.odd-rpg .skill.form-group {
+    margin-bottom: 0.25rem;
+}
+
+.odd-rpg .skill.form-group label {
+    min-width: 90px;
+    font-weight: normal;
+    font-size: 0.85rem;
+}
+
+
+/* -------------------------------------------------------------------------- */
+/*  Rollable Labels                                                           */
+/* -------------------------------------------------------------------------- */
+
+.odd-rpg .rollable {
+    cursor: pointer;
+    transition: color 0.15s, text-shadow 0.15s;
+}
+
+.odd-rpg .rollable:hover {
+    color: var(--odd-color-accent);
+    text-shadow: 0 0 6px rgba(255, 107, 107, 0.4);
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Hints                                                                     */
+/* -------------------------------------------------------------------------- */
+
+.odd-rpg .hint {
+    font-style: italic;
+    color: #999;
+    padding: 1rem 0;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Chat Messages                                                             */
+/* -------------------------------------------------------------------------- */
+
+.odd-chat-item h3 {
+    margin: 0 0 0.25rem;
+    border-bottom: 1px solid var(--odd-color-border);
+    padding-bottom: 0.25rem;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Dice Pool Tray                                                            */
+/* -------------------------------------------------------------------------- */
+
+.odd-rpg .dice-pool-tray {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.4rem 0.5rem;
+    background: #111;
+    border-bottom: 1px solid var(--odd-color-border);
+    flex-wrap: wrap;
+}
+
+.odd-rpg .dice-pool-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    flex: 1;
+    align-items: center;
+}
+
+.odd-rpg .pool-empty {
+    font-size: 0.75rem;
+    color: #666;
+    font-style: italic;
+}
+
+.odd-rpg .pool-chip {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    background: #2a2a2a;
+    border: 1px solid var(--odd-color-accent);
+    border-radius: 3px;
+    padding: 0.15rem 0.4rem;
+    cursor: pointer;
+    line-height: 1.2;
+    transition: background 0.1s, border-color 0.1s;
+}
+
+.odd-rpg .chip-label {
+    font-size: 0.65rem;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.odd-rpg .chip-die {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--odd-color-accent);
+}
+
+.odd-rpg .pool-chip:hover {
+    background: #3a1a1a;
+    border-color: #ff4444;
+}
+
+.odd-rpg .dice-pool-actions {
+    display: flex;
+    gap: 0.35rem;
+    align-self: center;
+    flex-shrink: 0;
+}
+
+.odd-rpg .dice-pool-actions button {
+    padding: 0.2rem 0.6rem;
+    font-size: 0.75rem;
+    font-family: var(--odd-font-primary);
+    font-weight: 600;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+
+.odd-rpg .dice-pool-roll-btn {
+    background: var(--odd-color-accent);
+    border: 1px solid var(--odd-color-accent);
+    color: #111;
+}
+
+.odd-rpg .dice-pool-clear-btn {
+    background: transparent;
+    border: 1px solid var(--odd-color-border);
+    color: var(--odd-color-primary);
+}
+
+.odd-rpg .dice-pool-actions button:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Dice Pool Chat Message                                                    */
+/* -------------------------------------------------------------------------- */
+
+.odd-dice-pool-result {
+    padding: 0.25rem 0;
+    color: #222;
+}
+
+.odd-dice-pool-result .roll-total {
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-align: center;
+    line-height: 1;
+    padding: 0.25rem 0;
+    color: #c0392b;
+}
+
+.odd-dice-pool-result .roll-breakdown {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.odd-dice-pool-result .roll-breakdown summary {
+    cursor: pointer;
+    color: #666;
+    font-style: italic;
+    padding: 0.15rem 0;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.odd-dice-pool-result .roll-breakdown summary:hover {
+    color: #222;
+}
+
+.odd-dice-pool-result .breakdown-list {
+    list-style: none;
+    margin: 0.35rem 0 0;
+    padding: 0;
+    border-top: 1px solid #ddd;
+}
+
+.odd-dice-pool-result .breakdown-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.2rem 0.1rem;
+    border-bottom: 1px solid #eee;
+    font-size: 0.82rem;
+}
+
+.odd-dice-pool-result .source-label {
+    flex: 1;
+    color: #333;
+}
+
+.odd-dice-pool-result .die-type {
+    color: #888;
+    min-width: 2rem;
+    text-align: center;
+}
+
+.odd-dice-pool-result .die-result {
+    font-weight: bold;
+    min-width: 1.5rem;
+    text-align: right;
+    color: #c0392b;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Character Main Tab                                                        */
+/* -------------------------------------------------------------------------- */
+
+.odd-rpg .character-main,
+.odd-rpg .character-combat,
+.odd-rpg .character-talents-flaws {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+/* ── Panel headers (Attributes / Statistics / Skills / Common Rolls) ── */
+.odd-rpg .panel-header {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    text-align: center;
+    padding: 0.25rem 0;
+    margin: 0 0 0.35rem;
+    border-bottom: 1px solid var(--odd-color-border);
+    color: #aaa;
+}
+
+/* ── Attributes + Statistics row ── */
+.odd-rpg .attr-stats-row {
+    display: flex;
+    border-bottom: 1px solid var(--odd-color-border);
+}
+
+.odd-rpg .attributes-panel {
+    flex: 0 0 62%;
+    border-right: 1px solid var(--odd-color-border);
+    padding: 0.25rem 0.75rem 0.5rem;
+}
+
+.odd-rpg .statistics-panel {
+    flex: 1;
+    padding: 0.25rem 0.75rem 0.5rem;
+}
+
+/* Scoped under .character-main to avoid conflict with old attributes-grid rule */
+.odd-rpg .character-main .attributes-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.odd-rpg .character-main .attribute-pair {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto;
+    align-items: center;
+    gap: 0.15rem 0.5rem;
+    padding: 0.2rem 0;
+}
+
+.odd-rpg .attr-label {
+    text-align: right;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: color 0.1s;
+}
+
+.odd-rpg .attr-label:hover {
+    color: var(--odd-color-accent);
+}
+
+.odd-rpg .attr-select {
+    width: 3.6rem;
+    font-size: 0.82rem;
+    padding: 0.25rem 0.4rem;
+}
+
+.odd-rpg .skill-select {
+    width: 3.2rem;
+    font-size: 0.75rem;
+    padding: 0.15rem 0.35rem;
+}
+
+/* Scoped under .character-main to avoid conflict with old statistics-grid rule */
+.odd-rpg .character-main .statistics-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.odd-rpg .character-main .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.2rem 0;
+    gap: 0.4rem;
+}
+
+.odd-rpg .character-main .stat-row label {
+    font-size: 0.8rem;
+    color: #ccc;
+    flex: 1;
+}
+
+.odd-rpg .character-main .stat-row input {
+    width: 3rem;
+    text-align: center;
+    font-size: 0.82rem;
+}
+
+.odd-rpg .character-main .stat-row .resource-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.1rem;
+}
+
+.odd-rpg .character-main .stat-row .resource-bar input {
+    width: 2.2rem;
+}
+
+/* ── Skills + Common Rolls row ── */
+.odd-rpg .skills-rolls-row {
+    display: flex;
+    flex: 1;
+}
+
+.odd-rpg .skills-panel {
+    flex: 0 0 76%;
+    border-right: 1px solid var(--odd-color-border);
+    padding: 0.25rem 0.5rem 0.5rem;
+}
+
+.odd-rpg .rolls-panel {
+    flex: 1;
+    padding: 0.25rem 0.6rem 0.5rem;
+}
+
+.odd-rpg .skill-row-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.odd-rpg .skill-row-group:last-child {
+    margin-bottom: 0;
+}
+
+.odd-rpg .category-header {
+    font-weight: 600;
+    font-size: 0.72rem;
+    text-align: right;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #999;
+    padding: 0.1rem 0 0.3rem;
+    margin-bottom: 0.1rem;
+    border-bottom: 1px solid #2d2d2d;
+}
+
+.odd-rpg .skill-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.12rem 0;
+    gap: 0.2rem;
+}
+
+.odd-rpg .skill-name {
+    font-size: 0.78rem;
+    flex: 1;
+    text-align: right;
+    cursor: pointer;
+    transition: color 0.1s;
+}
+
+.odd-rpg .skill-name:hover {
+    color: var(--odd-color-accent);
+}
+
+
+/* ── Common Rolls panel ── */
+.odd-rpg .roll-entry {
+    padding: 0.35rem 0;
+    text-align: center;
+}
+
+.odd-rpg .roll-entry + .roll-entry {
+    border-top: 1px solid #2a2a2a;
+}
+
+.odd-rpg .roll-name {
+    font-weight: 700;
+    font-size: 0.82rem;
+}
+
+.odd-rpg .roll-formula {
+    font-size: 0.85rem;
+    color: var(--odd-color-accent);
+    margin: 0.1rem 0 0.05rem;
+}
+
+.odd-rpg .roll-sources {
+    font-size: 0.68rem;
+    color: #777;
+    font-style: italic;
+    line-height: 1.3;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Strain Tracker                                                            */
+/* -------------------------------------------------------------------------- */
+
+.odd-rpg .strain-panel {
+    padding: 0.4rem 0.5rem 0.5rem;
+    border-top: 1px solid var(--odd-color-border);
+}
+
+.odd-rpg .strain-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 0.35rem;
+    flex-wrap: wrap;
+}
+
+.odd-rpg .fort-override-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-left: auto;
+    font-size: 0.68rem;
+    color: #888;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.odd-rpg .fort-override-toggle input[type="checkbox"] {
+    accent-color: var(--odd-color-accent);
+    cursor: pointer;
+}
+
+.odd-rpg .fort-override-toggle:has(input:checked) span {
+    color: #7eb8cf;
+}
+
+.odd-rpg .stamina-roll-hint {
+    font-size: 0.72rem;
+    color: #888;
+}
+
+.odd-rpg .stamina-roll-hint em {
+    color: #aaa;
+}
+
+.odd-rpg .strain-row {
+    display: flex;
+    gap: 0.25rem;
+    align-items: flex-start;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.odd-rpg .strain-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1rem;
+    flex: 1;
+    min-width: 0;
+}
+
+/* Per-slot lock/unlock toggle shown in manual override mode */
+.odd-rpg .fort-lock-btn {
+    display: inline-flex;
+    align-items: center;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font-size: 0.6rem;
+    line-height: normal;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.1s;
+}
+
+.odd-rpg .fort-lock-btn:hover {
+    opacity: 1;
+}
+
+/* Locked Fort slot — solid dark block, same height as a select */
+.odd-rpg .strain-slot.is-locked .slot-locked {
+    width: 100%;
+    height: 2rem;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 3px;
+}
+
+.odd-rpg .slot-select {
+    width: 100%;
+    font-size: 0.875rem;
+    padding: 0.3rem 0.15rem;
+    text-align: center;
+    border: 1px solid #3a3a3a;
+    border-radius: 3px;
+    background: #1e3a2a;
+    color: #7ecfa0;
+    cursor: pointer;
+    font-family: var(--odd-font-primary);
+}
+
+/* Active Fort slots get a blue-teal tint matching the PDF */
+.odd-rpg .strain-slot.is-fort .slot-select {
+    background: #1a2e3a;
+    color: #7eb8cf;
+    border-color: #2a4a5a;
+}
+
+.odd-rpg .slot-select:focus {
+    outline: none;
+    border-color: var(--odd-color-accent);
+}
+
+/* Per-value coloring — select background reflects current selection */
+.odd-rpg .slot-select:has(option[value=""]:checked)  { background: #1e3a2a; color: #7ecfa0; border-color: #2e5a3a; }
+.odd-rpg .slot-select:has(option[value="F"]:checked)  { background: #1a3050; color: #7eb8d8; border-color: #2a4a6a; }
+.odd-rpg .slot-select:has(option[value="E"]:checked)  { background: #1a2060; color: #8090d8; border-color: #2a3080; }
+.odd-rpg .slot-select:has(option[value="A"]:checked)  { background: #333;    color: #aaa;    border-color: #555;    }
+.odd-rpg .slot-select:has(option[value="BL"]:checked) { background: #4a0808; color: #d07070; border-color: #7a1010; }
+
+/* Option-level colors shown in the open dropdown */
+.odd-rpg .slot-select option[value=""]  { background: #1e3a2a; color: #7ecfa0; }
+.odd-rpg .slot-select option[value="F"]  { background: #1a3050; color: #7eb8d8; }
+.odd-rpg .slot-select option[value="E"]  { background: #1a2060; color: #8090d8; }
+.odd-rpg .slot-select option[value="A"]  { background: #333;    color: #aaa;    }
+.odd-rpg .slot-select option[value="BL"] { background: #4a0808; color: #d07070; }
+
+.odd-rpg .slot-label {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.2rem;
+    font-size: 0.6rem;
+    color: #888;
+    white-space: nowrap;
+}
+
+.odd-rpg .strain-slot.is-locked .slot-label {
+    color: #555;
+}
+
+/* Penalty row: mirrors strain-row flex layout so each cell aligns with its slot */
+.odd-rpg .strain-penalty-row {
+    position: relative;
+    display: flex;
+    gap: 0.25rem;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 0.1rem;
+}
+
+/* "Fatigue Penalty" label floats over the first (empty) cells without displacing the dice */
+.odd-rpg .strain-penalty-label {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.62rem;
+    color: #888;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.odd-rpg .penalty-cell {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #c0392b;
+    height: 1rem;
+    line-height: 1rem;
+}
+
+/* ── Misc ── */
+.odd-rpg .tab-placeholder {
+    color: #666;
+    font-style: italic;
+    padding: 1rem;
+    text-align: center;
+}

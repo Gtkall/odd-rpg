@@ -1,0 +1,107 @@
+{
+  "ODD": {
+    "ActorType": {
+      "character": "Character"
+    },
+    "ItemType": {
+      "item": "Item",
+      "feature": "Feature",
+      "spell": "Spell"
+    },
+    "Attributes": {
+      "str": "Strength",
+      "cun": "Cunning",
+      "agi": "Agility",
+      "int": "Intelligence",
+      "dex": "Dexterity",
+      "wil": "Willpower",
+      "vit": "Vitality",
+      "per": "Personality"
+    },
+    "SkillCategories": {
+      "combat": "Combat",
+      "physical": "Physical",
+      "knowledge": "Knowledge",
+      "social": "Social",
+      "mental": "Mental",
+      "special": "Special"
+    },
+    "Skills": {
+      "archery": "Archery",
+      "melee": "Melee",
+      "reflexes": "Reflexes",
+      "shooting": "Shooting",
+      "unarmed": "Unarmed",
+      "animals": "Animals",
+      "athletics": "Athletics",
+      "endurance": "Endurance",
+      "stealth": "Stealth",
+      "vehicles": "Vehicles",
+      "academics": "Academics",
+      "medicine": "Medicine",
+      "occult": "Occult",
+      "science": "Science",
+      "technology": "Technology",
+      "charm": "Charm",
+      "coercion": "Coercion",
+      "deception": "Deception",
+      "empathy": "Empathy",
+      "persuasion": "Persuasion",
+      "art": "Art",
+      "investigation": "Investigation",
+      "perception": "Perception",
+      "resolve": "Resolve",
+      "tactics": "Tactics",
+      "mana": "Mana"
+    },
+    "Statistics": {
+      "movementRate": "Movement Rate",
+      "composureThreshold": "Composure Threshold",
+      "healingRate": "Healing Rate",
+      "magicPoints": "Magic Points"
+    },
+    "Base": {
+      "playerName": "Player",
+      "xp": "XP"
+    },
+    "Dice": {
+      "none": "—",
+      "d4": "d4",
+      "d6": "d6",
+      "d8": "d8",
+      "d10": "d10",
+      "d12": "d12"
+    },
+    "Sections": {
+      "attributes": "Attributes",
+      "statistics": "Statistics",
+      "skills": "Skills",
+      "rolls": "Common Rolls",
+      "strain": "Strain",
+      "staminaRoll": "Stamina Roll"
+    },
+    "Strain": {
+      "none": "—",
+      "fatigue": "F",
+      "exhaustion": "E",
+      "armor": "A",
+      "bleeding": "BL",
+      "fatiguePenalty": "Fatigue Penalty",
+      "staminaSources": "Vitality + Willpower + Endurance",
+      "fortitudeManualOverride": "Manual",
+      "fortitudeOverrideHint": "Manually unlock Fortitude slots (bypasses game-rule calculations)"
+    },
+    "Rolls": {
+      "awareness": "Awareness",
+      "fear": "Fear",
+      "selfControl": "Self-Control"
+    },
+    "Sheet": {
+      "Tabs": {
+        "character": "Character",
+        "combat": "Combat",
+        "talentsFlaws": "Talents & Flaws"
+      }
+    }
+  }
+}

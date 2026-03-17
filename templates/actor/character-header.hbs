@@ -1,0 +1,27 @@
+{{!-- Character Header --}}
+<header class="sheet-header">
+  <img class="profile-img" src="{{actor.img}}" data-edit="img"
+       title="{{actor.name}}" height="100" width="100" />
+  <div class="header-fields">
+    <h1 class="charname">
+      <input name="name" type="text" value="{{actor.name}}" placeholder="Character Name" />
+    </h1>
+    <div class="header-row">
+      <div class="resource player-name">
+        <label>{{localize "ODD.Base.playerName"}}</label>
+        <input type="text" name="system.playerName"
+               value="{{system.playerName}}" placeholder="Player Name" />
+      </div>
+      <div class="resource xp">
+        <label>{{localize "ODD.Base.xp"}}</label>
+        <div class="resource-bar">
+          <input type="number" name="system.xp.value"
+                 value="{{system.xp.value}}" data-dtype="Number" />
+          <span class="separator">/</span>
+          <input type="number" name="system.xp.max"
+                 value="{{system.xp.max}}" data-dtype="Number" />
+        </div>
+      </div>
+    </div>
+  </div>
+</header>

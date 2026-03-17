@@ -1,0 +1,13 @@
+{{!-- Common Rolls table --}}
+<div class="rolls-panel">
+  <h3 class="panel-header">{{localize "ODD.Sections.rolls"}}</h3>
+  {{#each commonRolls}}
+  <div class="roll-entry">
+    <div class="roll-name rollable" data-common-roll="{{key}}">{{localize label}}</div>
+    {{#if formula}}
+    <div class="roll-formula">{{formula}}</div>
+    {{/if}}
+    <div class="roll-sources">{{sourceLabels}}</div>
+  </div>
+  {{/each}}
+</div>

@@ -1,0 +1,22 @@
+{{!-- Attributes table --}}
+<div class="attributes-panel">
+  <h3 class="panel-header">{{localize "ODD.Sections.attributes"}}</h3>
+  <div class="attributes-grid">
+    {{#each attributeLayout}}
+    <div class="attribute-pair">
+      <label class="attr-label rollable" data-roll-attribute="{{left}}">
+        {{localize (lookup ../attributeConfig left)}}
+      </label>
+      <select name="system.attributes.{{left}}" class="attr-select">
+        {{selectOptions ../attributeDiceTypes selected=(lookup ../system.attributes left) localize=true}}
+      </select>
+      <label class="attr-label rollable" data-roll-attribute="{{right}}">
+        {{localize (lookup ../attributeConfig right)}}
+      </label>
+      <select name="system.attributes.{{right}}" class="attr-select">
+        {{selectOptions ../attributeDiceTypes selected=(lookup ../system.attributes right) localize=true}}
+      </select>
+    </div>
+    {{/each}}
+  </div>
+</div>
