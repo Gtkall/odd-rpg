@@ -16,9 +16,9 @@ export default defineConfig({
       // Foundry VTT globals — don't bundle these
       external: [/^foundry/, /^pixi/],
     },
-    watch: {
+    watch: process.argv.includes("--watch") ? {
       include: ["src/**", "templates/**", "lang/**", "system.json"],
-    },
+    } : null,
   },
   plugins: [
     viteStaticCopy({
