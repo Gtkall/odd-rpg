@@ -2,7 +2,7 @@
   "id": "odd-rpg",
   "title": "ODD RPG",
   "description": "The ODD RPG game system for Foundry Virtual Tabletop.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "compatibility": {
     "minimum": 13,
     "verified": 13
@@ -13,8 +13,12 @@
       "url": "https://github.com/Gtkall"
     }
   ],
-  "esmodules": ["odd-rpg.js"],
-  "styles": ["styles/odd-rpg.css"],
+  "esmodules": [
+    "odd-rpg.js"
+  ],
+  "styles": [
+    "styles/odd-rpg.css"
+  ],
   "languages": [
     {
       "lang": "en",
@@ -25,18 +29,26 @@
   "documentTypes": {
     "Actor": {
       "character": {
-        "htmlFields": ["biography"]
+        "htmlFields": [
+          "biography"
+        ]
       }
     },
     "Item": {
       "item": {
-        "htmlFields": ["description"]
+        "htmlFields": [
+          "description"
+        ]
       },
       "feature": {
-        "htmlFields": ["description"]
+        "htmlFields": [
+          "description"
+        ]
       },
       "spell": {
-        "htmlFields": ["description"]
+        "htmlFields": [
+          "description"
+        ]
       }
     }
   },
@@ -50,5 +62,5 @@
   "secondaryTokenAttribute": "statistics.magicPoints",
   "url": "https://github.com/Gtkall/odd-rpg",
   "manifest": "https://github.com/Gtkall/odd-rpg/releases/latest/download/system.json",
-  "download": "https://github.com/Gtkall/odd-rpg/releases/download/v0.1.0/odd-rpg.zip"
+  "download": "https://github.com/Gtkall/odd-rpg/releases/download/v0.1.1/odd-rpg.zip"
 }
