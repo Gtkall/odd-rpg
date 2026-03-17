@@ -1,8 +1,7 @@
-import { defineConfig } from "eslint";
 import tseslint from "typescript-eslint";
 import sonarjs from "eslint-plugin-sonarjs";
 
-export default defineConfig(
+export default tseslint.config(
   // --- Ignored paths ---
   { ignores: ["dist/**", "node_modules/**"] },
 
