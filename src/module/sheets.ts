@@ -14,6 +14,7 @@ import {
   SKILLS,
   SKILL_CATEGORIES,
   SKILL_LAYOUT,
+  STAMINA_ROLL,
   STRAIN_DEFAULT_SLOT_COUNT,
   STRAIN_FATIGUE_PENALTIES,
   STRAIN_MAX_FORTITUDE_SLOTS,
@@ -177,6 +178,7 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
       strainSlots,
       strainValues: STRAIN_VALUES,
       strainFortitudeManualOverride: strain.fortitudeManualOverride,
+      staminaRollKey: STAMINA_ROLL.key,
       tabs: this._getTabs(),
     };
   }
@@ -337,7 +339,7 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
 
   /** Roll a predefined common roll by config key and post to chat. */
   async _rollCommonRoll(key: string): Promise<void> {
-    const def = COMMON_ROLLS.find((r) => r.key === key);
+    const def = COMMON_ROLLS.find((r) => r.key === key) ?? (STAMINA_ROLL.key === key ? STAMINA_ROLL : undefined);
     if (!def) return;
     const system = this.characterSystem;
     const entries = def.sources

@@ -760,7 +760,7 @@
 .odd-rpg .strain-row {
     display: flex;
     gap: 0.25rem;
-    align-items: flex-end;
+    align-items: flex-start;
     justify-content: space-between;
     width: 100%;
 }
@@ -776,16 +776,16 @@
 
 /* Per-slot lock/unlock toggle shown in manual override mode */
 .odd-rpg .fort-lock-btn {
-    width: 100%;
+    display: inline-flex;
+    align-items: center;
     background: none;
     border: none;
     padding: 0;
     margin: 0;
-    font-size: 0.85rem;
-    line-height: 1;
+    font-size: 0.6rem;
+    line-height: normal;
     cursor: pointer;
-    text-align: center;
-    opacity: 0.7;
+    opacity: 0.6;
     transition: opacity 0.1s;
 }
 
@@ -842,9 +842,12 @@
 .odd-rpg .slot-select option[value="BL"] { background: #4a0808; color: #d07070; }
 
 .odd-rpg .slot-label {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.2rem;
     font-size: 0.6rem;
     color: #888;
-    text-align: center;
     white-space: nowrap;
 }
 
@@ -852,21 +855,37 @@
     color: #555;
 }
 
-/* Penalty die lives inside each slot column — always renders to keep columns aligned */
-.odd-rpg .slot-penalty {
-    height: 1rem;
+/* Penalty row: mirrors strain-row flex layout so each cell aligns with its slot */
+.odd-rpg .strain-penalty-row {
+    position: relative;
+    display: flex;
+    gap: 0.25rem;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 0.1rem;
+}
+
+/* "Fatigue Penalty" label floats over the first (empty) cells without displacing the dice */
+.odd-rpg .strain-penalty-label {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.62rem;
+    color: #888;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.odd-rpg .penalty-cell {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
     font-size: 0.75rem;
     font-weight: 600;
     color: #c0392b;
-    text-align: center;
-}
-
-/* Small caption below the entire slot row */
-.odd-rpg .strain-penalty-label {
-    font-size: 0.62rem;
-    color: #888;
-    margin-top: 0.05rem;
-    padding-left: 0.1rem;
+    height: 1rem;
+    line-height: 1rem;
 }
 
 /* ── Misc ── */

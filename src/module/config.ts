@@ -155,6 +155,17 @@ export const COMMON_ROLLS: readonly CommonRollDef[] = Object.freeze([
   },
 ]);
 
+/** Stamina Roll definition — shown in the strain section header. */
+export const STAMINA_ROLL: CommonRollDef = {
+  key: "stamina",
+  label: "ODD.Sections.staminaRoll",
+  sources: [
+    { type: "attribute" as const, key: "vit" },
+    { type: "attribute" as const, key: "wil" },
+    { type: "skill" as const, category: "physical", key: "endurance" },
+  ],
+};
+
 /* ========================================================================== */
 /*  Strain Configuration                                                      */
 /* ========================================================================== */
