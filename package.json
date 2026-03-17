@@ -11,9 +11,14 @@
     "lint:fix": "eslint src --fix"
   },
   "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/exec": "^7.1.0",
+    "@semantic-release/git": "^10.0.1",
+    "conventional-changelog-conventionalcommits": "^9.3.0",
     "eslint": "^10.0.3",
     "eslint-plugin-sonarjs": "^4.0.2",
     "fvtt-types": "github:League-of-Foundry-Developers/foundry-vtt-types#main",
+    "semantic-release": "^25.0.3",
     "typescript": "^5.7.0",
     "typescript-eslint": "^8.57.1",
     "vite": "^6.0.0",
