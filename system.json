@@ -50,5 +50,5 @@
   "secondaryTokenAttribute": "statistics.magicPoints",
   "url": "https://github.com/Gtkall/odd-rpg",
   "manifest": "https://github.com/Gtkall/odd-rpg/releases/latest/download/system.json",
-  "download": "https://github.com/Gtkall/odd-rpg/releases/latest/download/odd-rpg.zip"
+  "download": "https://github.com/Gtkall/odd-rpg/releases/download/v0.1.0/odd-rpg.zip"
 }
