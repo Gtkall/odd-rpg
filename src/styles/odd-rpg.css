@@ -888,6 +888,378 @@
     line-height: 1rem;
 }
 
+/* -------------------------------------------------------------------------- */
+/*  Weapon Sheet                                                             */
+/* -------------------------------------------------------------------------- */
+
+.odd-rpg.weapon-form,
+.odd-rpg.armor-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    height: 100%;
+    overflow-y: auto;
+    font-family: var(--odd-font-primary);
+    color: var(--odd-color-primary);
+}
+
+.odd-rpg .weapon-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--odd-color-border);
+}
+
+.odd-rpg .weapon-header .item-img {
+    border-radius: 4px;
+    border: 1px solid var(--odd-color-border);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.odd-rpg .weapon-header .item-name {
+    flex: 1;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #555;
+    color: var(--odd-color-primary);
+    font-size: 1.1rem;
+    font-family: var(--odd-font-primary);
+    padding: 0.2rem 0;
+}
+
+.odd-rpg .weapon-header .item-name:disabled {
+    border-bottom-color: transparent;
+    opacity: 1;
+}
+
+/* Edit mode toggle button */
+.odd-rpg .item-edit-toggle {
+    flex-shrink: 0;
+    width: 1.8rem;
+    height: 1.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: #666;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: color 0.15s, border-color 0.15s;
+}
+
+.odd-rpg .item-edit-toggle:hover {
+    color: #7eb8d8;
+    border-color: #3a5a7a;
+}
+
+/* Description area */
+.odd-rpg .item-description {
+    min-height: 4rem;
+    max-height: 10rem;
+    overflow-y: auto;
+    font-size: 0.85rem;
+    color: #aaa;
+}
+
+.odd-rpg .item-description prose-mirror {
+    max-height: 8rem;
+    overflow-y: auto;
+}
+
+.odd-rpg .item-description-view:empty::before {
+    content: "No description.";
+    color: #555;
+    font-style: italic;
+}
+
+/* Disabled fieldset: remove chrome, dim interactive elements */
+.odd-rpg .item-fields {
+    border: none;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+    display: contents;
+}
+
+.odd-rpg .item-fields:disabled .toggle-btn,
+.odd-rpg .item-fields:disabled .location-btn,
+.odd-rpg .item-fields:disabled select,
+.odd-rpg .item-fields:disabled input[type="number"] {
+    opacity: 0.55;
+    cursor: default;
+}
+
+/* Toggle groups (melee/ranged, hands) */
+.odd-rpg .weapon-toggles {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.odd-rpg .toggle-group {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--odd-color-border);
+    border-radius: 4px;
+    overflow: hidden;
+    align-self: flex-start;
+}
+
+.odd-rpg .toggle-btn {
+    padding: 0.3rem 0.9rem;
+    font-size: 0.8rem;
+    font-family: var(--odd-font-primary);
+    color: #888;
+    background: #1e1e1e;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+    border-right: 1px solid var(--odd-color-border);
+    transition: background 0.15s, color 0.15s;
+}
+
+.odd-rpg .toggle-btn:last-child {
+    border-right: none;
+}
+
+.odd-rpg .toggle-btn input[type="radio"] {
+    display: none;
+}
+
+.odd-rpg .toggle-btn.active,
+.odd-rpg .toggle-btn:has(input:checked) {
+    background: #2a3a4a;
+    color: #7eb8d8;
+    font-weight: 600;
+}
+
+/* Hand configs table */
+.odd-rpg .hand-configs {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.odd-rpg .hand-configs-split {
+    flex-direction: row;
+    gap: 1.2rem;
+    align-items: flex-start;
+}
+
+.odd-rpg .hand-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.odd-rpg .hand-section-header {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #7eb8d8;
+    text-align: right;
+    padding-bottom: 0.15rem;
+    border-bottom: 1px solid #333;
+    margin-bottom: 0.1rem;
+}
+
+.odd-rpg .config-header,
+.odd-rpg .config-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.odd-rpg .config-row-label {
+    flex: 1;
+    font-size: 0.78rem;
+    color: #aaa;
+}
+
+.odd-rpg .config-col-header {
+    width: 6rem;
+    flex-shrink: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #7eb8d8;
+    text-align: right;
+}
+
+.odd-rpg .config-cell {
+    width: 6rem;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.odd-rpg .config-cell.damage-cell {
+    width: 10rem;
+}
+
+.odd-rpg .config-cell input[type="number"] {
+    width: 4rem;
+    text-align: center;
+    background: #1e1e1e;
+    border: 1px solid #444;
+    border-radius: 3px;
+    color: var(--odd-color-primary);
+    font-size: 0.85rem;
+    padding: 0.2rem 0.3rem;
+}
+
+.odd-rpg .config-cell select {
+    width: 100%;
+    max-width: 5rem;
+    background: #1e1e1e;
+    border: 1px solid #444;
+    border-radius: 3px;
+    color: var(--odd-color-primary);
+    font-size: 0.85rem;
+    padding: 0.2rem 0.2rem;
+    font-family: var(--odd-font-primary);
+}
+
+/* Damage cell: [+toggle] [count] [die] */
+.odd-rpg .damage-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.odd-rpg .bonus-toggle {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.odd-rpg .bonus-toggle input[type="checkbox"] {
+    display: none;
+}
+
+.odd-rpg .bonus-indicator {
+    width: 1.4rem;
+    height: 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #444;
+    border-radius: 3px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #555;
+    background: #1e1e1e;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.odd-rpg .bonus-toggle:has(input:checked) .bonus-indicator {
+    background: #1a3a20;
+    color: #7ecfa0;
+    border-color: #2e5a3a;
+}
+
+/* Armor location multi-select */
+.odd-rpg .armor-locations {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+}
+
+.odd-rpg .location-btn {
+    padding: 0.3rem 0.7rem;
+    font-size: 0.78rem;
+    font-family: var(--odd-font-primary);
+    color: #888;
+    background: #1e1e1e;
+    border: 1px solid var(--odd-color-border);
+    border-radius: 4px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.odd-rpg .location-btn.active {
+    background: #2a3a4a;
+    color: #7eb8d8;
+    border-color: #3a5a7a;
+    font-weight: 600;
+}
+
+/* Tags section */
+.odd-rpg .weapon-tags {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding-top: 0.4rem;
+    border-top: 1px solid var(--odd-color-border);
+}
+
+.odd-rpg .tags-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.odd-rpg .tag-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    min-height: 1.6rem;
+}
+
+.odd-rpg .tag-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.15rem 0.5rem;
+    background: #1e2e3a;
+    border: 1px solid #2a4a5a;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    color: #7eb8d8;
+}
+
+.odd-rpg .tag-remove {
+    background: none;
+    border: none;
+    color: #555;
+    cursor: pointer;
+    font-size: 0.65rem;
+    padding: 0;
+    line-height: 1;
+    transition: color 0.15s;
+}
+
+.odd-rpg .tag-remove:hover {
+    color: var(--odd-color-accent);
+}
+
+.odd-rpg .tag-input {
+    background: #1a1a1a;
+    border: 1px dashed #444;
+    border-radius: 3px;
+    color: var(--odd-color-primary);
+    font-size: 0.82rem;
+    font-family: var(--odd-font-primary);
+    padding: 0.25rem 0.5rem;
+    width: 100%;
+}
+
+.odd-rpg .tag-input:focus {
+    outline: none;
+    border-color: #7eb8d8;
+}
+
 /* ── Misc ── */
 .odd-rpg .tab-placeholder {
     color: #666;

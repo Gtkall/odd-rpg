@@ -49,7 +49,9 @@
         "htmlFields": [
           "description"
         ]
-      }
+      },
+      "weapon": { "htmlFields": ["description"] },
+      "armor":  { "htmlFields": ["description"] }
     }
   },
   "socket": false,

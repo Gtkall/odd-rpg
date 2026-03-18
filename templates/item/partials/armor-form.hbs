@@ -1,0 +1,71 @@
+<div class="odd-rpg armor-form">
+
+  {{!-- Header --}}
+  <header class="weapon-header">
+    <img class="item-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" width="48" height="48" />
+    <input class="item-name" name="name" type="text" value="{{item.name}}" placeholder="Armour Name"
+      {{#unless isEditMode}}disabled{{/unless}} />
+    <button type="button" class="item-edit-toggle" data-edit-toggle
+      title="{{#if isEditMode}}Finish editing{{else}}Edit item{{/if}}">
+      {{#if isEditMode}}<i class="fas fa-check"></i>{{else}}<i class="fas fa-pen"></i>{{/if}}
+    </button>
+  </header>
+
+  {{!-- Description --}}
+  <div class="item-description">
+    {{#if isEditMode}}
+      <prose-mirror name="system.description" value="{{system.description}}" compact></prose-mirror>
+    {{else}}
+      <div class="item-description-view">{{{enrichedDescription}}}</div>
+    {{/if}}
+  </div>
+
+  {{!-- All editable fields disabled in view mode --}}
+  <fieldset class="item-fields" {{#unless isEditMode}}disabled{{/unless}}>
+
+    {{!-- Location multi-select --}}
+    <div class="armor-locations">
+      <button type="button" class="location-btn{{#if locationAllActive}} active{{/if}}" data-location="all">
+        {{localize "ODD.Armor.Location.all"}}
+      </button>
+      {{#each armorLocations}}
+        <button type="button" class="location-btn{{#if (lookup ../locationActive @key)}} active{{/if}}" data-location="{{@key}}">
+          {{localize this}}
+        </button>
+      {{/each}}
+    </div>
+
+    {{!-- Stats --}}
+    <div class="hand-configs">
+      <div class="config-row">
+        <div class="config-row-label">{{localize "ODD.Armor.Bulk"}}</div>
+        <div class="config-cell">
+          <input type="number" name="system.bulk" value="{{system.bulk}}" min="0" step="0.25" />
+        </div>
+      </div>
+      <div class="config-row">
+        <div class="config-row-label">{{localize "ODD.Armor.Protection"}}</div>
+        <div class="config-cell">
+          <input type="number" name="system.protection" value="{{system.protection}}" min="0" />
+        </div>
+      </div>
+    </div>
+
+    {{!-- Notes / Tags --}}
+    <div class="weapon-tags">
+      <div class="tags-label">{{localize "ODD.Weapon.Notes"}}</div>
+      <div class="tag-pills">
+        {{#each system.notes}}
+          <span class="tag-pill">
+            {{this}}
+            <button type="button" class="tag-remove" data-remove-tag="{{this}}" title="Remove">✕</button>
+          </span>
+        {{/each}}
+      </div>
+      <input class="tag-input" type="text"
+        placeholder="{{localize "ODD.Weapon.TagPlaceholder"}}" />
+    </div>
+
+  </fieldset>
+
+</div>

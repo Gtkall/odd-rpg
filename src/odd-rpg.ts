@@ -12,6 +12,8 @@ import {
   ItemDataModel,
   FeatureDataModel,
   SpellDataModel,
+  WeaponDataModel,
+  ArmorDataModel,
 } from "./module/data-models.js";
 
 const loadTemplates = foundry.applications.handlebars.loadTemplates;
@@ -38,6 +40,9 @@ Hooks.once("init", () => {
     "systems/odd-rpg/templates/actor/tabs/character-combat.hbs",
     "systems/odd-rpg/templates/actor/tabs/character-talents-flaws.hbs",
     "systems/odd-rpg/templates/chat/dice-pool-roll.hbs",
+    // Item partials
+    "systems/odd-rpg/templates/item/partials/weapon-form.hbs",
+    "systems/odd-rpg/templates/item/partials/armor-form.hbs",
   ]);
 
   // ---- System configuration ----
@@ -52,6 +57,8 @@ Hooks.once("init", () => {
   CONFIG.Item.dataModels.item = ItemDataModel as any;
   CONFIG.Item.dataModels.feature = FeatureDataModel as any;
   CONFIG.Item.dataModels.spell = SpellDataModel as any;
+  CONFIG.Item.dataModels.weapon = WeaponDataModel as any;
+  CONFIG.Item.dataModels.armor  = ArmorDataModel as any;
 
   // ---- Trackable token attributes ----
   (CONFIG as any).Actor.trackableAttributes = {
