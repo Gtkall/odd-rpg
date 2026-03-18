@@ -1,4 +1,12 @@
 {
+  "TYPES": {
+    "Item": {
+      "item":    "Item",
+      "feature": "Feature",
+      "spell":   "Spell",
+      "weapon":  "Weapon"
+    }
+  },
   "ODD": {
     "ActorType": {
       "character": "Character"
@@ -102,6 +110,38 @@
         "combat": "Combat",
         "talentsFlaws": "Talents & Flaws"
       }
+    },
+    "Item": {
+      "description": "Description"
+    },
+    "ItemType": {
+      "weapon": "Weapon"
+    },
+    "Weapon": {
+      "Type": {
+        "melee":  "Melee",
+        "ranged": "Ranged"
+      },
+      "Hands": {
+        "oneHanded":  "1H",
+        "twoHanded":  "2H",
+        "versatile":  "Versatile"
+      },
+      "Distance": {
+        "veryShort": "VS",
+        "short":     "S",
+        "medium":    "M",
+        "long":      "L",
+        "veryLong":  "VL"
+      },
+      "Reach":        "Reach",
+      "Range":        "Range",
+      "Tempos":       "Tempos",
+      "Accuracy":     "Accuracy",
+      "Damage":       "Damage",
+      "DamageBonus":  "Additive — added as bonus to attack roll damage",
+      "Notes":        "Notes",
+      "TagPlaceholder": "Add tag and press Enter…"
     }
   }
 }

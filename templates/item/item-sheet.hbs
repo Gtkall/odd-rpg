@@ -1,48 +1,13 @@
-<form class="odd-rpg sheet item" autocomplete="off">
-
-  {{!-- Item Header --}}
-  <header class="sheet-header">
-    <img class="profile-img" src="{{item.img}}" data-edit="img"
-         title="{{item.name}}" height="48" width="48" />
-    <h1 class="item-name">
-      <input name="name" type="text" value="{{item.name}}" placeholder="Item Name" />
-    </h1>
-  </header>
-
-  {{!-- Sheet Tabs --}}
-  <nav class="sheet-tabs tabs" data-group="primary">
-    <a class="item" data-tab="description">Description</a>
-    <a class="item" data-tab="details">Details</a>
-  </nav>
-
-  {{!-- Sheet Body --}}
-  <section class="sheet-body">
-
-    {{!-- Description Tab --}}
-    <div class="tab description" data-group="primary" data-tab="description">
+{{#if (eq item.type "weapon")}}
+  {{> "systems/odd-rpg/templates/item/partials/weapon-form.hbs"}}
+{{else}}
+  <div class="odd-rpg sheet item">
+    <header class="item-header">
+      <img class="item-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" width="48" height="48" />
+      <input class="item-name" name="name" type="text" value="{{item.name}}" placeholder="Item Name" />
+    </header>
+    <section class="item-body">
       {{editor system.description target="system.description" button=true editable=true}}
-    </div>
-
-    {{!-- Details Tab --}}
-    <div class="tab details" data-group="primary" data-tab="details">
-      {{#if (eq data.type "item")}}
-      <div class="form-group">
-        <label>Quantity</label>
-        <input type="number" name="system.quantity" value="{{system.quantity}}" data-dtype="Number" />
-      </div>
-      <div class="form-group">
-        <label>Weight</label>
-        <input type="number" name="system.weight" value="{{system.weight}}" data-dtype="Number" step="0.1" />
-      </div>
-      {{/if}}
-
-      {{#if (eq data.type "spell")}}
-      <div class="form-group">
-        <label>Spell Level</label>
-        <input type="number" name="system.spellLevel" value="{{system.spellLevel}}" data-dtype="Number" />
-      </div>
-      {{/if}}
-    </div>
-
-  </section>
-</form>
+    </section>
+  </div>
+{{/if}}

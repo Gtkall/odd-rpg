@@ -19,8 +19,12 @@ import {
   STRAIN_FATIGUE_PENALTIES,
   STRAIN_MAX_FORTITUDE_SLOTS,
   STRAIN_VALUES,
+  WEAPON_TYPES,
+  WEAPON_HANDS,
+  WEAPON_DISTANCE,
+  WEAPON_TAGS,
 } from "./config";
-import type { CharacterSystemData } from "./data-models";
+import type { CharacterSystemData, WeaponSystemData } from "./data-models";
 
 const { ActorSheetV2, ItemSheetV2 } = foundry.applications.sheets;
 const { HandlebarsApplicationMixin } = foundry.applications.api;
@@ -396,13 +400,9 @@ export class OddItemSheet extends (HandlebarsApplicationMixin(
 ) as typeof ItemSheetV2) {
   static override readonly DEFAULT_OPTIONS = {
     classes: ["odd-rpg", "sheet", "item"],
-    position: {
-      width: 480,
-      height: 400,
-    },
-    form: {
-      submitOnChange: true,
-    },
+    position: { width: 520, height: 560 },
+    form: { submitOnChange: true },
+    window: { resizable: true },
   };
 
   static readonly PARTS = {
@@ -411,14 +411,62 @@ export class OddItemSheet extends (HandlebarsApplicationMixin(
     },
   };
 
-  override async _prepareContext(options: any) {
+  override async _prepareContext(options: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
     const context = await super._prepareContext(options);
     const item = this.document;
+    const system = item.system as unknown as WeaponSystemData;
 
-    return {
-      ...context,
-      item,
-      system: item.system,
-    };
+    const weaponContext = (item.type as string) === "weapon"
+      ? {
+          weaponTypes:    WEAPON_TYPES,
+          weaponHands:    WEAPON_HANDS,
+          weaponDistance: WEAPON_DISTANCE,
+          weaponTags:     WEAPON_TAGS,
+          diceTypes:      DICE_TYPES,
+          showOneHanded:  system.hands !== "2h",
+          showTwoHanded:  system.hands !== "1h",
+          showBoth:       system.hands === "versatile",
+          distanceLabel:  system.weaponType === "melee"
+            ? "ODD.Weapon.Reach"
+            : "ODD.Weapon.Range",
+        }
+      : {};
+
+    return { ...context, item, system: item.system, ...weaponContext };
+  }
+
+  override async _onRender(context: any, options: any): Promise<void> { // eslint-disable-line @typescript-eslint/no-explicit-any
+    await super._onRender(context, options);
+    if ((this.document.type as string) === "weapon") this._onRenderWeapon();
+  }
+
+  private _onRenderWeapon(): void {
+    const html = this.element;
+
+    // Add tag on Enter
+    html.querySelector<HTMLInputElement>(".tag-input")
+      ?.addEventListener("keydown", (ev: KeyboardEvent) => {
+        if (ev.key !== "Enter") return;
+        ev.preventDefault();
+        const input = ev.currentTarget as HTMLInputElement;
+        const tag = input.value.trim();
+        if (!tag) return;
+        input.value = "";
+        const notes = [...(this.document.system as unknown as WeaponSystemData).notes, tag];
+        void (this.document as unknown as { update(d: Record<string, unknown>): Promise<unknown> })
+          .update({ "system.notes": notes });
+      });
+
+    // Remove tag pill
+    html.querySelectorAll<HTMLButtonElement>("[data-remove-tag]")
+      .forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const tag = btn.dataset.removeTag!;
+          const notes = (this.document.system as unknown as WeaponSystemData).notes
+            .filter((t) => t !== tag);
+          void (this.document as unknown as { update(d: Record<string, unknown>): Promise<unknown> })
+            .update({ "system.notes": notes });
+        });
+      });
   }
 }
