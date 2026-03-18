@@ -399,6 +399,10 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
 export class OddItemSheet extends (HandlebarsApplicationMixin(
   ItemSheetV2,
 ) as typeof ItemSheetV2) {
+
+  /** Whether the sheet is currently in edit mode. */
+  #isEditMode = false;
+
   static override readonly DEFAULT_OPTIONS = {
     classes: ["odd-rpg", "sheet", "item"],
     position: { width: 520, height: 560 },
@@ -448,11 +452,33 @@ export class OddItemSheet extends (HandlebarsApplicationMixin(
         })()
       : {};
 
-    return { ...context, item, system: item.system, ...weaponContext, ...armorContext };
+    const isEditMode = this.#isEditMode;
+    const enrichedDescription = isEditMode
+      ? ""
+      : await foundry.applications.ux.TextEditor.enrichHTML(
+          ((item.system as Record<string, unknown>).description as string) || "",
+        );
+
+    return {
+      ...context,
+      item,
+      system: item.system,
+      isEditMode,
+      enrichedDescription,
+      ...weaponContext,
+      ...armorContext,
+    };
   }
 
   override async _onRender(context: any, options: any): Promise<void> { // eslint-disable-line @typescript-eslint/no-explicit-any
     await super._onRender(context, options);
+
+    // Edit mode toggle
+    this.element.querySelector<HTMLButtonElement>("[data-edit-toggle]")
+      ?.addEventListener("click", () => {
+        this.#isEditMode = !this.#isEditMode;
+        void this.render();
+      });
 
     // Image click → FilePicker
     this.element.querySelector<HTMLImageElement>("img.item-img")

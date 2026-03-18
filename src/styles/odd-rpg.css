@@ -930,6 +930,70 @@
     padding: 0.2rem 0;
 }
 
+.odd-rpg .weapon-header .item-name:disabled {
+    border-bottom-color: transparent;
+    opacity: 1;
+}
+
+/* Edit mode toggle button */
+.odd-rpg .item-edit-toggle {
+    flex-shrink: 0;
+    width: 1.8rem;
+    height: 1.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: #666;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: color 0.15s, border-color 0.15s;
+}
+
+.odd-rpg .item-edit-toggle:hover {
+    color: #7eb8d8;
+    border-color: #3a5a7a;
+}
+
+/* Description area */
+.odd-rpg .item-description {
+    min-height: 4rem;
+    max-height: 10rem;
+    overflow-y: auto;
+    font-size: 0.85rem;
+    color: #aaa;
+}
+
+.odd-rpg .item-description prose-mirror {
+    max-height: 8rem;
+    overflow-y: auto;
+}
+
+.odd-rpg .item-description-view:empty::before {
+    content: "No description.";
+    color: #555;
+    font-style: italic;
+}
+
+/* Disabled fieldset: remove chrome, dim interactive elements */
+.odd-rpg .item-fields {
+    border: none;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+    display: contents;
+}
+
+.odd-rpg .item-fields:disabled .toggle-btn,
+.odd-rpg .item-fields:disabled .location-btn,
+.odd-rpg .item-fields:disabled select,
+.odd-rpg .item-fields:disabled input[type="number"] {
+    opacity: 0.55;
+    cursor: default;
+}
+
 /* Toggle groups (melee/ranged, hands) */
 .odd-rpg .weapon-toggles {
     display: flex;
