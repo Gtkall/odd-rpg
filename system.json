@@ -50,8 +50,8 @@
           "description"
         ]
       },
-      "weapon": {},
-      "armor": {}
+      "weapon": { "htmlFields": ["description"] },
+      "armor":  { "htmlFields": ["description"] }
     }
   },
   "socket": false,

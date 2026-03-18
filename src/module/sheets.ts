@@ -453,6 +453,23 @@ export class OddItemSheet extends (HandlebarsApplicationMixin(
 
   override async _onRender(context: any, options: any): Promise<void> { // eslint-disable-line @typescript-eslint/no-explicit-any
     await super._onRender(context, options);
+
+    // Image click → FilePicker
+    this.element.querySelector<HTMLImageElement>("img.item-img")
+      ?.addEventListener("click", () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const fp = new (CONFIG as any).ux.FilePicker({
+          type: "image",
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          current: (this.document as any).img as string,
+          callback: (path: string) => {
+            void (this.document as unknown as { update(d: Record<string, unknown>): Promise<unknown> })
+              .update({ img: path });
+          },
+        });
+        void fp.browse();
+      });
+
     if ((this.document.type as string) === "weapon") this._onRenderWeapon();
     if ((this.document.type as string) === "armor")  this._onRenderArmor();
   }

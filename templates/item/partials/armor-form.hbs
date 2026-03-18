@@ -6,6 +6,11 @@
     <input class="item-name" name="name" type="text" value="{{item.name}}" placeholder="Armour Name" />
   </header>
 
+  {{!-- Description --}}
+  <div class="item-description">
+    <prose-mirror name="system.description" value="{{system.description}}" compact></prose-mirror>
+  </div>
+
   {{!-- Location multi-select --}}
   <div class="armor-locations">
     <button type="button" class="location-btn{{#if locationAllActive}} active{{/if}}" data-location="all">

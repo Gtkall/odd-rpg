@@ -271,6 +271,7 @@ export class WeaponDataModel extends foundry.abstract.TypeDataModel<
 
   static override defineSchema() {
     return {
+      description: new HTMLField({ required: true, blank: true }),
       weaponType: new StringField({
         required: true, initial: "melee",
         choices: Object.keys(WEAPON_TYPES),
@@ -320,6 +321,7 @@ export class ArmorDataModel extends foundry.abstract.TypeDataModel<
 
   static override defineSchema() {
     return {
+      description: new HTMLField({ required: true, blank: true }),
       bulk: new NumberField({ required: true, min: 0, initial: 0 }),
       protection: new NumberField({ required: true, integer: true, min: 0, initial: 0 }),
       location: new ArrayField(

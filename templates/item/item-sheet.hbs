@@ -9,7 +9,7 @@
       <input class="item-name" name="name" type="text" value="{{item.name}}" placeholder="Item Name" />
     </header>
     <section class="item-body">
-      {{editor system.description target="system.description" button=true editable=true}}
+      <prose-mirror name="system.description" value="{{system.description}}" compact></prose-mirror>
     </section>
   </div>
 {{/if}}

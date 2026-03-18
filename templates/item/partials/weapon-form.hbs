@@ -6,6 +6,11 @@
     <input class="item-name" name="name" type="text" value="{{item.name}}" placeholder="Weapon Name" />
   </header>
 
+  {{!-- Description --}}
+  <div class="item-description">
+    <prose-mirror name="system.description" value="{{system.description}}" compact></prose-mirror>
+  </div>
+
   {{!-- Weapon type + Hands toggles on same row --}}
   <div class="weapon-toggles">
     <div class="toggle-group">
