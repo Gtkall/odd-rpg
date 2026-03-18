@@ -1,5 +1,7 @@
 {{#if (eq item.type "weapon")}}
   {{> "systems/odd-rpg/templates/item/partials/weapon-form.hbs"}}
+{{else if (eq item.type "armor")}}
+  {{> "systems/odd-rpg/templates/item/partials/armor-form.hbs"}}
 {{else}}
   <div class="odd-rpg sheet item">
     <header class="item-header">

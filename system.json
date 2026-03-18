@@ -50,7 +50,8 @@
           "description"
         ]
       },
-      "weapon": {}
+      "weapon": {},
+      "armor": {}
     }
   },
   "socket": false,

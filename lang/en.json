@@ -4,7 +4,8 @@
       "item":    "Item",
       "feature": "Feature",
       "spell":   "Spell",
-      "weapon":  "Weapon"
+      "weapon":  "Weapon",
+      "armor":   "Armor"
     }
   },
   "ODD": {
@@ -115,7 +116,21 @@
       "description": "Description"
     },
     "ItemType": {
-      "weapon": "Weapon"
+      "weapon": "Weapon",
+      "armor":  "Armor"
+    },
+    "Armor": {
+      "Bulk":       "Bulk",
+      "Protection": "Protection",
+      "Location": {
+        "all":      "All",
+        "head":     "Head",
+        "torso":    "Torso",
+        "oneArm":   "1 Arm",
+        "bothArms": "Both Arms",
+        "oneLeg":   "1 Leg",
+        "bothLegs": "Both Legs"
+      }
     },
     "Weapon": {
       "Type": {

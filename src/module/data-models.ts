@@ -9,6 +9,7 @@ import {
   ATTRIBUTES, SKILLS, ATTRIBUTE_DICE_TYPES, DICE_TYPES, DEFAULT_DIE,
   STRAIN_VALUES, STRAIN_DEFAULT_SLOT_COUNT, STRAIN_MAX_FORTITUDE_SLOTS,
   WEAPON_TYPES, WEAPON_HANDS, WEAPON_DISTANCE, WEAPON_TEMPO_MIN, WEAPON_TEMPO_MAX,
+  ARMOR_LOCATIONS,
 } from "./config";
 import { OddActorSheet, OddItemSheet } from "./sheets";
 
@@ -301,4 +302,41 @@ export interface WeaponHandConfig {
   distance: string;
   accuracy: string;
   damage: { diceCount: number; dieType: string; isBonus: boolean };
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Armor / Shield                                                             */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Armor / Shield — protective equipment with body-location coverage.
+ */
+export class ArmorDataModel extends foundry.abstract.TypeDataModel<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  any,
+  Item.Implementation
+> {
+  static readonly sheetClass = OddItemSheet;
+
+  static override defineSchema() {
+    return {
+      bulk: new NumberField({ required: true, min: 0, initial: 0 }),
+      protection: new NumberField({ required: true, integer: true, min: 0, initial: 0 }),
+      location: new ArrayField(
+        new StringField({ required: true, blank: false, choices: Object.keys(ARMOR_LOCATIONS) }),
+        { required: true, initial: [] },
+      ),
+      notes: new ArrayField(
+        new StringField({ required: true, blank: false }),
+        { required: true, initial: [] },
+      ),
+    };
+  }
+}
+
+/** TypeScript shape of an armor's `system` object. */
+export interface ArmorSystemData extends OddItemBase {
+  bulk: number;
+  protection: number;
+  location: string[];
 }

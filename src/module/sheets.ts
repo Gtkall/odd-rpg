@@ -23,8 +23,9 @@ import {
   WEAPON_HANDS,
   WEAPON_DISTANCE,
   WEAPON_TAGS,
+  ARMOR_LOCATIONS,
 } from "./config";
-import type { CharacterSystemData, WeaponSystemData } from "./data-models";
+import type { CharacterSystemData, WeaponSystemData, ArmorSystemData } from "./data-models";
 
 const { ActorSheetV2, ItemSheetV2 } = foundry.applications.sheets;
 const { HandlebarsApplicationMixin } = foundry.applications.api;
@@ -432,12 +433,28 @@ export class OddItemSheet extends (HandlebarsApplicationMixin(
         }
       : {};
 
-    return { ...context, item, system: item.system, ...weaponContext };
+    const armorSystem = item.system as unknown as ArmorSystemData;
+    const armorContext = (item.type as string) === "armor"
+      ? (() => {
+          const locationActive: Record<string, boolean> = {};
+          for (const key of Object.keys(ARMOR_LOCATIONS)) {
+            locationActive[key] = armorSystem.location.includes(key);
+          }
+          return {
+            armorLocations:    ARMOR_LOCATIONS,
+            locationActive,
+            locationAllActive: Object.values(locationActive).every(Boolean),
+          };
+        })()
+      : {};
+
+    return { ...context, item, system: item.system, ...weaponContext, ...armorContext };
   }
 
   override async _onRender(context: any, options: any): Promise<void> { // eslint-disable-line @typescript-eslint/no-explicit-any
     await super._onRender(context, options);
     if ((this.document.type as string) === "weapon") this._onRenderWeapon();
+    if ((this.document.type as string) === "armor")  this._onRenderArmor();
   }
 
   private _onRenderWeapon(): void {
@@ -466,6 +483,54 @@ export class OddItemSheet extends (HandlebarsApplicationMixin(
             .filter((t) => t !== tag);
           void (this.document as unknown as { update(d: Record<string, unknown>): Promise<unknown> })
             .update({ "system.notes": notes });
+        });
+      });
+  }
+
+  private _onRenderArmor(): void {
+    const html = this.element;
+    const doc = this.document as unknown as { update(d: Record<string, unknown>): Promise<unknown> };
+    const allKeys = Object.keys(ARMOR_LOCATIONS);
+
+    // Location toggle buttons
+    html.querySelectorAll<HTMLButtonElement>("[data-location]")
+      .forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const loc = btn.dataset.location!;
+          const current = (this.document.system as unknown as ArmorSystemData).location;
+          let location: string[];
+          if (loc === "all") {
+            location = current.length === allKeys.length ? [] : [...allKeys];
+          } else if (current.includes(loc)) {
+            location = current.filter(l => l !== loc);
+          } else {
+            location = [...current, loc];
+          }
+          void doc.update({ "system.location": location });
+        });
+      });
+
+    // Add tag on Enter
+    html.querySelector<HTMLInputElement>(".tag-input")
+      ?.addEventListener("keydown", (ev: KeyboardEvent) => {
+        if (ev.key !== "Enter") return;
+        ev.preventDefault();
+        const input = ev.currentTarget as HTMLInputElement;
+        const tag = input.value.trim();
+        if (!tag) return;
+        input.value = "";
+        const notes = [...(this.document.system as unknown as ArmorSystemData).notes, tag];
+        void doc.update({ "system.notes": notes });
+      });
+
+    // Remove tag pill
+    html.querySelectorAll<HTMLButtonElement>("[data-remove-tag]")
+      .forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const tag = btn.dataset.removeTag!;
+          const notes = (this.document.system as unknown as ArmorSystemData).notes
+            .filter((t) => t !== tag);
+          void doc.update({ "system.notes": notes });
         });
       });
   }

@@ -229,6 +229,20 @@ export const WEAPON_TEMPO_MAX = 10;
 /** Predefined weapon tags. Empty until the GM list is finalized. */
 export const WEAPON_TAGS: readonly string[] = Object.freeze([]);
 
+/* ========================================================================== */
+/*  Armor Configuration                                                        */
+/* ========================================================================== */
+
+/** Body locations an armour/shield can protect. */
+export const ARMOR_LOCATIONS: Record<string, string> = Object.freeze({
+  head:     "ODD.Armor.Location.head",
+  torso:    "ODD.Armor.Location.torso",
+  oneArm:   "ODD.Armor.Location.oneArm",
+  bothArms: "ODD.Armor.Location.bothArms",
+  oneLeg:   "ODD.Armor.Location.oneLeg",
+  bothLegs: "ODD.Armor.Location.bothLegs",
+});
+
 /** Aggregate config object attached to CONFIG.ODD at init. */
 export const ODD = Object.freeze({
   attributes: ATTRIBUTES,
