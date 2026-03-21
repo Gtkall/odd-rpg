@@ -1,6 +1,6 @@
 {
   "name": "odd-rpg",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "ODD RPG game system for Foundry VTT",
   "type": "module",
   "scripts": {

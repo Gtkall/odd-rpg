@@ -1,3 +1,16 @@
+## [0.3.0](https://github.com/Gtkall/odd-rpg/compare/v0.2.0...v0.3.0) (2026-03-21)
+
+### Features
+
+* **combat:** initiative roll + reusable roll-entry partial with bonus toggle ([9c83907](https://github.com/Gtkall/odd-rpg/commit/9c83907d07dfb7423d9dec29c19965189f038f79))
+* **rolls:** add to pool with bonus, singular die labels, roll button styling ([03bef59](https://github.com/Gtkall/odd-rpg/commit/03bef596521f11a0d7734318b40d202cd7476903))
+* **rolls:** roll actions on entries, Foundry-native formula resolution ([214d599](https://github.com/Gtkall/odd-rpg/commit/214d5999768ecdd2485658f18198f90e6c2d5419))
+
+### Bug Fixes
+
+* **chat:** show bonus dice in roll breakdown ([013f6ae](https://github.com/Gtkall/odd-rpg/commit/013f6ae8cf52144c76cb644485a9afa1bbe9296e))
+* **rolls:** restore bonus dice to pool, extract _resolveBonusFormula ([6871ca0](https://github.com/Gtkall/odd-rpg/commit/6871ca067876b729668d8baef43241151e6836e8))
+
 ## [0.2.0](https://github.com/Gtkall/odd-rpg/compare/v0.1.1...v0.2.0) (2026-03-18)
 
 ### Features
