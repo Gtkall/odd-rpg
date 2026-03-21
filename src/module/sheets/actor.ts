@@ -234,10 +234,15 @@ export class OddActorSheet extends OddActorSheetBase {
       });
     });
 
-    html.querySelectorAll("[data-common-roll]").forEach((el) => {
+    html.querySelectorAll(".roll-action-roll[data-common-roll]").forEach((el) => {
       el.addEventListener("click", () => {
-        const key = (el as HTMLElement).dataset.commonRoll!;
-        void this._rollCommonRoll(key);
+        void this._rollCommonRoll((el as HTMLElement).dataset.commonRoll!);
+      });
+    });
+
+    html.querySelectorAll(".roll-action-pool[data-common-roll]").forEach((el) => {
+      el.addEventListener("click", () => {
+        void this._addCommonRollToPool((el as HTMLElement).dataset.commonRoll!);
       });
     });
 
@@ -317,12 +322,12 @@ export class OddActorSheet extends OddActorSheetBase {
     void this._updateDicePoolTray();
   }
 
-  async _rollCommonRoll(key: string): Promise<void> {
+  private _resolveCommonRoll(key: string): { entries: { label: string; die: string }[]; bonus: string | undefined } | undefined {
     const def =
       COMMON_ROLLS.find((r) => r.key === key) ??
       (STAMINA_ROLL.key === key ? STAMINA_ROLL : undefined) ??
       (INITIATIVE_ROLL.key === key ? INITIATIVE_ROLL : undefined);
-    if (!def) return;
+    if (!def) return undefined;
     const system = this.characterSystem;
     const entries = def.sources
       .map((src) => ({
@@ -334,17 +339,40 @@ export class OddActorSheet extends OddActorSheetBase {
           : (system.skills[src.category][src.key] ?? ""),
       }))
       .filter((e) => e.die);
-    const bonus = system.rollModifiers[key].trim() || undefined;
-    await this._executeRoll(entries, bonus);
+    const bonus = (system.rollModifiers[key] ?? "").trim() || undefined;
+    return { entries, bonus };
+  }
+
+  async _rollCommonRoll(key: string): Promise<void> {
+    const resolved = this._resolveCommonRoll(key);
+    if (!resolved) return;
+    await this._executeRoll(resolved.entries, resolved.bonus);
+  }
+
+  async _addCommonRollToPool(key: string): Promise<void> {
+    const resolved = this._resolveCommonRoll(key);
+    if (!resolved) return;
+    for (const { label, die } of resolved.entries) {
+      await this._addToDicePool(label, die);
+    }
   }
 
   private async _executeRoll(entries: { label: string; die: string }[], bonus?: string): Promise<void> {
     if (entries.length === 0) return;
 
-    const base = entries.map((e) => e.die).join("+");
-    const sanitizedBonus = bonus?.startsWith("-") ? bonus : `+${bonus?.replace(/^\+/, "")}`;
-    const formula = bonus ? `${base}${sanitizedBonus}` : base;
-    const roll = new Roll(formula);
+    interface WithRollData { getRollData(): Record<string, unknown> }
+    interface RollStatic { replaceFormulaData(f: string, d: object, o?: { missing?: string }): string }
+    const rollData = (this.document as unknown as WithRollData).getRollData();
+    const parts = entries.map((e) => e.die);
+    if (bonus) {
+      const cleaned = bonus.replace(/^\+/, "").trim();
+      // Pre-resolve @ref tokens (e.g. @attributes.str) against actor data before rolling
+      rollData.situational = (Roll as unknown as RollStatic).replaceFormulaData(cleaned, rollData, { missing: "0" });
+      parts.push("@situational");
+    }
+
+    const formula = parts.join("+");
+    const roll = new Roll(formula, rollData);
     await roll.evaluate();
 
     const breakdown: { label: string; die: string; result: number | string }[] =

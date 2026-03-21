@@ -2,7 +2,7 @@
      Context: { key, label, formula, sourceLabels, modifier, inline? }
      inline=true: compact single-row layout (for embedding in headers/rows) --}}
 <div class="roll-entry{{#if inline}} roll-entry--inline{{/if}}">
-  <div class="roll-name rollable" data-common-roll="{{key}}">{{localize label}}</div>
+  <div class="roll-name">{{localize label}}</div>
   <div class="roll-sources">{{sourceLabels}}</div>
   <div class="roll-formula-row">
     {{#if formula}}
@@ -15,5 +15,9 @@
     <div class="roll-modifier-field">
       <input type="text" name="system.rollModifiers.{{key}}" value="{{modifier}}" placeholder="+1d4">
     </div>
+  </div>
+  <div class="roll-actions">
+    <button type="button" class="roll-action-roll" data-common-roll="{{key}}"><span class="roll-emoji">🎲</span> Roll</button>
+    <button type="button" class="roll-action-pool" data-common-roll="{{key}}">Add to pool</button>
   </div>
 </div>
