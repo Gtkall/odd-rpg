@@ -87,7 +87,8 @@
       "skills": "Skills",
       "rolls": "Common Rolls",
       "strain": "Strain",
-      "staminaRoll": "Stamina Roll"
+      "staminaRoll": "Stamina Roll",
+      "initiative": "Initiative Roll"
     },
     "Strain": {
       "none": "—",
@@ -103,7 +104,8 @@
     "Rolls": {
       "awareness": "Awareness",
       "fear": "Fear",
-      "selfControl": "Self-Control"
+      "selfControl": "Self-Control",
+      "initiative": "Initiative"
     },
     "Sheet": {
       "Tabs": {

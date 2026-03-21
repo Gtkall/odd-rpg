@@ -6,6 +6,9 @@
         <span class="chip-die">{{die}}</span>
       </span>
     {{/each}}
+    {{#if dicePoolFlat}}
+      <span class="pool-flat">{{#if (gt dicePoolFlat 0)}}+{{/if}}{{dicePoolFlat}}</span>
+    {{/if}}
   {{else}}
     <span class="pool-empty">Click attributes or skills to build a pool</span>
   {{/if}}
