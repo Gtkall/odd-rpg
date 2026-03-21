@@ -1,3 +1,9 @@
+## [0.3.1](https://github.com/Gtkall/odd-rpg/compare/v0.3.0...v0.3.1) (2026-03-21)
+
+### Bug Fixes
+
+* clear roll modifier when bonus toggle is unchecked ([a9c0176](https://github.com/Gtkall/odd-rpg/commit/a9c0176d0eb08b8cf8b65f136f94c741066595f2))
+
 ## [0.3.0](https://github.com/Gtkall/odd-rpg/compare/v0.2.0...v0.3.0) (2026-03-21)
 
 ### Features
