@@ -252,6 +252,17 @@ export class OddActorSheet extends OddActorSheetBase {
       });
     });
 
+    html.querySelectorAll(".roll-entry .bonus-toggle input[type=checkbox]").forEach((el) => {
+      el.addEventListener("change", (ev: Event) => {
+        const checkbox = ev.currentTarget as HTMLInputElement;
+        if (!checkbox.checked) {
+          const key = checkbox.dataset.rollKey!;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- fvtt-types stubs don't model system.* dot-paths
+          void this.document.update({ [`system.rollModifiers.${key}`]: "" } as any);
+        }
+      });
+    });
+
     if (!this.isEditable) return;
 
     html.querySelectorAll("[data-fort-slot-toggle]").forEach((el) => {
