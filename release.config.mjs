@@ -12,20 +12,20 @@ export default {
       { preset: "conventionalcommits" },
     ],
     "@semantic-release/changelog",
+    // Bumps package.json version; npmPublish: false skips the npm registry
+    ["@semantic-release/npm", { npmPublish: false }],
     [
       "@semantic-release/exec",
       {
-        // Runs after version is determined — updates system.json, builds ZIP
+        // Runs after npm version bump — updates system.json, syncs lock file, builds ZIP
         prepareCmd: "node scripts/prepare-release.mjs ${nextRelease.version}",
       },
     ],
-    // Bumps package.json version; npmPublish: false skips the npm registry
-    ["@semantic-release/npm", { npmPublish: false }],
     // Commits CHANGELOG.md, package.json, system.json back to main
     [
       "@semantic-release/git",
       {
-        assets: ["CHANGELOG.md", "package.json", "system.json"],
+        assets: ["CHANGELOG.md", "package.json", "package-lock.json", "system.json"],
         message: "chore(release): ${nextRelease.version} [skip ci]",
       },
     ],
