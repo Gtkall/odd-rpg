@@ -9,7 +9,7 @@
     <div class="roll-formula">{{formula}}</div>
     {{/if}}
     <label class="bonus-toggle" title="Add bonus formula">
-      <input type="checkbox" {{#if modifier}}checked{{/if}}>
+      <input type="checkbox" data-roll-key="{{key}}" {{#if modifier}}checked{{/if}}>
       <span class="bonus-indicator">+</span>
     </label>
     <div class="roll-modifier-field">
