@@ -191,6 +191,7 @@ export class OddActorSheet extends OddActorSheetBase {
   }
 
   _dicePool: { id: string; label: string; die: string }[] = [];
+  _dicePoolFlat = 0;
 
   override async _onRender(_context: any, _options: any) {
     const html = this.element;
@@ -297,6 +298,7 @@ export class OddActorSheet extends OddActorSheetBase {
 
   async _clearDicePool(): Promise<void> {
     this._dicePool = [];
+    this._dicePoolFlat = 0;
     await this._updateDicePoolTray();
   }
 
@@ -306,7 +308,7 @@ export class OddActorSheet extends OddActorSheetBase {
 
     tray.innerHTML = await foundry.applications.handlebars.renderTemplate(
       "systems/odd-rpg/templates/actor/dice-pool-tray.hbs",
-      { dicePool: this._dicePool },
+      { dicePool: this._dicePool, dicePoolFlat: this._dicePoolFlat },
     );
 
     tray.querySelector(".dice-pool-roll-btn")?.addEventListener("click", () => { void this._rollDicePool(); });
@@ -321,8 +323,11 @@ export class OddActorSheet extends OddActorSheetBase {
 
   async _rollDicePool(): Promise<void> {
     if (this._dicePool.length === 0) return;
-    await this._executeRoll(this._dicePool);
+    const flatSign = this._dicePoolFlat > 0 ? "+" : "";
+    const bonus = this._dicePoolFlat !== 0 ? `${flatSign}${this._dicePoolFlat}` : undefined;
+    await this._executeRoll(this._dicePool, bonus);
     this._dicePool = [];
+    this._dicePoolFlat = 0;
     void this._updateDicePoolTray();
   }
 
@@ -360,13 +365,27 @@ export class OddActorSheet extends OddActorSheetBase {
       await this._addToDicePool(label, die);
     }
     if (resolved.bonus) {
-      const resolvedBonus = this._resolveBonusFormula(resolved.bonus);
-      for (const term of new Roll(resolvedBonus).terms) {
-        if (term instanceof foundry.dice.terms.DiceTerm) {
-          const { number, faces } = term as unknown as { number: number | undefined; faces: number };
-          await this._addToDicePool("Bonus", `${number ?? 1}d${faces}`);
-        }
-        // Flat numeric values only affect the total when rolling directly — skip for pool
+      await this._addBonusTermsToPool(this._resolveBonusFormula(resolved.bonus));
+    }
+  }
+
+  private async _addBonusTermsToPool(resolvedBonus: string): Promise<void> {
+    let sign = 1;
+    for (const term of new Roll(resolvedBonus).terms) {
+      if (term instanceof foundry.dice.terms.OperatorTerm) {
+        const { operator } = term as unknown as { operator: string };
+        sign = operator === "-" ? -1 : 1;
+      } else if (term instanceof foundry.dice.terms.DiceTerm) {
+        const { number, faces } = term as unknown as { number: number | undefined; faces: number };
+        const count = number ?? 1;
+        const prefix = sign < 0 ? "-" : "";
+        for (let i = 0; i < count; i++) await this._addToDicePool("Bonus", `${prefix}d${faces}`);
+        sign = 1;
+      } else if (term instanceof foundry.dice.terms.NumericTerm) {
+        const { number } = term as unknown as { number: number };
+        this._dicePoolFlat += sign * number;
+        await this._updateDicePoolTray();
+        sign = 1;
       }
     }
   }
@@ -396,10 +415,13 @@ export class OddActorSheet extends OddActorSheetBase {
         result: roll.dice[i]?.total ?? "?",
       }));
 
-    // Bonus dice sit in roll.dice beyond the source entries
+    // Bonus dice sit in roll.dice beyond the source entries; expand NdX into N rows
     for (const term of roll.dice.slice(entries.length)) {
-      const dieLabel = (term.number ?? 1) > 1 ? `${term.number}d${term.faces}` : `d${term.faces}`;
-      breakdown.push({ label: "Bonus", die: dieLabel, result: term.total ?? "?" });
+      const dieLabel = `d${term.faces}`;
+      const results = term.results as { result: number }[];
+      for (const { result } of results) {
+        breakdown.push({ label: "Bonus", die: dieLabel, result });
+      }
     }
 
     const diceCount = breakdown.length;

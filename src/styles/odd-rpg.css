@@ -396,6 +396,15 @@
     border-color: #ff4444;
 }
 
+.odd-rpg .pool-flat {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #aaa;
+    padding: 0 0.2rem;
+}
+
 
 .odd-rpg .dice-pool-actions {
     display: flex;
@@ -755,17 +764,22 @@
     background: #1e1e1e;
     color: #aaa;
     cursor: pointer;
-    transition: border-color 0.15s, color 0.15s;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
 }
 
-.odd-rpg .roll-action-roll:hover,
+.odd-rpg .roll-action-roll {
+    background: var(--odd-color-accent);
+    border-color: var(--odd-color-accent);
+    color: #111;
+}
+
+.odd-rpg .roll-action-roll:hover {
+    filter: brightness(1.15);
+}
+
 .odd-rpg .roll-action-pool:hover {
     border-color: #888;
     color: var(--odd-color-primary);
-}
-
-.odd-rpg .roll-emoji {
-    filter: grayscale(1);
 }
 
 .odd-rpg .roll-entry--inline .roll-actions {
