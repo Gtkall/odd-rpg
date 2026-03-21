@@ -25,7 +25,9 @@ import {
   WEAPON_TAGS,
   ARMOR_LOCATIONS,
 } from "./config";
-import type { CharacterSystemData, WeaponSystemData, ArmorSystemData } from "./data-models";
+import type { CharacterSystemData } from "./data/actor/character.js";
+import type { WeaponSystemData } from "./data/item/weapon.js";
+import type { ArmorSystemData } from "./data/item/armor.js";
 
 const { ActorSheetV2, ItemSheetV2 } = foundry.applications.sheets;
 const { HandlebarsApplicationMixin } = foundry.applications.api;

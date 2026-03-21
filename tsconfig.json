@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "types": ["fvtt-types"],
+    "types": ["fvtt-types", "vite/client"],
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Bundler",

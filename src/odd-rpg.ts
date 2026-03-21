@@ -1,50 +1,47 @@
 /**
  * ODD RPG — System Entry Point
  *
- * Registers all custom Document classes, Data Models, sheets, and
- * system-wide configuration with FoundryVTT.
+ * Adding a new Actor type:  create src/module/data/actor/<type>.ts (export default)
+ * Adding a new Item type:   create src/module/data/item/<type>.ts  (export default)
+ * Adding a new template:    drop a .hbs anywhere under templates/
+ * Everything else is auto-discovered.
  */
 
 import { ODD } from "./module/config.js";
 import { OddActor, OddItem } from "./module/documents.js";
 import { OddActorSheet, OddItemSheet } from "./module/sheets.js";
-import {
-  CharacterDataModel,
-  ItemDataModel,
-  FeatureDataModel,
-  SpellDataModel,
-  WeaponDataModel,
-  ArmorDataModel,
-} from "./module/data-models.js";
 
 const loadTemplates = foundry.applications.handlebars.loadTemplates;
 const DocumentSheetConfig = foundry.applications.apps.DocumentSheetConfig;
+
+// ---- Auto-discover Handlebars templates ----------------------------------------
+const templatePaths = Object.keys(
+  import.meta.glob("../templates/**/*.hbs"),
+).map(p => p.replace("../", "systems/odd-rpg/"));
+
+// ---- Auto-discover data models (file name = Foundry type name) -----------------
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type DataModelCtor = abstract new (...args: any[]) => any;
+
+const actorModels = import.meta.glob<DataModelCtor>(
+  "./module/data/actor/*.ts",
+  { eager: true, import: "default" },
+);
+const itemModels = import.meta.glob<DataModelCtor>(
+  "./module/data/item/*.ts",
+  { eager: true, import: "default" },
+);
+
+const typeName = (path: string) => path.split("/").pop()!.replace(".ts", "");
 
 /* -------------------------------------------------------------------------- */
 /*  Initialization                                                            */
 /* -------------------------------------------------------------------------- */
 
 Hooks.once("init", () => {
-  console.warn("ODD RPG | Initialising the ODD RPG game system");
+  console.warn("ODD RPG | Initializing the ODD RPG game system");
 
-  // ---- Preload Handlebars templates ----
-  void loadTemplates([
-    // Partials (registered by path so {{> "path"}} works in templates)
-    "systems/odd-rpg/templates/actor/partials/table-attributes.hbs",
-    "systems/odd-rpg/templates/actor/partials/table-statistics.hbs",
-    "systems/odd-rpg/templates/actor/partials/table-skills.hbs",
-    "systems/odd-rpg/templates/actor/partials/table-rolls.hbs",
-    "systems/odd-rpg/templates/actor/partials/table-strain.hbs",
-    // Tabs
-    "systems/odd-rpg/templates/actor/dice-pool-tray.hbs",
-    "systems/odd-rpg/templates/actor/tabs/character-main.hbs",
-    "systems/odd-rpg/templates/actor/tabs/character-combat.hbs",
-    "systems/odd-rpg/templates/actor/tabs/character-talents-flaws.hbs",
-    "systems/odd-rpg/templates/chat/dice-pool-roll.hbs",
-    // Item partials
-    "systems/odd-rpg/templates/item/partials/weapon-form.hbs",
-    "systems/odd-rpg/templates/item/partials/armor-form.hbs",
-  ]);
+  void loadTemplates(templatePaths);
 
   // ---- System configuration ----
   (CONFIG as any).ODD = ODD;
@@ -54,12 +51,12 @@ Hooks.once("init", () => {
   (CONFIG as any).Item.documentClass = OddItem;
 
   // ---- Data Models ----
-  CONFIG.Actor.dataModels.character = CharacterDataModel as any;
-  CONFIG.Item.dataModels.item = ItemDataModel as any;
-  CONFIG.Item.dataModels.feature = FeatureDataModel as any;
-  CONFIG.Item.dataModels.spell = SpellDataModel as any;
-  CONFIG.Item.dataModels.weapon = WeaponDataModel as any;
-  CONFIG.Item.dataModels.armor  = ArmorDataModel as any;
+  for (const [path, model] of Object.entries(actorModels)) {
+    CONFIG.Actor.dataModels[typeName(path)] = model as any;
+  }
+  for (const [path, model] of Object.entries(itemModels)) {
+    CONFIG.Item.dataModels[typeName(path)] = model as any;
+  }
 
   // ---- Trackable token attributes ----
   (CONFIG as any).Actor.trackableAttributes = {
@@ -74,11 +71,11 @@ Hooks.once("init", () => {
   DocumentSheetConfig.unregisterSheet(Item, "core", foundry.appv1.sheets.ItemSheet);
 
   DocumentSheetConfig.registerSheet(Actor, "odd-rpg", OddActorSheet, {
-    types: ["character"],
+    types: Object.keys(actorModels).map(typeName),
     makeDefault: true,
   });
   DocumentSheetConfig.registerSheet(Item, "odd-rpg", OddItemSheet, {
-    types: ["item", "feature", "spell", "weapon", "armor"],
+    types: Object.keys(itemModels).map(typeName),
     makeDefault: true,
   });
 });

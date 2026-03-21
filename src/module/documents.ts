@@ -4,7 +4,8 @@
  * These extend the core Actor and Item classes with system-specific logic.
  */
 
-import type { BaseItemSystemData, CharacterSystemData } from "./data-models";
+import type { BaseItemSystemData } from "./data/_base.js";
+import type { CharacterSystemData } from "./data/actor/character.js";
 
 /**
  * Extended Actor class for the ODD RPG system.
