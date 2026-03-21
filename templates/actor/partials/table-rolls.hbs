@@ -1,7 +1,19 @@
-{{!-- Common Rolls table --}}
-<div class="rolls-panel">
-  <h3 class="panel-header">{{localize "ODD.Sections.rolls"}}</h3>
-  {{#each commonRolls}}
-  {{> "systems/odd-rpg/templates/actor/partials/roll-entry.hbs" this}}
-  {{/each}}
+<div class="rolls-column">
+  {{!-- Common Rolls --}}
+  <div class="rolls-panel">
+    <h3 class="panel-header">{{localize "ODD.Sections.rolls"}}</h3>
+    {{#each commonRolls}}
+    {{> "systems/odd-rpg/templates/actor/partials/roll-entry.hbs" this}}
+    {{/each}}
+  </div>
+
+  {{!-- Saved Rolls --}}
+  {{#if savedRolls.length}}
+  <div class="rolls-panel saved-rolls-panel">
+    <h3 class="panel-header">{{localize "ODD.Sections.savedRolls"}}</h3>
+    {{#each savedRolls}}
+    {{> "systems/odd-rpg/templates/actor/partials/roll-entry.hbs" this}}
+    {{/each}}
+  </div>
+  {{/if}}
 </div>

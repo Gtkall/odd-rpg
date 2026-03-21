@@ -19,5 +19,8 @@
   <div class="roll-actions">
     <button type="button" class="roll-action-roll" data-common-roll="{{key}}">Roll</button>
     <button type="button" class="roll-action-pool" data-common-roll="{{key}}">Add to pool</button>
+    {{#if deletable}}
+    <button type="button" class="roll-action-delete" data-delete-roll="{{key}}" title="Delete">✕</button>
+    {{/if}}
   </div>
 </div>

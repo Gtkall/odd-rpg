@@ -132,6 +132,18 @@ export class OddActorSheet extends OddActorSheetBase {
     const initiativeRoll = allRolls.find((r) => r.key === INITIATIVE_ROLL.key);
     const staminaRoll = allRolls.find((r) => r.key === STAMINA_ROLL.key);
 
+    const savedRolls = system.savedRolls.map((r) => ({
+      key: r.id,
+      label: r.name,
+      formula: [
+        ...r.dice.map((d) => d.die),
+        ...(r.flat !== 0 ? [`${r.flat > 0 ? "+" : ""}${r.flat}`] : []),
+      ].join("+"),
+      sourceLabels: r.dice.map((d) => `${d.label} (${d.die})`).join(", "),
+      modifier: rollModifiers[r.id] ?? "",
+      deletable: true,
+    }));
+
     const { strain } = system;
     const lockedFortSlots = STRAIN_MAX_FORTITUDE_SLOTS - strain.fortitudeSlots;
     const strainSlots = Array.from(
@@ -172,6 +184,7 @@ export class OddActorSheet extends OddActorSheetBase {
       attributeLayout,
       skillLayout,
       commonRolls,
+      savedRolls,
       initiativeRoll,
       staminaRoll,
       strainSlots,
@@ -193,6 +206,9 @@ export class OddActorSheet extends OddActorSheetBase {
 
   _dicePool: { id: string; label: string; die: string }[] = [];
   _dicePoolFlat = 0;
+  _rollHistory: { pool: { id: string; label: string; die: string }[]; flat: number }[] = [];
+  _rollHistoryIndex = -1;
+  _saveRollName = "";
 
   override async _onRender(_context: any, _options: any) {
     const html = this.element;
@@ -252,6 +268,12 @@ export class OddActorSheet extends OddActorSheetBase {
       });
     });
 
+    html.querySelectorAll(".roll-action-delete[data-delete-roll]").forEach((el) => {
+      el.addEventListener("click", () => {
+        void this._deleteSavedRoll((el as HTMLElement).dataset.deleteRoll!);
+      });
+    });
+
     html.querySelectorAll(".roll-entry .bonus-toggle input[type=checkbox]").forEach((el) => {
       el.addEventListener("change", (ev: Event) => {
         const checkbox = ev.currentTarget as HTMLInputElement;
@@ -264,6 +286,22 @@ export class OddActorSheet extends OddActorSheetBase {
     });
 
     if (!this.isEditable) return;
+
+    // Avatar click → FilePicker
+    html.querySelector<HTMLImageElement>("img.profile-img")
+      ?.addEventListener("click", () => {
+        /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
+        const fp = new (CONFIG as any).ux.FilePicker({
+          type: "image",
+          current: (this.document as any).img as string,
+          callback: (path: string) => {
+            void (this.document as unknown as { update(d: Record<string, unknown>): Promise<unknown> })
+              .update({ img: path });
+          },
+        });
+        fp.browse();
+        /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
+      });
 
     html.querySelectorAll("[data-fort-slot-toggle]").forEach((el) => {
       el.addEventListener("click", (ev: Event) => {
@@ -311,6 +349,7 @@ export class OddActorSheet extends OddActorSheetBase {
   async _clearDicePool(): Promise<void> {
     this._dicePool = [];
     this._dicePoolFlat = 0;
+    this._rollHistoryIndex = -1;
     await this._updateDicePoolTray();
   }
 
@@ -320,7 +359,14 @@ export class OddActorSheet extends OddActorSheetBase {
 
     tray.innerHTML = await foundry.applications.handlebars.renderTemplate(
       "systems/odd-rpg/templates/actor/dice-pool-tray.hbs",
-      { dicePool: this._dicePool, dicePoolFlat: this._dicePoolFlat, bonusDice: ["d4", "d6", "d8", "d10", "d12"] },
+      {
+        dicePool: this._dicePool,
+        dicePoolFlat: this._dicePoolFlat,
+        bonusDice: ["d4", "d6", "d8", "d10", "d12"],
+        historyCanGoUp: this._rollHistoryIndex < this._rollHistory.length - 1,
+        historyCanGoDown: this._rollHistoryIndex >= 0,
+        saveRollName: this._saveRollName,
+      },
     );
 
     tray.querySelector(".dice-pool-roll-btn")?.addEventListener("click", () => { void this._rollDicePool(); });
@@ -337,16 +383,78 @@ export class OddActorSheet extends OddActorSheetBase {
         if (die) void this._addToDicePool("Bonus", die);
       });
     });
+    tray.querySelector(".history-up")?.addEventListener("click", () => { this._navigateHistory("up"); });
+    tray.querySelector(".history-down")?.addEventListener("click", () => { this._navigateHistory("down"); });
+    tray.querySelector<HTMLInputElement>(".save-roll-name")?.addEventListener("input", (ev) => {
+      this._saveRollName = (ev.currentTarget as HTMLInputElement).value;
+    });
+    tray.querySelector(".save-roll-btn")?.addEventListener("click", () => { void this._saveCurrentRoll(); });
   }
 
   async _rollDicePool(): Promise<void> {
     if (this._dicePool.length === 0) return;
+    // Save to history before clearing
+    this._rollHistory.unshift({ pool: this._dicePool.map((e) => ({ ...e })), flat: this._dicePoolFlat });
+    if (this._rollHistory.length > 25) this._rollHistory.pop();
+    this._rollHistoryIndex = -1;
     const flatSign = this._dicePoolFlat > 0 ? "+" : "";
     const bonus = this._dicePoolFlat !== 0 ? `${flatSign}${this._dicePoolFlat}` : undefined;
     await this._executeRoll(this._dicePool, bonus);
     this._dicePool = [];
     this._dicePoolFlat = 0;
     void this._updateDicePoolTray();
+  }
+
+  private _navigateHistory(direction: "up" | "down"): void {
+    const len = this._rollHistory.length;
+    if (len === 0) return;
+    if (direction === "up") {
+      this._rollHistoryIndex = Math.min(this._rollHistoryIndex + 1, len - 1);
+    } else {
+      if (this._rollHistoryIndex === -1) return;
+      this._rollHistoryIndex = Math.max(this._rollHistoryIndex - 1, -1);
+    }
+    if (this._rollHistoryIndex >= 0) {
+      const entry = this._rollHistory[this._rollHistoryIndex];
+      this._dicePool = entry.pool.map((e) => ({ ...e }));
+      this._dicePoolFlat = entry.flat;
+    } else {
+      this._dicePool = [];
+      this._dicePoolFlat = 0;
+    }
+    void this._updateDicePoolTray();
+  }
+
+  private async _saveCurrentRoll(): Promise<void> {
+    if (this._dicePool.length === 0 && this._dicePoolFlat === 0) return;
+    const name = this._saveRollName.trim() || "Saved Roll";
+    const entry = {
+      id: crypto.randomUUID(),
+      name,
+      dice: this._dicePool.map(({ label, die }) => ({ label, die })),
+      flat: this._dicePoolFlat,
+    };
+    const current = this.characterSystem.savedRolls;
+    await (this.document as unknown as { update(d: Record<string, unknown>): Promise<unknown> })
+      .update({ "system.savedRolls": [...current, entry] });
+    this._saveRollName = "";
+  }
+
+  private async _deleteSavedRoll(id: string): Promise<void> {
+    const updated = this.characterSystem.savedRolls.filter((r) => r.id !== id);
+    await (this.document as unknown as { update(d: Record<string, unknown>): Promise<unknown> })
+      .update({ "system.savedRolls": updated });
+  }
+
+  private _resolveSavedRoll(key: string): { entries: { label: string; die: string }[]; bonus: string | undefined } | undefined {
+    const saved = this.characterSystem.savedRolls.find((r) => r.id === key);
+    if (!saved) return undefined;
+    const entries = saved.dice.filter((d) => d.die);
+    const flatSign = saved.flat > 0 ? "+" : "";
+    const flatBonus = saved.flat !== 0 ? `${flatSign}${saved.flat}` : undefined;
+    const modBonus = (this.characterSystem.rollModifiers[key] ?? "").trim() || undefined;
+    const bonus = modBonus ?? flatBonus;
+    return { entries, bonus };
   }
 
   private _resolveCommonRoll(key: string): { entries: { label: string; die: string }[]; bonus: string | undefined } | undefined {
@@ -368,13 +476,13 @@ export class OddActorSheet extends OddActorSheetBase {
   }
 
   async _rollCommonRoll(key: string): Promise<void> {
-    const resolved = this._resolveCommonRoll(key);
+    const resolved = this._resolveCommonRoll(key) ?? this._resolveSavedRoll(key);
     if (!resolved) return;
     await this._executeRoll(resolved.entries, resolved.bonus);
   }
 
   async _addCommonRollToPool(key: string): Promise<void> {
-    const resolved = this._resolveCommonRoll(key);
+    const resolved = this._resolveCommonRoll(key) ?? this._resolveSavedRoll(key);
     if (!resolved) return;
     for (const { label, die } of resolved.entries) {
       await this._addToDicePool(label, die);

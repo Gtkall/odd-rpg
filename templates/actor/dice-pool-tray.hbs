@@ -19,9 +19,19 @@
     <button type="button" class="dice-pool-clear-btn" {{#unless dicePool.length}}disabled{{/unless}}>Clear</button>
   </div>
 </div>
-<div class="dice-pool-add-row">
-  <span class="dice-pool-add-label">Add:</span>
-  {{#each bonusDice}}
-    <button type="button" class="dice-pool-add-die" data-die="{{this}}">{{this}}</button>
-  {{/each}}
+<div class="dice-pool-utility-row">
+  <div class="dice-pool-add-row">
+    <span class="dice-pool-add-label">Add:</span>
+    {{#each bonusDice}}
+      <button type="button" class="dice-pool-add-die" data-die="{{this}}">{{this}}</button>
+    {{/each}}
+  </div>
+  <div class="dice-pool-history-nav">
+    <button type="button" class="history-up" {{#unless historyCanGoUp}}disabled{{/unless}} title="Previous roll">↑</button>
+    <button type="button" class="history-down" {{#unless historyCanGoDown}}disabled{{/unless}} title="Next roll">↓</button>
+  </div>
+  <div class="dice-pool-save-row">
+    <input type="text" class="save-roll-name" value="{{saveRollName}}" placeholder="Roll name…" maxlength="40">
+    <button type="button" class="save-roll-btn" {{#unless dicePool.length}}disabled{{/unless}}>Save Roll</button>
+  </div>
 </div>
