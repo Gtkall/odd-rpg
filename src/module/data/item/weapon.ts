@@ -1,7 +1,5 @@
-import {
-  WEAPON_TYPES, WEAPON_HANDS, WEAPON_DISTANCE,
-  WEAPON_TEMPO_MIN, WEAPON_TEMPO_MAX, DICE_TYPES,
-} from "../../config.js";
+import { WEAPON_TYPES, WEAPON_HANDS, WEAPON_DISTANCE, WEAPON_TEMPO_MIN, WEAPON_TEMPO_MAX } from "../../config/weapon.js";
+import { DICE_TYPES } from "../../config/dice.js";
 import type { OddItemBase } from "../_base.js";
 
 const { ArrayField, BooleanField, HTMLField, NumberField, SchemaField, StringField } =

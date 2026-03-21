@@ -7,9 +7,11 @@
  * Everything else is auto-discovered.
  */
 
-import { ODD } from "./module/config.js";
-import { OddActor, OddItem } from "./module/documents.js";
-import { OddActorSheet, OddItemSheet } from "./module/sheets.js";
+import { ODD } from "./module/config/index.js";
+import { OddActor } from "./module/documents/actor.js";
+import { OddItem } from "./module/documents/item.js";
+import { OddActorSheet } from "./module/sheets/actor.js";
+import { OddItemSheet } from "./module/sheets/item.js";
 
 const loadTemplates = foundry.applications.handlebars.loadTemplates;
 const DocumentSheetConfig = foundry.applications.apps.DocumentSheetConfig;

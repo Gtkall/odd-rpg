@@ -1,45 +1,20 @@
-/**
- * ODD RPG — Sheet classes
- *
- * ActorSheet and ItemSheet subclasses that render the Handlebars templates
- * and handle user interaction.
- */
-
+import { ATTRIBUTES, ATTRIBUTE_DICE_TYPES, ATTRIBUTE_LAYOUT } from "../config/attributes.js";
+import { SKILLS, SKILL_CATEGORIES, SKILL_LAYOUT } from "../config/skills.js";
+import { DICE_TYPES } from "../config/dice.js";
+import { COMMON_ROLLS, STAMINA_ROLL } from "../config/rolls.js";
 import {
-  ATTRIBUTES,
-  ATTRIBUTE_DICE_TYPES,
-  ATTRIBUTE_LAYOUT,
-  COMMON_ROLLS,
-  DICE_TYPES,
-  SKILLS,
-  SKILL_CATEGORIES,
-  SKILL_LAYOUT,
-  STAMINA_ROLL,
-  STRAIN_DEFAULT_SLOT_COUNT,
-  STRAIN_FATIGUE_PENALTIES,
-  STRAIN_MAX_FORTITUDE_SLOTS,
-  STRAIN_VALUES,
-  WEAPON_TYPES,
-  WEAPON_HANDS,
-  WEAPON_DISTANCE,
-  WEAPON_TAGS,
-  ARMOR_LOCATIONS,
-} from "./config";
-import type { CharacterSystemData } from "./data/actor/character.js";
-import type { WeaponSystemData } from "./data/item/weapon.js";
-import type { ArmorSystemData } from "./data/item/armor.js";
+  STRAIN_VALUES, STRAIN_DEFAULT_SLOT_COUNT,
+  STRAIN_MAX_FORTITUDE_SLOTS, STRAIN_FATIGUE_PENALTIES,
+} from "../config/strain.js";
+import type { CharacterSystemData } from "../data/actor/character.js";
 
-const { ActorSheetV2, ItemSheetV2 } = foundry.applications.sheets;
+const { ActorSheetV2 } = foundry.applications.sheets;
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 
 // HandlebarsApplicationMixin returns an opaque type; cast once here so class
 // declarations stay readable and type inference flows correctly throughout.
 const OddActorSheetBase = HandlebarsApplicationMixin(ActorSheetV2) as typeof ActorSheetV2;
-const OddItemSheetBase = HandlebarsApplicationMixin(ItemSheetV2) as typeof ItemSheetV2;
 
-/**
- * Character sheet for ODD RPG Actors.
- */
 export class OddActorSheet extends OddActorSheetBase {
   static override readonly DEFAULT_OPTIONS = {
     classes: ["odd-rpg", "sheet", "actor", "character"],
@@ -111,10 +86,8 @@ export class OddActorSheet extends OddActorSheetBase {
     const actor = this.document;
     const system = this.characterSystem;
 
-    // Attribute pairs for the 2-column layout, driven by ATTRIBUTE_LAYOUT config
     const attributeLayout = ATTRIBUTE_LAYOUT.map(([left, right]) => ({ left, right }));
 
-    // Skill rows for the 3-column layout, driven by SKILL_LAYOUT config
     const skillLayout = SKILL_LAYOUT.map((row) =>
       row.map((catKey) => ({
         key: catKey,
@@ -127,7 +100,6 @@ export class OddActorSheet extends OddActorSheetBase {
       })),
     );
 
-    // Common rolls with computed formulas from current attribute/skill values
     const commonRolls = COMMON_ROLLS.map((roll) => {
       const sources = roll.sources.map((src) => {
         const die =
@@ -148,7 +120,6 @@ export class OddActorSheet extends OddActorSheetBase {
       };
     });
 
-    // Strain: always render all 10 slots; locked = Fort slots not yet unlocked by talent.
     const { strain } = system;
     const lockedFortSlots = STRAIN_MAX_FORTITUDE_SLOTS - strain.fortitudeSlots;
     const strainSlots = Array.from(
@@ -207,13 +178,11 @@ export class OddActorSheet extends OddActorSheetBase {
     return this.document.system as unknown as CharacterSystemData;
   }
 
-  /** Accumulated dice pool entries waiting to be rolled. */
   _dicePool: { id: string; label: string; die: string }[] = [];
 
   override async _onRender(_context: any, _options: any) {
     const html = this.element;
 
-    // Wire up tab navigation
     html.querySelectorAll(".sheet-tabs [data-tab]").forEach((el) => {
       el.addEventListener("click", (ev: Event) => {
         ev.preventDefault();
@@ -223,7 +192,6 @@ export class OddActorSheet extends OddActorSheetBase {
       });
     });
 
-    // Inject dice pool tray after the nav (once per sheet lifetime)
     if (!html.querySelector(".dice-pool-tray")) {
       const nav = html.querySelector(".sheet-tabs");
       if (nav) {
@@ -234,7 +202,6 @@ export class OddActorSheet extends OddActorSheetBase {
     }
     await this._updateDicePoolTray();
 
-    // Dice pool: click attribute/skill labels to add dice to the pool
     html.querySelectorAll("[data-roll-attribute]").forEach((el) => {
       el.addEventListener("click", (ev: Event) => {
         const key = (ev.currentTarget as HTMLElement).dataset.rollAttribute!;
@@ -259,7 +226,6 @@ export class OddActorSheet extends OddActorSheetBase {
       });
     });
 
-    // Common rolls: clicking the roll name immediately rolls all sources
     html.querySelectorAll("[data-common-roll]").forEach((el) => {
       el.addEventListener("click", () => {
         const key = (el as HTMLElement).dataset.commonRoll!;
@@ -267,10 +233,8 @@ export class OddActorSheet extends OddActorSheetBase {
       });
     });
 
-    // Only allow editing for owners
     if (!this.isEditable) return;
 
-    // Fortitude manual slot toggle (🔒/🔓 per Fort slot)
     html.querySelectorAll("[data-fort-slot-toggle]").forEach((el) => {
       el.addEventListener("click", (ev: Event) => {
         ev.preventDefault();
@@ -283,7 +247,6 @@ export class OddActorSheet extends OddActorSheetBase {
       });
     });
 
-    // Delete owned item
     html.querySelectorAll(".item-delete").forEach((el) => {
       el.addEventListener("click", (ev: Event) => {
         const li = (ev.currentTarget as HTMLElement).closest<HTMLElement>(".item")!;
@@ -292,7 +255,6 @@ export class OddActorSheet extends OddActorSheetBase {
       });
     });
 
-    // Edit owned item (must be editable)
     html.querySelectorAll(".item-edit").forEach((el) => {
       el.addEventListener("click", (ev: Event) => {
         const li = (ev.currentTarget as HTMLElement).closest<HTMLElement>(".item")!;
@@ -305,25 +267,22 @@ export class OddActorSheet extends OddActorSheetBase {
       });
     });
   }
-  /** Add a die entry to the pool and refresh the tray. */
+
   async _addToDicePool(label: string, die: string): Promise<void> {
     this._dicePool.push({ id: crypto.randomUUID(), label, die });
     await this._updateDicePoolTray();
   }
 
-  /** Remove a single entry by id and refresh the tray. */
   async _removeFromDicePool(id: string): Promise<void> {
     this._dicePool = this._dicePool.filter((e) => e.id !== id);
     await this._updateDicePoolTray();
   }
 
-  /** Clear all dice from the pool and refresh the tray. */
   async _clearDicePool(): Promise<void> {
     this._dicePool = [];
     await this._updateDicePoolTray();
   }
 
-  /** Rebuild the tray DOM to reflect the current pool state. */
   async _updateDicePoolTray(): Promise<void> {
     const tray = this.element.querySelector(".dice-pool-tray");
     if (!tray) return;
@@ -343,7 +302,6 @@ export class OddActorSheet extends OddActorSheetBase {
     });
   }
 
-  /** Roll all pooled dice and post a chat message with an expandable breakdown. */
   async _rollDicePool(): Promise<void> {
     if (this._dicePool.length === 0) return;
     await this._executeRoll(this._dicePool);
@@ -351,7 +309,6 @@ export class OddActorSheet extends OddActorSheetBase {
     void this._updateDicePoolTray();
   }
 
-  /** Roll a predefined common roll by config key and post to chat. */
   async _rollCommonRoll(key: string): Promise<void> {
     const def = COMMON_ROLLS.find((r) => r.key === key) ?? (STAMINA_ROLL.key === key ? STAMINA_ROLL : undefined);
     if (!def) return;
@@ -365,11 +322,10 @@ export class OddActorSheet extends OddActorSheetBase {
           ? system.attributes[src.key]
           : (system.skills[src.category][src.key] ?? ""),
       }))
-      .filter((e) => e.die); // skip untrained skills
+      .filter((e) => e.die);
     await this._executeRoll(entries);
   }
 
-  /** Evaluate a set of labelled dice, post a breakdown chat message. */
   private async _executeRoll(entries: { label: string; die: string }[]): Promise<void> {
     if (entries.length === 0) return;
 
@@ -399,189 +355,5 @@ export class OddActorSheet extends OddActorSheetBase {
       content,
       rolls: [roll],
     });
-  }
-}
-
-/**
- * Sheet for ODD RPG Items.
- */
-export class OddItemSheet extends OddItemSheetBase {
-
-  /** Whether the sheet is currently in edit mode. */
-  #isEditMode = false;
-
-  static override readonly DEFAULT_OPTIONS = {
-    classes: ["odd-rpg", "sheet", "item"],
-    position: { width: 520, height: 560 },
-    form: { submitOnChange: true },
-    window: { resizable: true },
-  };
-
-  static readonly PARTS = {
-    sheet: {
-      template: "systems/odd-rpg/templates/item/item-sheet.hbs",
-    },
-  };
-
-  override async _prepareContext(options: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
-    const context = await super._prepareContext(options);
-    const item = this.document;
-    const system = item.system as unknown as WeaponSystemData;
-
-    const weaponContext = (item.type as string) === "weapon"
-      ? {
-          weaponTypes:    WEAPON_TYPES,
-          weaponHands:    WEAPON_HANDS,
-          weaponDistance: WEAPON_DISTANCE,
-          weaponTags:     WEAPON_TAGS,
-          diceTypes:      DICE_TYPES,
-          showOneHanded:  system.hands !== "2h",
-          showTwoHanded:  system.hands !== "1h",
-          showBoth:       system.hands === "versatile",
-          distanceLabel:  system.weaponType === "melee"
-            ? "ODD.Weapon.Reach"
-            : "ODD.Weapon.Range",
-        }
-      : {};
-
-    const armorSystem = item.system as unknown as ArmorSystemData;
-    const armorContext = (item.type as string) === "armor"
-      ? (() => {
-          const locationActive: Record<string, boolean> = {};
-          for (const key of Object.keys(ARMOR_LOCATIONS)) {
-            locationActive[key] = armorSystem.location.includes(key);
-          }
-          return {
-            armorLocations:    ARMOR_LOCATIONS,
-            locationActive,
-            locationAllActive: Object.values(locationActive).every(Boolean),
-          };
-        })()
-      : {};
-
-    const isEditMode = this.#isEditMode;
-    const enrichedDescription = isEditMode
-      ? ""
-      : await foundry.applications.ux.TextEditor.enrichHTML(
-          ((item.system as Record<string, unknown>).description as string) || "",
-        );
-
-    return {
-      ...context,
-      item,
-      system: item.system,
-      isEditMode,
-      enrichedDescription,
-      ...weaponContext,
-      ...armorContext,
-    };
-  }
-
-  override async _onRender(context: any, options: any): Promise<void> { // eslint-disable-line @typescript-eslint/no-explicit-any
-    await super._onRender(context, options);
-
-    // Edit mode toggle
-    this.element.querySelector<HTMLButtonElement>("[data-edit-toggle]")
-      ?.addEventListener("click", () => {
-        this.#isEditMode = !this.#isEditMode;
-        void this.render();
-      });
-
-    // Image click → FilePicker
-    this.element.querySelector<HTMLImageElement>("img.item-img")
-      ?.addEventListener("click", () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const fp = new (CONFIG as any).ux.FilePicker({
-          type: "image",
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          current: (this.document as any).img as string,
-          callback: (path: string) => {
-            void (this.document as unknown as { update(d: Record<string, unknown>): Promise<unknown> })
-              .update({ img: path });
-          },
-        });
-        void fp.browse();
-      });
-
-    if ((this.document.type as string) === "weapon") this._onRenderWeapon();
-    if ((this.document.type as string) === "armor")  this._onRenderArmor();
-  }
-
-  private _onRenderWeapon(): void {
-    const html = this.element;
-
-    // Add tag on Enter
-    html.querySelector<HTMLInputElement>(".tag-input")
-      ?.addEventListener("keydown", (ev: KeyboardEvent) => {
-        if (ev.key !== "Enter") return;
-        ev.preventDefault();
-        const input = ev.currentTarget as HTMLInputElement;
-        const tag = input.value.trim();
-        if (!tag) return;
-        input.value = "";
-        const notes = [...(this.document.system as unknown as WeaponSystemData).notes, tag];
-        void (this.document as unknown as { update(d: Record<string, unknown>): Promise<unknown> })
-          .update({ "system.notes": notes });
-      });
-
-    // Remove tag pill
-    html.querySelectorAll<HTMLButtonElement>("[data-remove-tag]")
-      .forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const tag = btn.dataset.removeTag!;
-          const notes = (this.document.system as unknown as WeaponSystemData).notes
-            .filter((t) => t !== tag);
-          void (this.document as unknown as { update(d: Record<string, unknown>): Promise<unknown> })
-            .update({ "system.notes": notes });
-        });
-      });
-  }
-
-  private _onRenderArmor(): void {
-    const html = this.element;
-    const doc = this.document as unknown as { update(d: Record<string, unknown>): Promise<unknown> };
-    const allKeys = Object.keys(ARMOR_LOCATIONS);
-
-    // Location toggle buttons
-    html.querySelectorAll<HTMLButtonElement>("[data-location]")
-      .forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const loc = btn.dataset.location!;
-          const current = (this.document.system as unknown as ArmorSystemData).location;
-          let location: string[];
-          if (loc === "all") {
-            location = current.length === allKeys.length ? [] : [...allKeys];
-          } else if (current.includes(loc)) {
-            location = current.filter(l => l !== loc);
-          } else {
-            location = [...current, loc];
-          }
-          void doc.update({ "system.location": location });
-        });
-      });
-
-    // Add tag on Enter
-    html.querySelector<HTMLInputElement>(".tag-input")
-      ?.addEventListener("keydown", (ev: KeyboardEvent) => {
-        if (ev.key !== "Enter") return;
-        ev.preventDefault();
-        const input = ev.currentTarget as HTMLInputElement;
-        const tag = input.value.trim();
-        if (!tag) return;
-        input.value = "";
-        const notes = [...(this.document.system as unknown as ArmorSystemData).notes, tag];
-        void doc.update({ "system.notes": notes });
-      });
-
-    // Remove tag pill
-    html.querySelectorAll<HTMLButtonElement>("[data-remove-tag]")
-      .forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const tag = btn.dataset.removeTag!;
-          const notes = (this.document.system as unknown as ArmorSystemData).notes
-            .filter((t) => t !== tag);
-          void doc.update({ "system.notes": notes });
-        });
-      });
   }
 }

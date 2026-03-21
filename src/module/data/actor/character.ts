@@ -10,10 +10,10 @@
  * - Biography: free-form HTML
  */
 
-import {
-  ATTRIBUTES, SKILLS, ATTRIBUTE_DICE_TYPES, DICE_TYPES, DEFAULT_DIE,
-  STRAIN_VALUES, STRAIN_DEFAULT_SLOT_COUNT, STRAIN_MAX_FORTITUDE_SLOTS,
-} from "../../config.js";
+import { ATTRIBUTES, ATTRIBUTE_DICE_TYPES, DEFAULT_DIE } from "../../config/attributes.js";
+import { SKILLS } from "../../config/skills.js";
+import { DICE_TYPES } from "../../config/dice.js";
+import { STRAIN_VALUES, STRAIN_DEFAULT_SLOT_COUNT, STRAIN_MAX_FORTITUDE_SLOTS } from "../../config/strain.js";
 
 const { ArrayField, BooleanField, HTMLField, NumberField, SchemaField, StringField } =
   foundry.data.fields;

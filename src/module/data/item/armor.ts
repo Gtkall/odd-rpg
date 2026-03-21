@@ -1,4 +1,4 @@
-import { ARMOR_LOCATIONS } from "../../config.js";
+import { ARMOR_LOCATIONS } from "../../config/armor.js";
 import type { OddItemBase } from "../_base.js";
 
 const { ArrayField, HTMLField, NumberField, StringField } = foundry.data.fields;
