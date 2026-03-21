@@ -2,12 +2,20 @@ export type RollSource =
   | { type: "attribute"; key: string }
   | { type: "skill"; category: string; key: string };
 
+export type RollResolution = "sum" | "keepHighest";
+
 export interface CommonRollDef {
   key: string;
   label: string;
   sources: RollSource[];
   /** True for rolls that appear in a dedicated sheet section — excluded from the Common Rolls panel. */
   dedicated?: boolean;
+  /**
+   * How the dice pool is resolved.
+   * - "sum": add all dice (default)
+   * - "keepHighest": keep the single highest die (Foundry pool `{...}kh1` syntax)
+   */
+  rollResolution?: RollResolution;
 }
 
 export const COMMON_ROLLS: readonly CommonRollDef[] = Object.freeze([
@@ -15,6 +23,7 @@ export const COMMON_ROLLS: readonly CommonRollDef[] = Object.freeze([
     key: "initiative",
     label: "ODD.Rolls.initiative",
     dedicated: true,
+    rollResolution: "keepHighest",
     sources: [
       { type: "attribute", key: "agi" },
       { type: "attribute", key: "cun" },

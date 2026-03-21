@@ -565,69 +565,107 @@
 /*  Dice Pool Chat Message                                                    */
 /* -------------------------------------------------------------------------- */
 
-.odd-dice-pool-result {
-    padding: 0.25rem 0;
+.odd-roll-result {
+    padding: 0.3rem 0.25rem 0.1rem;
     color: #222;
-}
-
-.odd-dice-pool-result .roll-total {
-    font-size: 2.5rem;
-    font-weight: bold;
     text-align: center;
-    line-height: 1;
-    padding: 0.25rem 0;
-    color: #c0392b;
 }
 
-.odd-dice-pool-result .roll-breakdown {
-    margin-top: 0.5rem;
-    font-size: 0.85rem;
+.odd-roll-result .roll-label {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 0.2rem;
 }
 
-.odd-dice-pool-result .roll-breakdown summary {
-    cursor: pointer;
-    color: #666;
-    font-style: italic;
-    padding: 0.15rem 0;
-    -webkit-user-select: none;
-    user-select: none;
-}
-
-.odd-dice-pool-result .roll-breakdown summary:hover {
-    color: #222;
-}
-
-.odd-dice-pool-result .breakdown-list {
-    list-style: none;
-    margin: 0.35rem 0 0;
-    padding: 0;
-    border-top: 1px solid #ddd;
-}
-
-.odd-dice-pool-result .breakdown-row {
+/* ── Die chips row ── */
+.odd-roll-result .roll-dice-row {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.2rem 0.1rem;
-    border-bottom: 1px solid #eee;
-    font-size: 0.82rem;
+    justify-content: center;
+    gap: 0.2rem;
+    flex-wrap: wrap;
+    padding: 0.1rem 0;
 }
 
-.odd-dice-pool-result .source-label {
-    flex: 1;
-    color: #333;
+.odd-roll-result .roll-operator {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #aaa;
+    padding: 0 0.05rem;
+    margin-bottom: 1.1rem; /* vertically centre with the chip */
 }
 
-.odd-dice-pool-result .die-type {
-    color: #888;
-    min-width: 2rem;
-    text-align: center;
+.odd-roll-result .roll-die-entry {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
 }
 
-.odd-dice-pool-result .die-result {
-    font-weight: bold;
-    min-width: 1.5rem;
-    text-align: right;
+.odd-roll-result .die-chip {
+    width: 2.1rem;
+    height: 2.1rem;
+    border: 2px solid #c0392b;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #c0392b;
+    background: #fff9f9;
+}
+
+.odd-roll-result .die-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.1;
+}
+
+.odd-roll-result .die-type {
+    font-size: 0.58rem;
+    font-weight: 700;
+    color: #aaa;
+}
+
+.odd-roll-result .die-source {
+    font-size: 0.55rem;
+    color: #bbb;
+    max-width: 3rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Discarded (non-kept) dice for keepHighest */
+.odd-roll-result .roll-die-entry.discarded .die-chip {
+    border-color: #ccc;
+    color: #ccc;
+    background: #f5f5f5;
+    text-decoration: line-through;
+}
+
+.odd-roll-result .roll-die-entry.discarded .die-type,
+.odd-roll-result .roll-die-entry.discarded .die-source {
+    color: #ddd;
+}
+
+/* ── Total ── */
+.odd-roll-result .roll-divider {
+    height: 1px;
+    background: #e0e0e0;
+    margin: 0.4rem 0.5rem 0.25rem;
+}
+
+.odd-roll-result .roll-total {
+    font-size: 2.6rem;
+    font-weight: 700;
+    line-height: 1;
+    padding: 0.1rem 0 0.3rem;
     color: #c0392b;
 }
 

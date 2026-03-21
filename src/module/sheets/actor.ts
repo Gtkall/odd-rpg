@@ -2,6 +2,7 @@ import { ATTRIBUTES, ATTRIBUTE_DICE_TYPES, ATTRIBUTE_LAYOUT } from "../config/at
 import { SKILLS, SKILL_CATEGORIES, SKILL_LAYOUT } from "../config/skills.js";
 import { DICE_TYPES } from "../config/dice.js";
 import { COMMON_ROLLS, INITIATIVE_ROLL, STAMINA_ROLL } from "../config/rolls.js";
+import type { RollResolution } from "../config/rolls.js";
 import {
   STRAIN_VALUES, STRAIN_DEFAULT_SLOT_COUNT,
   STRAIN_MAX_FORTITUDE_SLOTS, STRAIN_FATIGUE_PENALTIES,
@@ -118,10 +119,14 @@ export class OddActorSheet extends OddActorSheetBase {
             : (SKILLS[src.category][src.key] ?? src.key);
         return { die, label: game.i18n!.localize(labelKey) };
       });
+      const dice = sources.filter((s) => s.die).map((s) => s.die);
+      const formula = roll.rollResolution === "keepHighest"
+        ? `{${dice.join(",")}}kh1`
+        : dice.join("+");
       return {
         key: roll.key,
         label: roll.label,
-        formula: sources.filter((s) => s.die).map((s) => s.die).join("+"),
+        formula,
         sourceLabels: sources.map((s) => s.label).join(" + "),
         modifier: rollModifiers[roll.key] ?? "",
       };
@@ -446,7 +451,7 @@ export class OddActorSheet extends OddActorSheetBase {
       .update({ "system.savedRolls": updated });
   }
 
-  private _resolveSavedRoll(key: string): { entries: { label: string; die: string }[]; bonus: string | undefined } | undefined {
+  private _resolveSavedRoll(key: string): { entries: { label: string; die: string }[]; bonus: string | undefined; resolution: RollResolution } | undefined {
     const saved = this.characterSystem.savedRolls.find((r) => r.id === key);
     if (!saved) return undefined;
     const entries = saved.dice.filter((d) => d.die);
@@ -454,10 +459,10 @@ export class OddActorSheet extends OddActorSheetBase {
     const flatBonus = saved.flat !== 0 ? `${flatSign}${saved.flat}` : undefined;
     const modBonus = (this.characterSystem.rollModifiers[key] ?? "").trim() || undefined;
     const bonus = modBonus ?? flatBonus;
-    return { entries, bonus };
+    return { entries, bonus, resolution: "sum" };
   }
 
-  private _resolveCommonRoll(key: string): { entries: { label: string; die: string }[]; bonus: string | undefined } | undefined {
+  private _resolveCommonRoll(key: string): { entries: { label: string; die: string }[]; bonus: string | undefined; resolution: RollResolution } | undefined {
     const def = COMMON_ROLLS.find((r) => r.key === key);
     if (!def) return undefined;
     const system = this.characterSystem;
@@ -472,13 +477,16 @@ export class OddActorSheet extends OddActorSheetBase {
       }))
       .filter((e) => e.die);
     const bonus = (system.rollModifiers[key] ?? "").trim() || undefined;
-    return { entries, bonus };
+    return { entries, bonus, resolution: def.rollResolution ?? "sum" };
   }
 
   async _rollCommonRoll(key: string): Promise<void> {
     const resolved = this._resolveCommonRoll(key) ?? this._resolveSavedRoll(key);
     if (!resolved) return;
-    await this._executeRoll(resolved.entries, resolved.bonus);
+    const total = await this._executeRoll(resolved.entries, resolved.bonus, resolved.resolution);
+    if (resolved.resolution === "keepHighest" && total !== undefined) {
+      await this._setInitiativeInCombat(total);
+    }
   }
 
   async _addCommonRollToPool(key: string): Promise<void> {
@@ -519,44 +527,59 @@ export class OddActorSheet extends OddActorSheetBase {
     return (Roll as unknown as RollWithReplaceFormulaData).replaceFormulaData(cleaned, rollData, { missing: "0" });
   }
 
-  private async _executeRoll(entries: { label: string; die: string }[], bonus?: string): Promise<void> {
-    if (entries.length === 0) return;
+  private async _executeRoll(
+    entries: { label: string; die: string }[],
+    bonus?: string,
+    resolution: RollResolution = "sum",
+  ): Promise<number | undefined> {
+    if (entries.length === 0) return undefined;
 
-    const parts = entries.map((e) => e.die);
-    if (bonus) {
-      parts.push(this._resolveBonusFormula(bonus));
-    }
-
-    const formula = parts.join("+");
-    const roll = new Roll(formula);
+    const diceParts = entries.map((e) => e.die);
+    const roll = new Roll(diceParts.join("+"));
     await roll.evaluate();
 
-    const breakdown: { label: string; die: string; result: number | string }[] =
-      entries.map(({ label, die }, i) => ({
-        label,
-        die,
-        result: roll.dice[i]?.total ?? "?",
-      }));
+    let finalTotal: number;
+    let breakdown: { label: string; die: string; result: number | string; discarded?: boolean }[];
 
-    // Bonus dice sit in roll.dice beyond the source entries; expand NdX into N rows
-    for (const term of roll.dice.slice(entries.length)) {
-      const dieLabel = `d${term.faces}`;
-      const results = term.results as { result: number }[];
-      for (const { result } of results) {
-        breakdown.push({ label: "Bonus", die: dieLabel, result });
+    if (resolution === "keepHighest") {
+      // Determine max die; mark the rest discarded
+      const dieValues = entries.map((_, i) => {
+        const r = roll.dice[i]?.results?.[0] as { result: number } | undefined;
+        return r?.result ?? 0;
+      });
+      const maxVal = Math.max(...dieValues);
+      const keptIdx = dieValues.indexOf(maxVal);
+
+      let bonusVal = 0;
+      if (bonus) {
+        const bonusRoll = await new Roll(this._resolveBonusFormula(bonus)).evaluate();
+        bonusVal = bonusRoll.total;
+      }
+      finalTotal = maxVal + bonusVal;
+      breakdown = entries.map(({ label, die }, i) => ({
+        label, die, result: dieValues[i] ?? "?", discarded: i !== keptIdx,
+      }));
+    } else {
+      if (bonus) {
+        const resolved = this._resolveBonusFormula(bonus);
+        const bonusRoll = await new Roll(resolved).evaluate();
+        finalTotal = roll.total! + bonusRoll.total;
+        breakdown = this._buildSumBreakdown(entries, roll);
+        // Bonus dice from the bonus roll
+        for (const term of bonusRoll.dice) {
+          const dieLabel = `d${term.faces}`;
+          const results = term.results as { result: number }[];
+          for (const { result } of results) breakdown.push({ label: "Bonus", die: dieLabel, result });
+        }
+      } else {
+        finalTotal = roll.total ?? 0;
+        breakdown = this._buildSumBreakdown(entries, roll);
       }
     }
 
-    const diceCount = breakdown.length;
     const content = await foundry.applications.handlebars.renderTemplate(
       "systems/odd-rpg/templates/chat/dice-pool-roll.hbs",
-      {
-        total: roll.total,
-        formula,
-        diceCount,
-        diceWord: diceCount === 1 ? "die" : "dice",
-        breakdown,
-      },
+      { total: finalTotal, breakdown, isKeepHighest: resolution === "keepHighest" },
     );
 
     await (ChatMessage as any).create({ // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -564,5 +587,29 @@ export class OddActorSheet extends OddActorSheetBase {
       content,
       rolls: [roll],
     });
+
+    return finalTotal;
+  }
+
+  private _buildSumBreakdown(
+    entries: { label: string; die: string }[],
+    roll: Roll,
+  ): { label: string; die: string; result: number | string }[] {
+    return entries.map(({ label, die }, i) => ({ label, die, result: roll.dice[i]?.total ?? "?" }));
+  }
+
+  private async _setInitiativeInCombat(value: number): Promise<void> {
+    /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
+    const combat = (game as any).combat;
+    if (!combat) return;
+    const tokens: { id: string }[] = (this.document as any).getActiveTokens();
+    if (tokens.length === 0) return; // no placed token — cannot create/find combatant
+    const token = tokens[0];
+    const existing = (combat.combatants as any[]).find(
+      (c: any) => c.actorId === this.document.id || c.tokenId === token.id,
+    );
+    const combatant = existing ?? (await combat.createEmbeddedDocuments("Combatant", [{ actorId: this.document.id, tokenId: token.id }]))[0];
+    await combatant.update({ initiative: value });
+    /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
   }
 }
