@@ -15,6 +15,10 @@ const { HandlebarsApplicationMixin } = foundry.applications.api;
 // declarations stay readable and type inference flows correctly throughout.
 const OddActorSheetBase = HandlebarsApplicationMixin(ActorSheetV2) as typeof ActorSheetV2;
 
+// fvtt-types doesn't fully model these APIs; typed once here to avoid repetition
+interface ActorWithRollData { getRollData(): Record<string, unknown> }
+interface RollWithReplaceFormulaData { replaceFormulaData(f: string, d: object, o?: { missing?: string }): string }
+
 export class OddActorSheet extends OddActorSheetBase {
   static override readonly DEFAULT_OPTIONS = {
     classes: ["odd-rpg", "sheet", "actor", "character"],
@@ -355,24 +359,34 @@ export class OddActorSheet extends OddActorSheetBase {
     for (const { label, die } of resolved.entries) {
       await this._addToDicePool(label, die);
     }
+    if (resolved.bonus) {
+      const resolvedBonus = this._resolveBonusFormula(resolved.bonus);
+      for (const term of new Roll(resolvedBonus).terms) {
+        if (term instanceof foundry.dice.terms.DiceTerm) {
+          const { number, faces } = term as unknown as { number: number | undefined; faces: number };
+          await this._addToDicePool("Bonus", `${number ?? 1}d${faces}`);
+        }
+        // Flat numeric values only affect the total when rolling directly — skip for pool
+      }
+    }
+  }
+
+  private _resolveBonusFormula(bonus: string): string {
+    const rollData = (this.document as unknown as ActorWithRollData).getRollData();
+    const cleaned = bonus.replace(/^\+/, "").trim();
+    return (Roll as unknown as RollWithReplaceFormulaData).replaceFormulaData(cleaned, rollData, { missing: "0" });
   }
 
   private async _executeRoll(entries: { label: string; die: string }[], bonus?: string): Promise<void> {
     if (entries.length === 0) return;
 
-    interface WithRollData { getRollData(): Record<string, unknown> }
-    interface RollStatic { replaceFormulaData(f: string, d: object, o?: { missing?: string }): string }
-    const rollData = (this.document as unknown as WithRollData).getRollData();
     const parts = entries.map((e) => e.die);
     if (bonus) {
-      const cleaned = bonus.replace(/^\+/, "").trim();
-      // Pre-resolve @ref tokens (e.g. @attributes.str) against actor data before rolling
-      rollData.situational = (Roll as unknown as RollStatic).replaceFormulaData(cleaned, rollData, { missing: "0" });
-      parts.push("@situational");
+      parts.push(this._resolveBonusFormula(bonus));
     }
 
     const formula = parts.join("+");
-    const roll = new Roll(formula, rollData);
+    const roll = new Roll(formula);
     await roll.evaluate();
 
     const breakdown: { label: string; die: string; result: number | string }[] =
