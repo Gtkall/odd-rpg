@@ -343,12 +343,18 @@
 
 .odd-rpg .dice-pool-tray {
     display: flex;
-    align-items: flex-start;
-    gap: 0.5rem;
+    flex-direction: column;
+    gap: 0.35rem;
     padding: 0.4rem 0.5rem;
+    min-height: 3.5rem;
     background: #111;
     border-bottom: 1px solid var(--odd-color-border);
-    flex-wrap: wrap;
+}
+
+.odd-rpg .dice-pool-tray-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .odd-rpg .dice-pool-chips {
@@ -406,11 +412,41 @@
 }
 
 
+.odd-rpg .dice-pool-add-row {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.odd-rpg .dice-pool-add-label {
+    font-size: 0.7rem;
+    color: var(--odd-color-muted, #888);
+    flex-shrink: 0;
+}
+
+.odd-rpg .dice-pool-add-die {
+    padding: 0.15rem 0.4rem;
+    font-size: 0.7rem;
+    font-family: var(--odd-font-primary);
+    font-weight: 600;
+    background: transparent;
+    border: 1px solid var(--odd-color-border);
+    border-radius: 3px;
+    color: var(--odd-color-primary);
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+}
+
+.odd-rpg .dice-pool-add-die:hover {
+    border-color: var(--odd-color-accent);
+    color: var(--odd-color-accent);
+}
+
 .odd-rpg .dice-pool-actions {
     display: flex;
     gap: 0.35rem;
-    align-self: center;
     flex-shrink: 0;
+    margin-left: auto;
 }
 
 .odd-rpg .dice-pool-actions button {

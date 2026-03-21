@@ -320,7 +320,7 @@ export class OddActorSheet extends OddActorSheetBase {
 
     tray.innerHTML = await foundry.applications.handlebars.renderTemplate(
       "systems/odd-rpg/templates/actor/dice-pool-tray.hbs",
-      { dicePool: this._dicePool, dicePoolFlat: this._dicePoolFlat },
+      { dicePool: this._dicePool, dicePoolFlat: this._dicePoolFlat, bonusDice: ["d4", "d6", "d8", "d10", "d12"] },
     );
 
     tray.querySelector(".dice-pool-roll-btn")?.addEventListener("click", () => { void this._rollDicePool(); });
@@ -329,6 +329,12 @@ export class OddActorSheet extends OddActorSheetBase {
       chip.addEventListener("click", () => {
         const id = (chip as HTMLElement).dataset.id;
         if (id) void this._removeFromDicePool(id);
+      });
+    });
+    tray.querySelectorAll(".dice-pool-add-die").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const die = (btn as HTMLElement).dataset.die;
+        if (die) void this._addToDicePool("Bonus", die);
       });
     });
   }
