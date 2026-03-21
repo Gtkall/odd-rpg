@@ -1,3 +1,15 @@
+## [0.4.0](https://github.com/Gtkall/odd-rpg/compare/v0.3.1...v0.4.0) (2026-03-21)
+
+### Features
+
+* **dice-pool:** add bonus dice buttons to pool tray ([f8ef5a4](https://github.com/Gtkall/odd-rpg/commit/f8ef5a4b0a3663a279e352c63c4d514dee42952b))
+* **dice-pool:** roll history, save rolls, and bonus dice buttons ([7ed89de](https://github.com/Gtkall/odd-rpg/commit/7ed89dee06c2194c5821d60a31434dd0139801fd))
+* **initiative:** keepHighest resolution + Foundry combat integration ([14b0649](https://github.com/Gtkall/odd-rpg/commit/14b06494765bdba66f126af2527ec2013f2bfbc7))
+
+### Bug Fixes
+
+* improve chat roll card readability and sheet title localization ([0a86341](https://github.com/Gtkall/odd-rpg/commit/0a863412c3ffe108f3e5879ca02c28125cabe10e)), closes [#999](https://github.com/Gtkall/odd-rpg/issues/999)
+
 ## [0.3.1](https://github.com/Gtkall/odd-rpg/compare/v0.3.0...v0.3.1) (2026-03-21)
 
 ### Bug Fixes
