@@ -20,17 +20,8 @@ const templatePaths = Object.keys(
 ).map(p => p.replace("../", "systems/odd-rpg/"));
 
 // ---- Auto-discover data models (file name = Foundry type name) -----------------
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type DataModelCtor = abstract new (...args: any[]) => any;
-
-const actorModels = import.meta.glob<DataModelCtor>(
-  "./module/data/actor/*.ts",
-  { eager: true, import: "default" },
-);
-const itemModels = import.meta.glob<DataModelCtor>(
-  "./module/data/item/*.ts",
-  { eager: true, import: "default" },
-);
+const actorModels = import.meta.glob("./module/data/actor/*.ts", { eager: true, import: "default" });
+const itemModels = import.meta.glob("./module/data/item/*.ts", { eager: true, import: "default" });
 
 const typeName = (path: string) => path.split("/").pop()!.replace(".ts", "");
 
@@ -44,22 +35,29 @@ Hooks.once("init", () => {
   void loadTemplates(templatePaths);
 
   // ---- System configuration ----
+  // CONFIG.ODD is a system-specific extension not in fvtt-types; cast is unavoidable here.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
   (CONFIG as any).ODD = ODD;
 
   // ---- Custom Document implementations ----
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
   (CONFIG as any).Actor.documentClass = OddActor;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
   (CONFIG as any).Item.documentClass = OddItem;
 
   // ---- Data Models ----
+  // model is unknown (glob return); cast to the record's value type to avoid bare `any`.
+  type ActorDataModel = (typeof CONFIG.Actor.dataModels)[string];
+  type ItemDataModel  = (typeof CONFIG.Item.dataModels)[string];
   for (const [path, model] of Object.entries(actorModels)) {
-    CONFIG.Actor.dataModels[typeName(path)] = model as any;
+    CONFIG.Actor.dataModels[typeName(path)] = model as ActorDataModel;
   }
   for (const [path, model] of Object.entries(itemModels)) {
-    CONFIG.Item.dataModels[typeName(path)] = model as any;
+    CONFIG.Item.dataModels[typeName(path)] = model as ItemDataModel;
   }
 
   // ---- Trackable token attributes ----
-  (CONFIG as any).Actor.trackableAttributes = {
+  CONFIG.Actor.trackableAttributes = {
     character: {
       bar: ["xp", "statistics.magicPoints"],
       value: ["statistics.movementRate", "statistics.composureThreshold", "statistics.healingRate"],
