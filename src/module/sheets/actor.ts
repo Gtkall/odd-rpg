@@ -127,9 +127,10 @@ export class OddActorSheet extends OddActorSheetBase {
       };
     };
 
-    const commonRolls = COMMON_ROLLS.map(buildRollContext);
-    const initiativeRoll = buildRollContext(INITIATIVE_ROLL);
-    const staminaRoll = buildRollContext(STAMINA_ROLL);
+    const allRolls = COMMON_ROLLS.map((def) => ({ ...buildRollContext(def), dedicated: def.dedicated }));
+    const commonRolls = allRolls.filter((r) => !r.dedicated);
+    const initiativeRoll = allRolls.find((r) => r.key === INITIATIVE_ROLL.key);
+    const staminaRoll = allRolls.find((r) => r.key === STAMINA_ROLL.key);
 
     const { strain } = system;
     const lockedFortSlots = STRAIN_MAX_FORTITUDE_SLOTS - strain.fortitudeSlots;
@@ -332,10 +333,7 @@ export class OddActorSheet extends OddActorSheetBase {
   }
 
   private _resolveCommonRoll(key: string): { entries: { label: string; die: string }[]; bonus: string | undefined } | undefined {
-    const def =
-      COMMON_ROLLS.find((r) => r.key === key) ??
-      (STAMINA_ROLL.key === key ? STAMINA_ROLL : undefined) ??
-      (INITIATIVE_ROLL.key === key ? INITIATIVE_ROLL : undefined);
+    const def = COMMON_ROLLS.find((r) => r.key === key);
     if (!def) return undefined;
     const system = this.characterSystem;
     const entries = def.sources

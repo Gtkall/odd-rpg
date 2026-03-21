@@ -6,9 +6,31 @@ export interface CommonRollDef {
   key: string;
   label: string;
   sources: RollSource[];
+  /** True for rolls that appear in a dedicated sheet section — excluded from the Common Rolls panel. */
+  dedicated?: boolean;
 }
 
 export const COMMON_ROLLS: readonly CommonRollDef[] = Object.freeze([
+  {
+    key: "initiative",
+    label: "ODD.Rolls.initiative",
+    dedicated: true,
+    sources: [
+      { type: "attribute", key: "agi" },
+      { type: "attribute", key: "cun" },
+      { type: "skill", category: "combat", key: "reflexes" },
+    ],
+  },
+  {
+    key: "stamina",
+    label: "ODD.Sections.staminaRoll",
+    dedicated: true,
+    sources: [
+      { type: "attribute", key: "vit" },
+      { type: "attribute", key: "wil" },
+      { type: "skill", category: "physical", key: "endurance" },
+    ],
+  },
   {
     key: "awareness",
     label: "ODD.Rolls.awareness",
@@ -36,22 +58,6 @@ export const COMMON_ROLLS: readonly CommonRollDef[] = Object.freeze([
   },
 ]);
 
-export const STAMINA_ROLL: CommonRollDef = {
-  key: "stamina",
-  label: "ODD.Sections.staminaRoll",
-  sources: [
-    { type: "attribute" as const, key: "vit" },
-    { type: "attribute" as const, key: "wil" },
-    { type: "skill" as const, category: "physical", key: "endurance" },
-  ],
-};
-
-export const INITIATIVE_ROLL: CommonRollDef = {
-  key: "initiative",
-  label: "ODD.Rolls.initiative",
-  sources: [
-    { type: "attribute" as const, key: "agi" },
-    { type: "attribute" as const, key: "cun" },
-    { type: "skill" as const, category: "combat", key: "reflexes" },
-  ],
-};
+/** Convenience accessors for rolls that also appear in dedicated sheet sections. */
+export const STAMINA_ROLL = COMMON_ROLLS.find((r) => r.key === "stamina")!;
+export const INITIATIVE_ROLL = COMMON_ROLLS.find((r) => r.key === "initiative")!;
