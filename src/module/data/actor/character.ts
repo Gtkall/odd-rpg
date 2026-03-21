@@ -15,7 +15,7 @@ import { SKILLS } from "../../config/skills.js";
 import { DICE_TYPES } from "../../config/dice.js";
 import { STRAIN_VALUES, STRAIN_DEFAULT_SLOT_COUNT, STRAIN_MAX_FORTITUDE_SLOTS } from "../../config/strain.js";
 
-const { ArrayField, BooleanField, HTMLField, NumberField, SchemaField, StringField } =
+const { ArrayField, BooleanField, HTMLField, NumberField, ObjectField, SchemaField, StringField } =
   foundry.data.fields;
 
 export class CharacterDataModel extends foundry.abstract.TypeDataModel<
@@ -79,6 +79,7 @@ export class CharacterDataModel extends foundry.abstract.TypeDataModel<
         ),
       }),
       biography: new HTMLField({ required: true, blank: true }),
+      rollModifiers: new ObjectField({ initial: {} }),
     } as CharacterDataModel.Schema;
   }
 
@@ -114,6 +115,7 @@ export interface CharacterSystemData {
     fortitudeManualSlots: boolean[];
   };
   biography: string;
+  rollModifiers: Record<string, string>;
   health: { value: number; max: number };
 }
 

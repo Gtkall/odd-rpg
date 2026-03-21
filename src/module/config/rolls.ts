@@ -45,3 +45,13 @@ export const STAMINA_ROLL: CommonRollDef = {
     { type: "skill" as const, category: "physical", key: "endurance" },
   ],
 };
+
+export const INITIATIVE_ROLL: CommonRollDef = {
+  key: "initiative",
+  label: "ODD.Rolls.initiative",
+  sources: [
+    { type: "attribute" as const, key: "agi" },
+    { type: "attribute" as const, key: "cun" },
+    { type: "skill" as const, category: "combat", key: "reflexes" },
+  ],
+};

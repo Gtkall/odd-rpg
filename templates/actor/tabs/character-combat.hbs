@@ -1,4 +1,9 @@
 {{!-- Combat Tab --}}
 <section class="tab character-combat {{ tab.cssClass }}" data-group="{{ tab.group }}" data-tab="{{ tab.id }}">
-  <p class="tab-placeholder">Combat — coming soon.</p>
+
+  <div class="initiative-panel">
+    <h3 class="panel-header">{{localize "ODD.Sections.initiative"}}</h3>
+    {{> "systems/odd-rpg/templates/actor/partials/roll-entry.hbs" initiativeRoll}}
+  </div>
+
 </section>

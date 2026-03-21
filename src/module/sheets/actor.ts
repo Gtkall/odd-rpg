@@ -1,7 +1,7 @@
 import { ATTRIBUTES, ATTRIBUTE_DICE_TYPES, ATTRIBUTE_LAYOUT } from "../config/attributes.js";
 import { SKILLS, SKILL_CATEGORIES, SKILL_LAYOUT } from "../config/skills.js";
 import { DICE_TYPES } from "../config/dice.js";
-import { COMMON_ROLLS, STAMINA_ROLL } from "../config/rolls.js";
+import { COMMON_ROLLS, INITIATIVE_ROLL, STAMINA_ROLL } from "../config/rolls.js";
 import {
   STRAIN_VALUES, STRAIN_DEFAULT_SLOT_COUNT,
   STRAIN_MAX_FORTITUDE_SLOTS, STRAIN_FATIGUE_PENALTIES,
@@ -100,7 +100,9 @@ export class OddActorSheet extends OddActorSheetBase {
       })),
     );
 
-    const commonRolls = COMMON_ROLLS.map((roll) => {
+    const rollModifiers: Record<string, string> = system.rollModifiers;
+
+    const buildRollContext = (roll: (typeof COMMON_ROLLS)[number]) => {
       const sources = roll.sources.map((src) => {
         const die =
           src.type === "attribute"
@@ -117,8 +119,12 @@ export class OddActorSheet extends OddActorSheetBase {
         label: roll.label,
         formula: sources.filter((s) => s.die).map((s) => s.die).join("+"),
         sourceLabels: sources.map((s) => s.label).join(" + "),
+        modifier: rollModifiers[roll.key] ?? "",
       };
-    });
+    };
+
+    const commonRolls = COMMON_ROLLS.map(buildRollContext);
+    const initiativeRoll = buildRollContext(INITIATIVE_ROLL);
 
     const { strain } = system;
     const lockedFortSlots = STRAIN_MAX_FORTITUDE_SLOTS - strain.fortitudeSlots;
@@ -160,6 +166,7 @@ export class OddActorSheet extends OddActorSheetBase {
       attributeLayout,
       skillLayout,
       commonRolls,
+      initiativeRoll,
       strainSlots,
       strainValues: STRAIN_VALUES,
       strainFortitudeManualOverride: strain.fortitudeManualOverride,
@@ -310,7 +317,10 @@ export class OddActorSheet extends OddActorSheetBase {
   }
 
   async _rollCommonRoll(key: string): Promise<void> {
-    const def = COMMON_ROLLS.find((r) => r.key === key) ?? (STAMINA_ROLL.key === key ? STAMINA_ROLL : undefined);
+    const def =
+      COMMON_ROLLS.find((r) => r.key === key) ??
+      (STAMINA_ROLL.key === key ? STAMINA_ROLL : undefined) ??
+      (INITIATIVE_ROLL.key === key ? INITIATIVE_ROLL : undefined);
     if (!def) return;
     const system = this.characterSystem;
     const entries = def.sources
@@ -323,13 +333,16 @@ export class OddActorSheet extends OddActorSheetBase {
           : (system.skills[src.category][src.key] ?? ""),
       }))
       .filter((e) => e.die);
-    await this._executeRoll(entries);
+    const bonus = system.rollModifiers[key].trim() || undefined;
+    await this._executeRoll(entries, bonus);
   }
 
-  private async _executeRoll(entries: { label: string; die: string }[]): Promise<void> {
+  private async _executeRoll(entries: { label: string; die: string }[], bonus?: string): Promise<void> {
     if (entries.length === 0) return;
 
-    const formula = entries.map((e) => e.die).join("+");
+    const base = entries.map((e) => e.die).join("+");
+    const sanitizedBonus = bonus?.startsWith("-") ? bonus : `+${bonus?.replace(/^\+/, "")}`;
+    const formula = bonus ? `${base}${sanitizedBonus}` : base;
     const roll = new Roll(formula);
     await roll.evaluate();
 

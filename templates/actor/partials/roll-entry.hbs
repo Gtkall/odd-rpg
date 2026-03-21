@@ -1,0 +1,18 @@
+{{!-- Reusable roll entry partial.
+     Context: { key, label, formula, sourceLabels, modifier } --}}
+<div class="roll-entry">
+  <div class="roll-name rollable" data-common-roll="{{key}}">{{localize label}}</div>
+  <div class="roll-formula-row">
+    {{#if formula}}
+    <div class="roll-formula">{{formula}}</div>
+    {{/if}}
+    <label class="bonus-toggle" title="Add bonus formula">
+      <input type="checkbox" {{#if modifier}}checked{{/if}}>
+      <span class="bonus-indicator">+</span>
+    </label>
+    <div class="roll-modifier-field">
+      <input type="text" name="system.rollModifiers.{{key}}" value="{{modifier}}" placeholder="+1d4">
+    </div>
+  </div>
+  <div class="roll-sources">{{sourceLabels}}</div>
+</div>
