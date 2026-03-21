@@ -1,16 +1,22 @@
 {{!-- Dice Pool Roll Chat Message --}}
-<div class="odd-dice-pool-result">
+<div class="odd-roll-result">
+  {{#if isKeepHighest}}<div class="roll-label">Initiative Index</div>{{/if}}
+
+  <div class="roll-dice-row">
+    {{#each breakdown}}
+      {{#unless @first}}
+        {{#unless ../isKeepHighest}}<span class="roll-operator">+</span>{{/unless}}
+      {{/unless}}
+      <div class="roll-die-entry{{#if this.discarded}} discarded{{/if}}">
+        <div class="die-chip">{{this.result}}</div>
+        <div class="die-meta">
+          <span class="die-type">{{this.die}}</span>
+          <span class="die-source">{{this.label}}</span>
+        </div>
+      </div>
+    {{/each}}
+  </div>
+
+  <div class="roll-divider"></div>
   <div class="roll-total">{{total}}</div>
-  <details class="roll-breakdown">
-    <summary>{{diceCount}} {{diceWord}} — {{formula}}</summary>
-    <ul class="breakdown-list">
-      {{#each breakdown}}
-      <li class="breakdown-row">
-        <span class="source-label">{{this.label}}</span>
-        <span class="die-type">{{this.die}}</span>
-        <span class="die-result">{{this.result}}</span>
-      </li>
-      {{/each}}
-    </ul>
-  </details>
 </div>

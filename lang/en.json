@@ -1,5 +1,8 @@
 {
   "TYPES": {
+    "Actor": {
+      "character": "Character"
+    },
     "Item": {
       "item":    "Item",
       "feature": "Feature",
@@ -11,11 +14,6 @@
   "ODD": {
     "ActorType": {
       "character": "Character"
-    },
-    "ItemType": {
-      "item": "Item",
-      "feature": "Feature",
-      "spell": "Spell"
     },
     "Attributes": {
       "str": "Strength",
@@ -86,6 +84,7 @@
       "statistics": "Statistics",
       "skills": "Skills",
       "rolls": "Common Rolls",
+      "savedRolls": "Saved Rolls",
       "strain": "Strain",
       "staminaRoll": "Stamina Roll",
       "initiative": "Initiative Roll"

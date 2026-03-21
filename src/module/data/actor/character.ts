@@ -80,6 +80,20 @@ export class CharacterDataModel extends foundry.abstract.TypeDataModel<
       }),
       biography: new HTMLField({ required: true, blank: true }),
       rollModifiers: new ObjectField({ initial: {} }),
+      savedRolls: new ArrayField(
+        new SchemaField({
+          id:   new StringField({ required: true, blank: false }),
+          name: new StringField({ required: true, blank: true, initial: "Saved Roll" }),
+          dice: new ArrayField(
+            new SchemaField({
+              label: new StringField({ required: true, blank: true }),
+              die:   new StringField({ required: true, blank: false }),
+            }),
+          ),
+          flat: new NumberField({ required: true, initial: 0 }),
+        }),
+        { initial: [] },
+      ),
     } as CharacterDataModel.Schema;
   }
 
@@ -116,6 +130,7 @@ export interface CharacterSystemData {
   };
   biography: string;
   rollModifiers: Record<string, string>;
+  savedRolls: { id: string; name: string; dice: { label: string; die: string }[]; flat: number }[];
   health: { value: number; max: number };
 }
 

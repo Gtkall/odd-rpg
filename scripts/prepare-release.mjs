@@ -30,6 +30,9 @@ writeFileSync("system.json", JSON.stringify(systemJson, null, 2) + "\n");
 // Publish updated system.json into the build output
 copyFileSync("system.json", "dist/system.json");
 
+// Sync package-lock.json to the bumped package.json version
+execSync("npm install --package-lock-only", { stdio: "inherit" });
+
 // Package the build output
 execSync("cd dist && zip -r ../odd-rpg.zip .", { stdio: "inherit" });
 
