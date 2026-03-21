@@ -2,7 +2,7 @@
 <div class="strain-panel">
   <div class="strain-header">
     <h3 class="panel-header">{{localize "ODD.Sections.strain"}}</h3>
-    <span class="stamina-roll-hint rollable" data-common-roll="{{staminaRollKey}}">{{localize "ODD.Sections.staminaRoll"}}: <em>{{localize "ODD.Strain.staminaSources"}}</em></span>
+    {{> "systems/odd-rpg/templates/actor/partials/roll-entry.hbs" staminaRoll inline=true}}
     <label class="fort-override-toggle" title="{{localize "ODD.Strain.fortitudeOverrideHint"}}">
       <input type="checkbox" name="system.strain.fortitudeManualOverride" {{#if strainFortitudeManualOverride}}checked{{/if}}>
       <span>{{localize "ODD.Strain.fortitudeManualOverride"}}</span>

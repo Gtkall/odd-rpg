@@ -716,6 +716,28 @@
     margin: 0.1rem 0 0.05rem;
 }
 
+.odd-rpg .roll-entry--inline {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0;
+    text-align: left;
+}
+
+.odd-rpg .roll-entry--inline .roll-name {
+    font-size: 0.78rem;
+}
+
+.odd-rpg .roll-entry--inline .roll-formula-row {
+    margin: 0;
+}
+
+.odd-rpg .roll-entry--inline .roll-sources {
+    font-size: 0.68rem;
+    color: #777;
+    font-style: italic;
+}
+
 .odd-rpg .roll-modifier-field {
     display: none;
 }

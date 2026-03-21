@@ -125,6 +125,7 @@ export class OddActorSheet extends OddActorSheetBase {
 
     const commonRolls = COMMON_ROLLS.map(buildRollContext);
     const initiativeRoll = buildRollContext(INITIATIVE_ROLL);
+    const staminaRoll = buildRollContext(STAMINA_ROLL);
 
     const { strain } = system;
     const lockedFortSlots = STRAIN_MAX_FORTITUDE_SLOTS - strain.fortitudeSlots;
@@ -167,10 +168,10 @@ export class OddActorSheet extends OddActorSheetBase {
       skillLayout,
       commonRolls,
       initiativeRoll,
+      staminaRoll,
       strainSlots,
       strainValues: STRAIN_VALUES,
       strainFortitudeManualOverride: strain.fortitudeManualOverride,
-      staminaRollKey: STAMINA_ROLL.key,
       tabs: this._getTabs(),
     };
   }
