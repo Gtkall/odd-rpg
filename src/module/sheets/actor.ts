@@ -347,19 +347,27 @@ export class OddActorSheet extends OddActorSheetBase {
     const roll = new Roll(formula);
     await roll.evaluate();
 
-    const breakdown = entries.map(({ label, die }, i) => ({
-      label,
-      die,
-      result: roll.dice[i]?.total ?? "?",
-    }));
+    const breakdown: { label: string; die: string; result: number | string }[] =
+      entries.map(({ label, die }, i) => ({
+        label,
+        die,
+        result: roll.dice[i]?.total ?? "?",
+      }));
 
+    // Bonus dice sit in roll.dice beyond the source entries
+    for (const term of roll.dice.slice(entries.length)) {
+      const dieLabel = (term.number ?? 1) > 1 ? `${term.number}d${term.faces}` : `d${term.faces}`;
+      breakdown.push({ label: "Bonus", die: dieLabel, result: term.total ?? "?" });
+    }
+
+    const diceCount = breakdown.length;
     const content = await foundry.applications.handlebars.renderTemplate(
       "systems/odd-rpg/templates/chat/dice-pool-roll.hbs",
       {
         total: roll.total,
         formula,
-        diceCount: entries.length,
-        diceWord: entries.length === 1 ? "die" : "dice",
+        diceCount,
+        diceWord: diceCount === 1 ? "die" : "dice",
         breakdown,
       },
     );
