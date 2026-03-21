@@ -627,15 +627,15 @@
 }
 
 .odd-roll-result .die-type {
-    font-size: 0.58rem;
+    font-size: 0.72rem;
     font-weight: 700;
-    color: #aaa;
+    color: #555;
 }
 
 .odd-roll-result .die-source {
-    font-size: 0.55rem;
-    color: #bbb;
-    max-width: 3rem;
+    font-size: 0.70rem;
+    color: #666;
+    max-width: 5rem;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -643,15 +643,15 @@
 
 /* Discarded (non-kept) dice for keepHighest */
 .odd-roll-result .roll-die-entry.discarded .die-chip {
-    border-color: #ccc;
-    color: #ccc;
-    background: #f5f5f5;
+    border-color: #999;
+    color: #999;
+    background: #f0f0f0;
     text-decoration: line-through;
 }
 
 .odd-roll-result .roll-die-entry.discarded .die-type,
 .odd-roll-result .roll-die-entry.discarded .die-source {
-    color: #ddd;
+    color: #999;
 }
 
 /* ── Total ── */
