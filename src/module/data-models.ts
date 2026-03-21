@@ -11,7 +11,6 @@ import {
   WEAPON_TYPES, WEAPON_HANDS, WEAPON_DISTANCE, WEAPON_TEMPO_MIN, WEAPON_TEMPO_MAX,
   ARMOR_LOCATIONS,
 } from "./config";
-import { OddActorSheet, OddItemSheet } from "./sheets";
 
 const { ArrayField, BooleanField, HTMLField, NumberField, SchemaField, StringField } =
   foundry.data.fields;
@@ -34,7 +33,6 @@ export class CharacterDataModel extends foundry.abstract.TypeDataModel<
   CharacterDataModel.Schema,
   Actor.Implementation
 > {
-  static readonly sheetClass = OddActorSheet;
 
   static override defineSchema(): CharacterDataModel.Schema {
     // --- Attribute fields (each a die-value string) ---
@@ -180,7 +178,6 @@ class BaseItemDataModel extends foundry.abstract.TypeDataModel<
  * Generic Item (equipment, consumable, etc.)
  */
 export class ItemDataModel extends BaseItemDataModel {
-  static readonly sheetClass = OddItemSheet;
 
   static override defineSchema() {
     return {
@@ -204,7 +201,6 @@ export class ItemDataModel extends BaseItemDataModel {
  * Feature — a special ability or trait.
  */
 export class FeatureDataModel extends BaseItemDataModel {
-  static readonly sheetClass = OddItemSheet;
 
   static override defineSchema() {
     return {
@@ -217,7 +213,6 @@ export class FeatureDataModel extends BaseItemDataModel {
  * Spell — a castable magical effect.
  */
 export class SpellDataModel extends BaseItemDataModel {
-  static readonly sheetClass = OddItemSheet;
 
   static override defineSchema() {
     return {
@@ -267,7 +262,6 @@ export class WeaponDataModel extends foundry.abstract.TypeDataModel<
   any,
   Item.Implementation
 > {
-  static readonly sheetClass = OddItemSheet;
 
   static override defineSchema() {
     return {
@@ -317,7 +311,6 @@ export class ArmorDataModel extends foundry.abstract.TypeDataModel<
   any,
   Item.Implementation
 > {
-  static readonly sheetClass = OddItemSheet;
 
   static override defineSchema() {
     return {

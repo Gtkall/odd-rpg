@@ -7,6 +7,7 @@
 
 import { ODD } from "./module/config.js";
 import { OddActor, OddItem } from "./module/documents.js";
+import { OddActorSheet, OddItemSheet } from "./module/sheets.js";
 import {
   CharacterDataModel,
   ItemDataModel,
@@ -68,32 +69,18 @@ Hooks.once("init", () => {
     },
   };
 
-  // ---- Register sheets (discovered from data models) ----
+  // ---- Register sheets ----
   DocumentSheetConfig.unregisterSheet(Actor, "core", foundry.appv1.sheets.ActorSheet);
   DocumentSheetConfig.unregisterSheet(Item, "core", foundry.appv1.sheets.ItemSheet);
 
-  function registerFromModels(
-    documentClass: typeof Actor | typeof Item,
-    dataModels: Record<string, any>,
-  ) {
-    const bySheet = new Map<any, string[]>();
-    for (const [type, model] of Object.entries(dataModels)) {
-      if (model.sheetClass) {
-        const types = bySheet.get(model.sheetClass) ?? [];
-        types.push(type);
-        bySheet.set(model.sheetClass, types);
-      }
-    }
-    for (const [sheetClass, types] of bySheet) {
-      DocumentSheetConfig.registerSheet(documentClass, "odd-rpg", sheetClass, {
-        types,
-        makeDefault: true,
-      });
-    }
-  }
-
-  registerFromModels(Actor, CONFIG.Actor.dataModels as Record<string, any>);
-  registerFromModels(Item, CONFIG.Item.dataModels as Record<string, any>);
+  DocumentSheetConfig.registerSheet(Actor, "odd-rpg", OddActorSheet, {
+    types: ["character"],
+    makeDefault: true,
+  });
+  DocumentSheetConfig.registerSheet(Item, "odd-rpg", OddItemSheet, {
+    types: ["item", "feature", "spell", "weapon", "armor"],
+    makeDefault: true,
+  });
 });
 
 /* -------------------------------------------------------------------------- */

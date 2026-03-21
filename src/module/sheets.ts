@@ -30,12 +30,15 @@ import type { CharacterSystemData, WeaponSystemData, ArmorSystemData } from "./d
 const { ActorSheetV2, ItemSheetV2 } = foundry.applications.sheets;
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 
+// HandlebarsApplicationMixin returns an opaque type; cast once here so class
+// declarations stay readable and type inference flows correctly throughout.
+const OddActorSheetBase = HandlebarsApplicationMixin(ActorSheetV2) as typeof ActorSheetV2;
+const OddItemSheetBase = HandlebarsApplicationMixin(ItemSheetV2) as typeof ItemSheetV2;
+
 /**
  * Character sheet for ODD RPG Actors.
  */
-export class OddActorSheet extends (HandlebarsApplicationMixin(
-  ActorSheetV2,
-) as typeof ActorSheetV2) {
+export class OddActorSheet extends OddActorSheetBase {
   static override readonly DEFAULT_OPTIONS = {
     classes: ["odd-rpg", "sheet", "actor", "character"],
     position: {
@@ -71,7 +74,10 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
     },
   };
 
-  static override readonly TABS = [
+  // Our TABS is a {tab, label}[] consumed by _getTabs(); parent expects
+  // Record<string, TabsConfiguration> — shapes are incompatible so we use any.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  static override readonly TABS: any = [
     { tab: "character", label: "ODD.Sheet.Tabs.character" },
     { tab: "combat", label: "ODD.Sheet.Tabs.combat" },
     { tab: "talentsFlaws", label: "ODD.Sheet.Tabs.talentsFlaws" },
@@ -82,8 +88,9 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
   };
 
   _getTabs(): Record<string, any> {
-    return (this.constructor as typeof OddActorSheet).TABS.reduce(
-      (tabs: Record<string, any>, { tab, ...config }) => {
+    const tabDefs = (this.constructor as typeof OddActorSheet).TABS as { tab: string; label: string }[];
+    return tabDefs.reduce(
+      (tabs: Record<string, unknown>, { tab, ...config }: { tab: string; label: string }) => {
         tabs[tab] = {
           ...config,
           id: tab,
@@ -396,9 +403,7 @@ export class OddActorSheet extends (HandlebarsApplicationMixin(
 /**
  * Sheet for ODD RPG Items.
  */
-export class OddItemSheet extends (HandlebarsApplicationMixin(
-  ItemSheetV2,
-) as typeof ItemSheetV2) {
+export class OddItemSheet extends OddItemSheetBase {
 
   /** Whether the sheet is currently in edit mode. */
   #isEditMode = false;
