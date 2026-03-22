@@ -18,8 +18,39 @@
         </select>
       </div>
       {{/each}}
+      {{#each customSkills}}
+      <div class="skill-row custom-skill-row">
+        <span class="skill-name rollable custom-skill-name"
+              data-roll-custom-skill="{{id}}">{{name}}</span>
+        <span class="custom-badge">(custom)</span>
+        <select class="skill-select custom-skill-die" data-custom-skill-id="{{id}}">
+          {{selectOptions ../../../diceTypes selected=die localize=true}}
+        </select>
+        <button type="button" class="custom-skill-delete danger-btn" data-custom-skill-id="{{id}}" title="Remove">×</button>
+        <span class="custom-skill-delete-confirm">
+          <span class="delete-confirm-label">Delete?</span>
+          <button type="button" class="custom-skill-confirm-delete danger-btn" data-custom-skill-id="{{id}}">Delete</button>
+          <button type="button" class="custom-skill-cancel-delete icon-btn">Cancel</button>
+        </span>
+      </div>
+      {{/each}}
     </div>
     {{/each}}
   </div>
   {{/each}}
+
+  <div class="custom-skill-add-section">
+    <div class="custom-skill-form hidden">
+      <input type="text" class="custom-skill-name-input" placeholder="Skill name…" maxlength="40">
+      <select class="custom-skill-category-select">
+        {{#each customSkillCategories}}
+        <option value="{{key}}">{{localize label}}</option>
+        {{/each}}
+      </select>
+      <span class="custom-skill-form-spacer"></span>
+      <button type="button" class="custom-skill-save-btn">Save</button>
+      <button type="button" class="custom-skill-cancel-btn">Cancel</button>
+    </div>
+    <button type="button" class="add-custom-skill-btn">+ Add custom skill</button>
+  </div>
 </div>

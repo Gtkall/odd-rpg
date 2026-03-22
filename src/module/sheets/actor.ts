@@ -93,6 +93,13 @@ export class OddActorSheet extends OddActorSheetBase {
 
     const attributeLayout = ATTRIBUTE_LAYOUT.map(([left, right]) => ({ left, right }));
 
+    const customSkillsByCategory = new Map<string, typeof system.customSkills>();
+    for (const cs of system.customSkills) {
+      const arr = customSkillsByCategory.get(cs.category) ?? [];
+      arr.push(cs);
+      customSkillsByCategory.set(cs.category, arr);
+    }
+
     const skillLayout = SKILL_LAYOUT.map((row) =>
       row.map((catKey) => ({
         key: catKey,
@@ -101,6 +108,11 @@ export class OddActorSheet extends OddActorSheetBase {
           key: skillKey,
           category: catKey,
           label: labelKey,
+        })),
+        customSkills: (customSkillsByCategory.get(catKey) ?? []).map((cs) => ({
+          id: cs.id,
+          name: cs.name,
+          die: cs.die,
         })),
       })),
     );
@@ -188,6 +200,7 @@ export class OddActorSheet extends OddActorSheetBase {
       skillCategoryLabels: SKILL_CATEGORIES,
       attributeLayout,
       skillLayout,
+      customSkillCategories: Object.entries(SKILL_CATEGORIES).map(([key, label]) => ({ key, label })),
       commonRolls,
       savedRolls,
       initiativeRoll,
@@ -259,6 +272,72 @@ export class OddActorSheet extends OddActorSheetBase {
           void this._addToDicePool(label, die);
         }
       });
+    });
+
+    html.querySelectorAll("[data-roll-custom-skill]").forEach((el) => {
+      el.addEventListener("click", (ev: Event) => {
+        const id = (ev.currentTarget as HTMLElement).dataset.rollCustomSkill!;
+        const cs = this.characterSystem.customSkills.find((s) => s.id === id);
+        if (cs?.die) void this._addToDicePool(cs.name, cs.die);
+      });
+    });
+
+    html.querySelectorAll(".custom-skill-die").forEach((el) => {
+      el.addEventListener("change", (ev: Event) => {
+        const select = ev.currentTarget as HTMLSelectElement;
+        const id = select.dataset.customSkillId!;
+        const updated = this.characterSystem.customSkills.map((s) =>
+          s.id === id ? { ...s, die: select.value } : s,
+        );
+        void (this.document as unknown as { update(d: Record<string, unknown>): Promise<unknown> })
+          .update({ "system.customSkills": updated });
+      });
+    });
+
+    html.querySelectorAll(".custom-skill-delete").forEach((el) => {
+      el.addEventListener("click", (ev: Event) => {
+        const row = (ev.currentTarget as HTMLElement).closest<HTMLElement>(".custom-skill-row")!;
+        row.dataset.confirmDelete = "true";
+      });
+    });
+
+    html.querySelectorAll(".custom-skill-confirm-delete").forEach((el) => {
+      el.addEventListener("click", (ev: Event) => {
+        const id = (ev.currentTarget as HTMLElement).dataset.customSkillId!;
+        const updated = this.characterSystem.customSkills.filter((s) => s.id !== id);
+        void (this.document as unknown as { update(d: Record<string, unknown>): Promise<unknown> })
+          .update({ "system.customSkills": updated });
+      });
+    });
+
+    html.querySelectorAll(".custom-skill-cancel-delete").forEach((el) => {
+      el.addEventListener("click", (ev: Event) => {
+        const row = (ev.currentTarget as HTMLElement).closest<HTMLElement>(".custom-skill-row")!;
+        delete row.dataset.confirmDelete;
+      });
+    });
+
+    html.querySelector(".add-custom-skill-btn")?.addEventListener("click", () => {
+      html.querySelector(".custom-skill-form")?.classList.remove("hidden");
+      html.querySelector<HTMLButtonElement>(".add-custom-skill-btn")!.style.display = "none";
+      html.querySelector<HTMLInputElement>(".custom-skill-name-input")?.focus();
+    });
+
+    html.querySelector(".custom-skill-cancel-btn")?.addEventListener("click", () => {
+      html.querySelector(".custom-skill-form")?.classList.add("hidden");
+      html.querySelector<HTMLButtonElement>(".add-custom-skill-btn")!.style.display = "";
+    });
+
+    html.querySelector(".custom-skill-save-btn")?.addEventListener("click", () => {
+      const nameInput = html.querySelector<HTMLInputElement>(".custom-skill-name-input");
+      const categorySelect = html.querySelector<HTMLSelectElement>(".custom-skill-category-select");
+      const name = nameInput?.value.trim() ?? "";
+      if (!name) { nameInput?.focus(); return; }
+      const category = categorySelect?.value ?? "combat";
+      const entry = { id: crypto.randomUUID(), name, category, die: "" };
+      const updated = [...this.characterSystem.customSkills, entry];
+      void (this.document as unknown as { update(d: Record<string, unknown>): Promise<unknown> })
+        .update({ "system.customSkills": updated });
     });
 
     html.querySelectorAll(".roll-action-roll[data-common-roll]").forEach((el) => {
