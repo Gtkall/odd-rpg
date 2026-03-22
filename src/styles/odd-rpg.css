@@ -1183,11 +1183,82 @@
     padding: 0.1rem 0.3rem;
 }
 
-/* Initiative panel on Combat tab */
+/* ── Combat tab ── */
+.odd-rpg .initiative-encumbrance-row {
+    display: flex;
+    gap: 0.5rem;
+}
+
 .odd-rpg .initiative-panel {
+    flex: 1;
     padding: 0.5rem 0.6rem;
-    border-bottom: 1px solid var(--odd-color-border);
-    max-width: 16rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--odd-color-border-subtle);
+    border-radius: 6px;
+}
+
+.odd-rpg .encumbrance-panel {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--odd-color-border-subtle);
+    border-radius: 6px;
+}
+
+.odd-rpg .enc-level-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.6rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--odd-color-border-subtle);
+}
+
+.odd-rpg .enc-label {
+    font-size: 0.82rem;
+    color: #ccc;
+}
+
+.odd-rpg .enc-select {
+    background: #2a2a2a;
+    border: 1px solid var(--odd-color-border);
+    border-radius: 4px;
+    color: var(--odd-color-primary);
+    font-family: var(--odd-font-primary);
+    font-size: 0.82rem;
+    padding: 0.2rem 0.3rem;
+    width: 8rem;
+}
+
+.odd-rpg .enc-stats {
+    display: flex;
+    justify-content: space-around;
+    gap: 0.5rem;
+}
+
+.odd-rpg .enc-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.odd-rpg .enc-stat-label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #888;
+}
+
+.odd-rpg .enc-stat-value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #555;
+}
+
+.odd-rpg .enc-stat-value.has-value {
+    color: var(--odd-color-accent);
 }
 
 /* -------------------------------------------------------------------------- */

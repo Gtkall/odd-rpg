@@ -14,6 +14,7 @@ import { ATTRIBUTES, ATTRIBUTE_DICE_TYPES, DEFAULT_DIE } from "../../config/attr
 import { SKILLS, SKILL_CATEGORIES } from "../../config/skills.js";
 import { DICE_TYPES } from "../../config/dice.js";
 import { STRAIN_VALUES, STRAIN_DEFAULT_SLOT_COUNT, STRAIN_MAX_FORTITUDE_SLOTS } from "../../config/strain.js";
+import { ENCUMBRANCE_LEVELS } from "../../config/encumbrance.js";
 
 const { ArrayField, BooleanField, HTMLField, NumberField, ObjectField, SchemaField, StringField } =
   foundry.data.fields;
@@ -103,6 +104,9 @@ export class CharacterDataModel extends foundry.abstract.TypeDataModel<
         }),
         { initial: [] },
       ),
+      encumbrance: new SchemaField({
+        level: new StringField({ required: true, blank: false, initial: "none", choices: Object.keys(ENCUMBRANCE_LEVELS) }),
+      }),
     } as CharacterDataModel.Schema;
   }
 
@@ -141,6 +145,7 @@ export interface CharacterSystemData {
   rollModifiers: Record<string, string>;
   savedRolls: { id: string; name: string; dice: { label: string; die: string }[]; flat: number }[];
   customSkills: { id: string; name: string; category: string; die: string }[];
+  encumbrance: { level: string };
   health: { value: number; max: number };
 }
 

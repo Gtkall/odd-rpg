@@ -3,6 +3,7 @@ import { SKILLS, SKILL_CATEGORIES, SKILL_LAYOUT } from "../config/skills.js";
 import { DICE_TYPES } from "../config/dice.js";
 import { COMMON_ROLLS, INITIATIVE_ROLL, STAMINA_ROLL } from "../config/rolls.js";
 import type { RollResolution } from "../config/rolls.js";
+import { ENCUMBRANCE_LEVELS } from "../config/encumbrance.js";
 import {
   STRAIN_VALUES, STRAIN_DEFAULT_SLOT_COUNT,
   STRAIN_MAX_FORTITUDE_SLOTS, STRAIN_FATIGUE_PENALTIES,
@@ -211,6 +212,10 @@ export class OddActorSheet extends OddActorSheetBase {
       strainSlots,
       strainValues: STRAIN_VALUES,
       strainFortitudeManualOverride: strain.fortitudeManualOverride,
+      encumbranceLevelOptions: Object.fromEntries(
+        Object.entries(ENCUMBRANCE_LEVELS).map(([key, def]) => [key, def.label]),
+      ),
+      currentEncumbrance: ENCUMBRANCE_LEVELS[system.encumbrance.level] ?? ENCUMBRANCE_LEVELS.none,
       tabs: this._getTabs(),
     };
   }

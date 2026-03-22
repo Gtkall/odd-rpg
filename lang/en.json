@@ -87,7 +87,18 @@
       "savedRolls": "Saved Rolls",
       "strain": "Strain",
       "staminaRoll": "Stamina Roll",
-      "initiative": "Initiative Roll"
+      "initiative": "Initiative Roll",
+      "encumbrance": "Encumbrance"
+    },
+    "Encumbrance": {
+      "levelLabel": "Level",
+      "penalty": "Penalty",
+      "maxII": "Max II",
+      "strain": "+Strain",
+      "none": "None",
+      "light": "Light",
+      "moderate": "Moderate",
+      "heavy": "Heavy"
     },
     "Strain": {
       "none": "—",

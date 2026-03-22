@@ -1,9 +1,43 @@
 {{!-- Combat Tab --}}
 <section class="tab character-combat {{ tab.cssClass }}" data-group="{{ tab.group }}" data-tab="{{ tab.id }}">
 
-  <div class="initiative-panel">
-    <h3 class="panel-header">{{localize "ODD.Sections.initiative"}}</h3>
-    {{> "systems/odd-rpg/templates/actor/partials/roll-entry.hbs" initiativeRoll}}
+  <div class="initiative-encumbrance-row">
+
+    <div class="initiative-panel">
+      <h3 class="panel-header">{{localize "ODD.Sections.initiative"}}</h3>
+      {{> "systems/odd-rpg/templates/actor/partials/roll-entry.hbs" initiativeRoll}}
+    </div>
+
+    <div class="encumbrance-panel">
+      <h3 class="panel-header">{{localize "ODD.Sections.encumbrance"}}</h3>
+      <div class="enc-level-row">
+        <label class="enc-label">{{localize "ODD.Encumbrance.levelLabel"}}</label>
+        <select name="system.encumbrance.level" class="enc-select">
+          {{selectOptions encumbranceLevelOptions selected=system.encumbrance.level localize=true}}
+        </select>
+      </div>
+      <div class="enc-stats">
+        <div class="enc-stat">
+          <span class="enc-stat-label">{{localize "ODD.Encumbrance.penalty"}}</span>
+          <span class="enc-stat-value {{#if currentEncumbrance.penalty}}has-value{{/if}}">
+            {{#if currentEncumbrance.penalty}}{{currentEncumbrance.penalty}}{{else}}—{{/if}}
+          </span>
+        </div>
+        <div class="enc-stat">
+          <span class="enc-stat-label">{{localize "ODD.Encumbrance.maxII"}}</span>
+          <span class="enc-stat-value {{#if currentEncumbrance.maxII}}has-value{{/if}}">
+            {{#if currentEncumbrance.maxII}}{{currentEncumbrance.maxII}}{{else}}—{{/if}}
+          </span>
+        </div>
+        <div class="enc-stat">
+          <span class="enc-stat-label">{{localize "ODD.Encumbrance.strain"}}</span>
+          <span class="enc-stat-value {{#if currentEncumbrance.strain}}has-value{{/if}}">
+            {{#if currentEncumbrance.strain}}+{{currentEncumbrance.strain}}{{else}}—{{/if}}
+          </span>
+        </div>
+      </div>
+    </div>
+
   </div>
 
 </section>
