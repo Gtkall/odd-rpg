@@ -758,13 +758,13 @@
 
 .odd-rpg .attr-select {
     width: 4.1rem;
-    font-size: 0.82rem;
+    font-size: 0.88rem;
     padding: 0.25rem 0.4rem;
 }
 
 .odd-rpg .skill-select {
     width: 3.7rem;
-    font-size: 0.75rem;
+    font-size: 0.82rem;
     padding: 0.15rem 0.35rem;
 }
 
@@ -784,7 +784,7 @@
 }
 
 .odd-rpg .character-main .stat-row label {
-    font-size: 0.8rem;
+    font-size: 0.82rem;
     color: #ccc;
     flex: 1;
 }
@@ -869,7 +869,7 @@
 }
 
 .odd-rpg .skill-name {
-    font-size: 0.78rem;
+    font-size: 0.82rem;
     flex: 1;
     text-align: left;
     cursor: pointer;
@@ -890,13 +890,13 @@
     width: 4.1rem;
     text-align: center;
     font-weight: 700;
-    font-size: 0.82rem;
+    font-size: 0.88rem;
     color: var(--odd-color-accent);
 }
 
 .odd-rpg .skill-row .die-value-static {
     width: 3.7rem;
-    font-size: 0.75rem;
+    font-size: 0.82rem;
 }
 
 .odd-rpg .stat-value-static {
