@@ -21,6 +21,8 @@ interface ActorWithRollData { getRollData(): Record<string, unknown> }
 interface RollWithReplaceFormulaData { replaceFormulaData(f: string, d: object, o?: { missing?: string }): string }
 
 export class OddActorSheet extends OddActorSheetBase {
+  /** Whether the sheet is currently in edit mode. */
+  #isEditMode = false;
   static override readonly DEFAULT_OPTIONS = {
     classes: ["odd-rpg", "sheet", "actor", "character"],
     position: {
@@ -193,6 +195,7 @@ export class OddActorSheet extends OddActorSheetBase {
       actor,
       system: actor.system,
       flags: actor.flags,
+      isEditMode: this.#isEditMode,
       attributeConfig: ATTRIBUTES,
       attributeDiceTypes: ATTRIBUTE_DICE_TYPES,
       diceTypes: DICE_TYPES,
@@ -238,6 +241,11 @@ export class OddActorSheet extends OddActorSheetBase {
         const tab = target.dataset.tab;
         if (tab) this.changeTab(tab, "primary");
       });
+    });
+
+    html.querySelector("[data-actor-edit-toggle]")?.addEventListener("click", () => {
+      this.#isEditMode = !this.#isEditMode;
+      void this.render();
     });
 
     if (!html.querySelector(".dice-pool-tray")) {

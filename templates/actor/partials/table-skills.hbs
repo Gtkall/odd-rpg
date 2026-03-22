@@ -11,11 +11,19 @@
         <span class="skill-name rollable"
               data-roll-skill="{{key}}"
               data-roll-category="{{category}}">{{localize label}}</span>
-        <select name="system.skills.{{category}}.{{key}}" class="skill-select">
-          {{selectOptions ../../../diceTypes
-            selected=(lookup (lookup ../../../system.skills category) key)
-            localize=true}}
-        </select>
+        {{#if ../../../isEditMode}}
+          <select name="system.skills.{{category}}.{{key}}" class="skill-select">
+            {{selectOptions ../../../diceTypes
+              selected=(lookup (lookup ../../../system.skills category) key)
+              localize=true}}
+          </select>
+        {{else}}
+          <span class="die-value-static">
+            {{#if (lookup (lookup ../../../system.skills category) key)}}
+              {{lookup (lookup ../../../system.skills category) key}}
+            {{else}}—{{/if}}
+          </span>
+        {{/if}}
       </div>
       {{/each}}
       {{#each customSkills}}
@@ -23,15 +31,19 @@
         <span class="skill-name rollable custom-skill-name"
               data-roll-custom-skill="{{id}}">{{name}}</span>
         <span class="custom-badge">(custom)</span>
-        <select class="skill-select custom-skill-die" data-custom-skill-id="{{id}}">
-          {{selectOptions ../../../diceTypes selected=die localize=true}}
-        </select>
-        <button type="button" class="custom-skill-delete danger-btn" data-custom-skill-id="{{id}}" title="Remove">×</button>
-        <span class="custom-skill-delete-confirm">
-          <span class="delete-confirm-label">Delete?</span>
-          <button type="button" class="custom-skill-confirm-delete danger-btn" data-custom-skill-id="{{id}}">Delete</button>
-          <button type="button" class="custom-skill-cancel-delete icon-btn">Cancel</button>
-        </span>
+        {{#if ../../../isEditMode}}
+          <select class="skill-select custom-skill-die" data-custom-skill-id="{{id}}">
+            {{selectOptions ../../../diceTypes selected=die localize=true}}
+          </select>
+          <span class="custom-skill-delete-confirm">
+            <span class="delete-confirm-label">Delete?</span>
+            <button type="button" class="custom-skill-confirm-delete danger-btn" data-custom-skill-id="{{id}}">Delete</button>
+            <button type="button" class="custom-skill-cancel-delete icon-btn">Cancel</button>
+          </span>
+          <button type="button" class="custom-skill-delete danger-btn" data-custom-skill-id="{{id}}" title="Remove">×</button>
+        {{else}}
+          <span class="die-value-static">{{#if die}}{{die}}{{else}}—{{/if}}</span>
+        {{/if}}
       </div>
       {{/each}}
     </div>
@@ -39,6 +51,7 @@
   </div>
   {{/each}}
 
+  {{#if isEditMode}}
   <div class="custom-skill-add-section">
     <div class="custom-skill-form hidden">
       <input type="text" class="custom-skill-name-input" placeholder="Skill name…" maxlength="40">
@@ -53,4 +66,5 @@
     </div>
     <button type="button" class="add-custom-skill-btn">+ Add custom skill</button>
   </div>
+  {{/if}}
 </div>

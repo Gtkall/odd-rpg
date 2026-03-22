@@ -4,18 +4,30 @@
   <div class="statistics-grid">
     <div class="stat-row">
       <label>{{localize "ODD.Statistics.movementRate"}}</label>
-      <input type="number" name="system.statistics.movementRate"
-             value="{{system.statistics.movementRate}}" data-dtype="Number" />
+      {{#if isEditMode}}
+        <input type="number" name="system.statistics.movementRate"
+               value="{{system.statistics.movementRate}}" data-dtype="Number" />
+      {{else}}
+        <span class="stat-value-static">{{system.statistics.movementRate}}</span>
+      {{/if}}
     </div>
     <div class="stat-row">
       <label>{{localize "ODD.Statistics.composureThreshold"}}</label>
-      <input type="number" name="system.statistics.composureThreshold"
-             value="{{system.statistics.composureThreshold}}" data-dtype="Number" />
+      {{#if isEditMode}}
+        <input type="number" name="system.statistics.composureThreshold"
+               value="{{system.statistics.composureThreshold}}" data-dtype="Number" />
+      {{else}}
+        <span class="stat-value-static">{{system.statistics.composureThreshold}}</span>
+      {{/if}}
     </div>
     <div class="stat-row">
       <label>{{localize "ODD.Statistics.healingRate"}}</label>
-      <input type="number" name="system.statistics.healingRate"
-             value="{{system.statistics.healingRate}}" data-dtype="Number" />
+      {{#if isEditMode}}
+        <input type="number" name="system.statistics.healingRate"
+               value="{{system.statistics.healingRate}}" data-dtype="Number" />
+      {{else}}
+        <span class="stat-value-static">{{system.statistics.healingRate}}</span>
+      {{/if}}
     </div>
     <div class="stat-row">
       <label>{{localize "ODD.Statistics.magicPoints"}}</label>
@@ -23,8 +35,12 @@
         <input type="number" name="system.statistics.magicPoints.value"
                value="{{system.statistics.magicPoints.value}}" data-dtype="Number" />
         <span class="separator">/</span>
-        <input type="number" name="system.statistics.magicPoints.max"
-               value="{{system.statistics.magicPoints.max}}" data-dtype="Number" />
+        {{#if isEditMode}}
+          <input type="number" name="system.statistics.magicPoints.max"
+                 value="{{system.statistics.magicPoints.max}}" data-dtype="Number" />
+        {{else}}
+          <span class="stat-value-static">{{system.statistics.magicPoints.max}}</span>
+        {{/if}}
       </div>
     </div>
   </div>
