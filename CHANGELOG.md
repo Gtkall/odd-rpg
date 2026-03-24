@@ -1,3 +1,16 @@
+## [0.5.0](https://github.com/Gtkall/odd-rpg/compare/v0.4.0...v0.5.0) (2026-03-24)
+
+### Features
+
+* **combat:** encumbrance panel on Combat tab ([989e924](https://github.com/Gtkall/odd-rpg/commit/989e92424a05cdaa575125717d699d5d65e9fddf))
+* **combat:** weapon/armor inventory tables and dodge roll panel ([9f66c9e](https://github.com/Gtkall/odd-rpg/commit/9f66c9efe0f6a72411b10ab0e42adee7992ee4cb))
+* **sheet:** add edit mode toggle to character sheet ([7bc9f87](https://github.com/Gtkall/odd-rpg/commit/7bc9f87eb2c27b5b9a6edb60623caf490c3ef9d0))
+* **skills:** add custom skills to the skills table ([070f67e](https://github.com/Gtkall/odd-rpg/commit/070f67e32d9a91c0c8ce99c216ad7799e40c1cd0))
+
+### Bug Fixes
+
+* **skills:** single separator between skill groups and add section ([2465c3e](https://github.com/Gtkall/odd-rpg/commit/2465c3e011e65f775d8051ba12062daeaa89c119))
+
 ## [0.4.0](https://github.com/Gtkall/odd-rpg/compare/v0.3.1...v0.4.0) (2026-03-21)
 
 ### Features
