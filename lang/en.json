@@ -88,7 +88,25 @@
       "strain": "Strain",
       "staminaRoll": "Stamina Roll",
       "initiative": "Initiative Roll",
-      "encumbrance": "Encumbrance"
+      "encumbrance": "Encumbrance",
+      "weapons": "Weapons",
+      "armor": "Armor"
+    },
+    "Inventory": {
+      "attack": "Attack",
+      "name": "Name",
+      "tempos": "Tempos",
+      "distance": "Dist.",
+      "accuracy": "Acc.",
+      "damage": "Damage",
+      "notes": "Notes",
+      "bulk": "Bulk",
+      "protection": "Prot.",
+      "location": "Location",
+      "equipped": "Equipped",
+      "addToPool": "Add to dice pool",
+      "addWeapon": "Add weapon…",
+      "addArmor": "Add armor…"
     },
     "Encumbrance": {
       "levelLabel": "Level",
@@ -113,6 +131,8 @@
     },
     "Rolls": {
       "awareness": "Awareness",
+      "dodge": "Dodge",
+      "parry": "Parry",
       "fear": "Fear",
       "selfControl": "Self-Control",
       "initiative": "Initiative"

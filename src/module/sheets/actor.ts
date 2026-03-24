@@ -1,9 +1,13 @@
 import { ATTRIBUTES, ATTRIBUTE_DICE_TYPES, ATTRIBUTE_LAYOUT } from "../config/attributes.js";
 import { SKILLS, SKILL_CATEGORIES, SKILL_LAYOUT } from "../config/skills.js";
 import { DICE_TYPES } from "../config/dice.js";
-import { COMMON_ROLLS, INITIATIVE_ROLL, STAMINA_ROLL } from "../config/rolls.js";
+import { COMMON_ROLLS, INITIATIVE_ROLL, STAMINA_ROLL, DODGE_ROLL } from "../config/rolls.js";
 import type { RollResolution } from "../config/rolls.js";
 import { ENCUMBRANCE_LEVELS } from "../config/encumbrance.js";
+import { WEAPON_DISTANCE } from "../config/weapon.js";
+import { ARMOR_LOCATIONS } from "../config/armor.js";
+import type { WeaponSystemData, WeaponHandConfig } from "../data/item/weapon.js";
+import type { ArmorSystemData } from "../data/item/armor.js";
 import {
   STRAIN_VALUES, STRAIN_DEFAULT_SLOT_COUNT,
   STRAIN_MAX_FORTITUDE_SLOTS, STRAIN_FATIGUE_PENALTIES,
@@ -151,6 +155,7 @@ export class OddActorSheet extends OddActorSheetBase {
     const commonRolls = allRolls.filter((r) => !r.dedicated);
     const initiativeRoll = allRolls.find((r) => r.key === INITIATIVE_ROLL.key);
     const staminaRoll = allRolls.find((r) => r.key === STAMINA_ROLL.key);
+    const dodgeRoll = allRolls.find((r) => r.key === DODGE_ROLL.key);
 
     const savedRolls = system.savedRolls.map((r) => ({
       key: r.id,
@@ -209,6 +214,7 @@ export class OddActorSheet extends OddActorSheetBase {
       savedRolls,
       initiativeRoll,
       staminaRoll,
+      dodgeRoll,
       strainSlots,
       strainValues: STRAIN_VALUES,
       strainFortitudeManualOverride: strain.fortitudeManualOverride,
@@ -216,6 +222,9 @@ export class OddActorSheet extends OddActorSheetBase {
         Object.entries(ENCUMBRANCE_LEVELS).map(([key, def]) => [key, def.label]),
       ),
       currentEncumbrance: ENCUMBRANCE_LEVELS[system.encumbrance.level] ?? ENCUMBRANCE_LEVELS.none,
+      weaponRows: this._buildWeaponRows(system, rollModifiers),
+      armorRows: this._buildArmorRows(),
+      weaponDistance: WEAPON_DISTANCE,
       tabs: this._getTabs(),
     };
   }
@@ -237,6 +246,8 @@ export class OddActorSheet extends OddActorSheetBase {
   _saveRollName = "";
 
   override async _onRender(_context: any, _options: any) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    await super._onRender(_context, _options);
     const html = this.element;
 
     html.querySelectorAll(".sheet-tabs [data-tab]").forEach((el) => {
@@ -431,6 +442,49 @@ export class OddActorSheet extends OddActorSheetBase {
         }
       });
     });
+
+    // Weapon attack roll
+    html.querySelectorAll<HTMLElement>(".weapon-attack-roll[data-attack-key]").forEach((el) => {
+      el.addEventListener("click", () => { void this._rollWeaponAttack(el); });
+    });
+    html.querySelectorAll<HTMLElement>(".weapon-attack-pool[data-attack-key]").forEach((el) => {
+      el.addEventListener("click", () => { void this._addWeaponAttackToPool(el); });
+    });
+
+    // Equipped toggle
+    html.querySelectorAll<HTMLInputElement>(".item-equipped[data-item-id]").forEach((el) => {
+      el.addEventListener("change", () => {
+        const item = this.document.items.get(el.dataset.itemId!);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        void (item as any)?.update({ "system.equipped": el.checked });
+      });
+    });
+
+    // Sort buttons
+    html.querySelectorAll<HTMLElement>(".item-sort-up[data-item-id]").forEach((el) => {
+      el.addEventListener("click", () => {
+        if (el.dataset.itemId && el.dataset.itemType) void this._sortItem(el.dataset.itemId, el.dataset.itemType, -1);
+      });
+    });
+    html.querySelectorAll<HTMLElement>(".item-sort-down[data-item-id]").forEach((el) => {
+      el.addEventListener("click", () => {
+        if (el.dataset.itemId && el.dataset.itemType) void this._sortItem(el.dataset.itemId, el.dataset.itemType, 1);
+      });
+    });
+
+    // Inline add row
+    html.querySelectorAll<HTMLInputElement>(".inventory-add-input[data-item-type]").forEach((el) => {
+      el.addEventListener("keydown", (ev: Event) => {
+        const ke = ev as KeyboardEvent;
+        if (ke.key !== "Enter") return;
+        const name = el.value.trim();
+        if (!name) return;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        void this.document.createEmbeddedDocuments("Item", [{ name, type: el.dataset.itemType }] as any[]);
+        el.value = "";
+      });
+    });
+
   }
 
   async _addToDicePool(label: string, die: string): Promise<void> {
@@ -688,6 +742,137 @@ export class OddActorSheet extends OddActorSheetBase {
     roll: Roll,
   ): { label: string; die: string; result: number | string }[] {
     return entries.map(({ label, die }, i) => ({ label, die, result: roll.dice[i]?.total ?? "?" }));
+  }
+
+  private _buildWeaponRows(
+    system: CharacterSystemData,
+    rollModifiers: Record<string, string>,
+  ) {
+    const buildAttack = (
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      item: any,
+      hand: WeaponHandConfig,
+      suffix: string,
+      type: "melee" | "ranged",
+    ) => {
+      const attrKey = type === "ranged" ? "dex" : "agi";
+      const skillKey = type === "ranged" ? "archery" : "melee";
+      const sources = [
+        { label: game.i18n!.localize(ATTRIBUTES[attrKey]), die: system.attributes[attrKey] ?? "" },
+        { label: game.i18n!.localize(SKILLS.combat[skillKey] ?? ""), die: system.skills.combat[skillKey] ?? "" },
+        { label: game.i18n!.localize("ODD.Weapon.Accuracy"), die: hand.accuracy },
+      ].filter((s) => s.die);
+      const keySuffix = suffix ? `-${suffix}` : "";
+      const key = `weapon-attack-${item.id as string}${keySuffix}`;
+      return {
+        key,
+        formula: sources.map((s) => s.die).join("+"),
+        sourceLabels: sources.map((s) => s.label).join(","),
+        sourceLabelsDisplay: sources.map((s) => s.label).join(" + "),
+        modifier: rollModifiers[key] ?? "",
+      };
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return ([...this.document.items] as any[])
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .filter((i: any) => (i.type as string) === "weapon")
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+      .sort((a: any, b: any) => (a.sort as number) - (b.sort as number))
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .flatMap((item: any) => {
+        const sys = item.system as WeaponSystemData;
+        const base = {
+          id: item.id as string,
+          name: item.name as string,
+          equipped: sys.equipped,
+          notes: sys.notes.join(", "),
+        };
+        const fmt = (h: WeaponHandConfig) => {
+          const dmg = `${h.damage.diceCount}${h.damage.dieType}`;
+          return {
+            tempos: h.tempos,
+            distance: game.i18n!.localize(WEAPON_DISTANCE[h.distance] ?? h.distance),
+            accuracy: h.accuracy,
+            damage: h.damage.isBonus ? `+${dmg}` : dmg,
+          };
+        };
+        if (sys.hands === "1h") {
+          return [{ ...base, handLabel: "", isFirstRow: true, hand: fmt(sys.oneHanded), attackRoll: buildAttack(item, sys.oneHanded, "", sys.weaponType) }];
+        } else if (sys.hands === "2h") {
+          return [{ ...base, handLabel: "", isFirstRow: true, hand: fmt(sys.twoHanded), attackRoll: buildAttack(item, sys.twoHanded, "", sys.weaponType) }];
+        } else {
+          return [
+            { ...base, handLabel: "1H", isFirstRow: true,  hand: fmt(sys.oneHanded), attackRoll: buildAttack(item, sys.oneHanded, "1h", sys.weaponType) },
+            { ...base, handLabel: "2H", isFirstRow: false, hand: fmt(sys.twoHanded), attackRoll: buildAttack(item, sys.twoHanded, "2h", sys.weaponType) },
+          ];
+        }
+      });
+  }
+
+  private _buildArmorRows() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return ([...this.document.items] as any[])
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .filter((i: any) => (i.type as string) === "armor")
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+      .sort((a: any, b: any) => (a.sort as number) - (b.sort as number))
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map((item: any) => {
+        const sys = item.system as ArmorSystemData;
+        return {
+          id: item.id as string,
+          name: item.name as string,
+          bulk: sys.bulk,
+          protection: sys.protection,
+          location: sys.location.map((k) => game.i18n!.localize(ARMOR_LOCATIONS[k] ?? k)).join(", "),
+          notes: sys.notes.join(", "),
+          equipped: sys.equipped,
+        };
+      });
+  }
+
+  private async _sortItem(id: string, type: string, direction: number): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const items = ([...this.document.items] as any[])
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .filter((i: any) => (i.type as string) === type)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+      .sort((a: any, b: any) => (a.sort as number) - (b.sort as number));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const idx = items.findIndex((i: any) => (i.id as string) === id);
+    const swapIdx = idx + direction;
+    if (idx < 0 || swapIdx < 0 || swapIdx >= items.length) return;
+    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+    const updates = [
+      { _id: items[idx].id as string,     sort: items[swapIdx].sort as number },
+      { _id: items[swapIdx].id as string, sort: items[idx].sort as number },
+    ];
+    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (this.document as any).updateEmbeddedDocuments("Item", updates);
+  }
+
+  private _resolveWeaponAttack(el: HTMLElement): { entries: { label: string; die: string }[]; bonus: string | undefined } {
+    const key = el.dataset.attackKey!;
+    const formula = el.dataset.attackFormula ?? "";
+    const sourcesRaw = el.dataset.attackSources ?? "";
+    const labels = sourcesRaw.split(",").filter(Boolean);
+    const dice = formula.split("+").filter(Boolean);
+    const entries = dice.map((die, i) => ({ label: labels[i] ?? die, die }));
+    const bonus = (this.characterSystem.rollModifiers[key] ?? "").trim() || undefined;
+    return { entries, bonus };
+  }
+
+  private async _rollWeaponAttack(el: HTMLElement): Promise<void> {
+    const { entries, bonus } = this._resolveWeaponAttack(el);
+    await this._executeRoll(entries, bonus);
+  }
+
+  private async _addWeaponAttackToPool(el: HTMLElement): Promise<void> {
+    const { entries, bonus } = this._resolveWeaponAttack(el);
+    for (const { label, die } of entries) await this._addToDicePool(label, die);
+    if (bonus) await this._addBonusTermsToPool(this._resolveBonusFormula(bonus));
   }
 
   private async _setInitiativeInCombat(value: number): Promise<void> {

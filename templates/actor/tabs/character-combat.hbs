@@ -40,4 +40,124 @@
 
   </div>
 
+  {{!-- Weapons --}}
+  <div class="inventory-card weapon-card">
+    <h3 class="panel-header">{{localize "ODD.Sections.weapons"}}</h3>
+    {{#if weaponRows.length}}
+    <table class="inventory-table weapon-table">
+      <thead>
+        <tr>
+          <th class="col-attack">{{localize "ODD.Inventory.attack"}}</th>
+          <th class="col-name">{{localize "ODD.Inventory.name"}}</th>
+          <th class="col-tempos">{{localize "ODD.Inventory.tempos"}}</th>
+          <th class="col-dist">{{localize "ODD.Inventory.distance"}}</th>
+          <th class="col-acc">{{localize "ODD.Inventory.accuracy"}}</th>
+          <th class="col-dmg">{{localize "ODD.Inventory.damage"}}</th>
+          <th class="col-notes">{{localize "ODD.Inventory.notes"}}</th>
+          <th class="col-controls"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each weaponRows as |row|}}
+        <tr class="item draggable{{#unless row.isFirstRow}} weapon-row-secondary{{/unless}}" data-item-id="{{row.id}}">
+          <td class="col-attack">
+            <div class="attack-btns">
+              <button type="button" class="weapon-attack-roll"
+                data-attack-key="{{row.attackRoll.key}}"
+                data-attack-formula="{{row.attackRoll.formula}}"
+                data-attack-sources="{{row.attackRoll.sourceLabels}}"
+                title="{{row.attackRoll.sourceLabelsDisplay}}">⚄</button>
+              <button type="button" class="weapon-attack-pool"
+                data-attack-key="{{row.attackRoll.key}}"
+                data-attack-formula="{{row.attackRoll.formula}}"
+                data-attack-sources="{{row.attackRoll.sourceLabels}}"
+                title="{{localize 'ODD.Inventory.addToPool'}}">+</button>
+            </div>
+          </td>
+          <td class="col-name">
+            {{row.name}}{{#if row.handLabel}}<span class="hand-label"> {{row.handLabel}}</span>{{/if}}
+          </td>
+          <td class="col-tempos">{{row.hand.tempos}}</td>
+          <td class="col-dist">{{row.hand.distance}}</td>
+          <td class="col-acc">{{row.hand.accuracy}}</td>
+          <td class="col-dmg">{{row.hand.damage}}</td>
+          <td class="col-notes">{{row.notes}}</td>
+          <td class="col-controls">
+            {{#if row.isFirstRow}}
+            <div class="item-controls">
+              <label class="item-equipped-label" title="{{localize 'ODD.Inventory.equipped'}}">
+                <input type="checkbox" class="item-equipped" data-item-id="{{row.id}}" {{#if row.equipped}}checked{{/if}}>
+              </label>
+              <button type="button" class="item-sort-up" data-item-id="{{row.id}}" data-item-type="weapon" title="Up">↑</button>
+              <button type="button" class="item-sort-down" data-item-id="{{row.id}}" data-item-type="weapon" title="Down">↓</button>
+              <button type="button" class="item-edit" data-item-id="{{row.id}}" title="Edit">✎</button>
+              <button type="button" class="item-delete" data-item-id="{{row.id}}" title="Delete">✕</button>
+            </div>
+            {{/if}}
+          </td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+    {{/if}}
+    <div class="inventory-add-row">
+      <input type="text" class="inventory-add-input" data-item-type="weapon"
+        placeholder="{{localize 'ODD.Inventory.addWeapon'}}">
+    </div>
+  </div>
+
+  {{!-- Armor + Dodge row --}}
+  <div class="armor-dodge-row">
+
+    <div class="inventory-card armor-card">
+      <h3 class="panel-header">{{localize "ODD.Sections.armor"}}</h3>
+      {{#if armorRows.length}}
+      <table class="inventory-table armor-table">
+        <thead>
+          <tr>
+            <th class="col-name">{{localize "ODD.Inventory.name"}}</th>
+            <th class="col-bulk">{{localize "ODD.Inventory.bulk"}}</th>
+            <th class="col-prot">{{localize "ODD.Inventory.protection"}}</th>
+            <th class="col-loc">{{localize "ODD.Inventory.location"}}</th>
+            <th class="col-notes">{{localize "ODD.Inventory.notes"}}</th>
+            <th class="col-controls"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each armorRows as |row|}}
+          <tr class="item draggable" data-item-id="{{row.id}}">
+            <td class="col-name">{{row.name}}</td>
+            <td class="col-bulk">{{row.bulk}}</td>
+            <td class="col-prot">{{row.protection}}</td>
+            <td class="col-loc">{{row.location}}</td>
+            <td class="col-notes">{{row.notes}}</td>
+            <td class="col-controls">
+              <div class="item-controls">
+                <label class="item-equipped-label" title="{{localize 'ODD.Inventory.equipped'}}">
+                  <input type="checkbox" class="item-equipped" data-item-id="{{row.id}}" {{#if row.equipped}}checked{{/if}}>
+                </label>
+                <button type="button" class="item-sort-up" data-item-id="{{row.id}}" data-item-type="armor" title="Up">↑</button>
+                <button type="button" class="item-sort-down" data-item-id="{{row.id}}" data-item-type="armor" title="Down">↓</button>
+                <button type="button" class="item-edit" data-item-id="{{row.id}}" title="Edit">✎</button>
+                <button type="button" class="item-delete" data-item-id="{{row.id}}" title="Delete">✕</button>
+              </div>
+            </td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+      {{/if}}
+      <div class="inventory-add-row">
+        <input type="text" class="inventory-add-input" data-item-type="armor"
+          placeholder="{{localize 'ODD.Inventory.addArmor'}}">
+      </div>
+    </div>
+
+    <div class="dodge-panel">
+      <h3 class="panel-header">{{localize "ODD.Rolls.dodge"}}</h3>
+      {{> "systems/odd-rpg/templates/actor/partials/roll-entry.hbs" dodgeRoll}}
+    </div>
+
+  </div>
+
 </section>

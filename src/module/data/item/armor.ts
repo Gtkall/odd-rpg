@@ -1,7 +1,7 @@
 import { ARMOR_LOCATIONS } from "../../config/armor.js";
 import type { OddItemBase } from "../_base.js";
 
-const { ArrayField, HTMLField, NumberField, StringField } = foundry.data.fields;
+const { ArrayField, BooleanField, HTMLField, NumberField, StringField } = foundry.data.fields;
 
 /** Armor / Shield — protective equipment with body-location coverage. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -19,11 +19,13 @@ export class ArmorDataModel extends foundry.abstract.TypeDataModel<any, Item.Imp
         new StringField({ required: true, blank: false }),
         { required: true, initial: [] },
       ),
+      equipped: new BooleanField({ required: true, initial: false }),
     };
   }
 }
 
 export interface ArmorSystemData extends OddItemBase {
+  equipped: boolean;
   bulk: number;
   protection: number;
   location: string[];
