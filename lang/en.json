@@ -144,6 +144,46 @@
         "talentsFlaws": "Talents & Flaws"
       }
     },
+    "Wounds": {
+      "sectionTitle": "Hit Locations",
+      "painPenaltyLabel": "Pain Penalty",
+      "painPenaltyHint": "Apply this die as a penalty to affected rolls when Wounded or Crippled",
+      "rollD20": "Roll d20",
+      "colRange": "d20",
+      "colLocation": "Location",
+      "colEffect": "Effect",
+      "colState": "State",
+      "colSubStatus": "Condition",
+      "TorsoRangedNote": "In Ranged combat, rolls of 3, 6, 12, 15, or 18 also hit the Torso",
+      "Locations": {
+        "head":     "Head",
+        "rightArm": "R. Arm",
+        "leftArm":  "L. Arm",
+        "torso":    "Torso",
+        "rightLeg": "R. Leg",
+        "leftLeg":  "L. Leg"
+      },
+      "States": {
+        "uninjured": "Uninjured",
+        "wounded":   "Wounded",
+        "crippled":  "Crippled"
+      },
+      "SubStatuses": {
+        "blunt":    "Blunt",
+        "bleeding": "Bleeding",
+        "bandaged": "Bandaged"
+      },
+      "Effects": {
+        "headWounded":    "Pain Penalty to all Tests; −2 Max Initiative",
+        "headCrippled":   "KO — when you wake up, Incapacitated until healed",
+        "armWounded":     "Pain Penalty to use this arm",
+        "armCrippled":    "Arm is unusable",
+        "torsoWounded":   "−1 Max Initiative",
+        "torsoCrippled":  "Incapacitated; then Pain Penalty to all Tests",
+        "legWounded":     "Pain Penalty to use this leg",
+        "legCrippled":    "Leg is unusable"
+      }
+    },
     "Item": {
       "description": "Description"
     },

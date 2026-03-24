@@ -6,6 +6,10 @@ import type { RollResolution } from "../config/rolls.js";
 import { ENCUMBRANCE_LEVELS } from "../config/encumbrance.js";
 import { WEAPON_DISTANCE } from "../config/weapon.js";
 import { ARMOR_LOCATIONS } from "../config/armor.js";
+import {
+  HIT_LOCATIONS, HIT_LOCATION_ORDER, WOUND_BASE_STATES, WOUND_SUB_STATUSES,
+  PAIN_PENALTY_DICE, resolveHitLocation,
+} from "../config/wounds.js";
 import type { WeaponSystemData, WeaponHandConfig } from "../data/item/weapon.js";
 import type { ArmorSystemData } from "../data/item/armor.js";
 import {
@@ -226,6 +230,19 @@ export class OddActorSheet extends OddActorSheetBase {
       armorRows: this._buildArmorRows(),
       weaponDistance: WEAPON_DISTANCE,
       tabs: this._getTabs(),
+      woundLocations: this._buildWoundLocations(system),
+      woundsMap: Object.fromEntries(
+        this._buildWoundLocations(system).map((loc) => [loc.key, loc]),
+      ),
+      woundBaseStateOptions: Object.fromEntries(
+        Object.entries(WOUND_BASE_STATES).map(([k, v]) => [k, v]),
+      ),
+      woundSubStatusOptions: Object.fromEntries(
+        Object.entries(WOUND_SUB_STATUSES).map(([k, v]) => [k, v]),
+      ),
+      painPenaltyDieOptions: Object.fromEntries(
+        Object.entries(PAIN_PENALTY_DICE).map(([k, v]) => [k, v]),
+      ),
     };
   }
 
@@ -244,11 +261,29 @@ export class OddActorSheet extends OddActorSheetBase {
   _rollHistory: { pool: { id: string; label: string; die: string }[]; flat: number }[] = [];
   _rollHistoryIndex = -1;
   _saveRollName = "";
+  _scrollPositions = new Map<string, number>();
+
+  // eslint-disable-next-line @typescript-eslint/require-await -- Foundry API requires async signature
+  override async _preRender(_context: unknown, _options: unknown): Promise<void> {
+    if (!this.rendered) return;
+    for (const selector of [".character-main", ".character-combat", ".character-talents-flaws"]) {
+      const el = this.element.querySelector<HTMLElement>(selector);
+      if (el) this._scrollPositions.set(selector, el.scrollTop);
+    }
+  }
 
   override async _onRender(_context: any, _options: any) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     await super._onRender(_context, _options);
     const html = this.element;
+
+    for (const [selector, top] of this._scrollPositions) {
+      const el = html.querySelector<HTMLElement>(selector);
+      if (el) el.scrollTop = top;
+    }
+    this._scrollPositions.clear();
+
+    if (this._lastHitLocation) this._applyLastHitHighlight(this._lastHitLocation);
 
     html.querySelectorAll(".sheet-tabs [data-tab]").forEach((el) => {
       el.addEventListener("click", (ev: Event) => {
@@ -390,6 +425,46 @@ export class OddActorSheet extends OddActorSheetBase {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any -- fvtt-types stubs don't model system.* dot-paths
           void this.document.update({ [`system.rollModifiers.${key}`]: "" } as any);
         }
+      });
+    });
+
+    // Hit location roll
+    html.querySelector(".hit-location-roll")?.addEventListener("click", () => {
+      void this._rollHitLocation();
+    });
+
+    // SVG body region click → cycle base state
+    html.querySelectorAll<SVGElement>(".body-region[data-location]").forEach((el) => {
+      el.addEventListener("click", () => {
+        const loc = el.dataset.location!;
+        const order = ["uninjured", "wounded", "crippled"] as const;
+        const current = this.characterSystem.wounds[loc].state as typeof order[number];
+        const next = order[(order.indexOf(current) + 1) % order.length];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        void this.document.update({ [`system.wounds.${loc}.state`]: next } as any);
+      });
+    });
+
+    // Pain penalty die select
+    html.querySelector<HTMLSelectElement>(".pain-penalty-die-select")?.addEventListener("change", (ev) => {
+      const select = ev.currentTarget as HTMLSelectElement;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      void this.document.update({ "system.painPenaltyDie": select.value } as any);
+    });
+
+    // Wound state dropdown change
+    html.querySelectorAll<HTMLSelectElement>(".wound-state-select[data-location]").forEach((el) => {
+      el.addEventListener("change", () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        void this.document.update({ [`system.wounds.${el.dataset.location!}.state`]: el.value } as any);
+      });
+    });
+
+    // Wound sub-status dropdown change
+    html.querySelectorAll<HTMLSelectElement>(".wound-substatus-select[data-location]").forEach((el) => {
+      el.addEventListener("change", () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        void this.document.update({ [`system.wounds.${el.dataset.location!}.subStatus`]: el.value } as any);
       });
     });
 
@@ -742,6 +817,78 @@ export class OddActorSheet extends OddActorSheetBase {
     roll: Roll,
   ): { label: string; die: string; result: number | string }[] {
     return entries.map(({ label, die }, i) => ({ label, die, result: roll.dice[i]?.total ?? "?" }));
+  }
+
+  /** Last hit location resolved from a d20 roll — client-side transient. */
+  _lastHitLocation: string | null = null;
+
+  private _buildWoundLocations(system: CharacterSystemData) {
+    return HIT_LOCATION_ORDER.map((key) => {
+      const def = HIT_LOCATIONS[key];
+      const loc = system.wounds[key];
+      return {
+        key,
+        svgRegion: def.svgRegion,
+        label: def.label,
+        rangeLabel: `${def.rangeMin}–${def.rangeMax}`,
+        rangeFootnote: def.rangeFootnote ?? null,
+        state: loc.state,
+        subStatus: loc.subStatus,
+        isInjured: loc.state !== "uninjured",
+        woundedEffect: def.woundedEffect,
+        crippledEffect: def.crippledEffect,
+      };
+    });
+  }
+
+  private async _rollHitLocation(): Promise<void> {
+    const roll = await new Roll("1d20").evaluate();
+    const total = roll.total;
+    const key = resolveHitLocation(total);
+    this._lastHitLocation = key;
+
+    const def = HIT_LOCATIONS[key];
+    const content = await foundry.applications.handlebars.renderTemplate(
+      "systems/odd-rpg/templates/chat/hit-location-roll.hbs",
+      {
+        total,
+        locationKey: key,
+        locationLabel: game.i18n!.localize(def.label),
+      },
+    );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (ChatMessage as any).create({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      speaker: (ChatMessage as any).getSpeaker({ actor: this.document }),
+      content,
+      rolls: [roll],
+    });
+
+    // Apply persistent highlight + one-shot flash (Web Animations, not CSS animation)
+    this._applyLastHitHighlight(key, true);
+  }
+
+  private _applyLastHitHighlight(key: string, flash = false): void {
+    this.element.querySelectorAll<Element>(".body-region").forEach((el) => el.classList.remove("last-hit"));
+    this.element.querySelectorAll<HTMLElement>(".wound-row").forEach((el) => {
+      el.classList.toggle("last-hit", el.dataset.location === key);
+    });
+    const region = this.element.querySelector<Element>(`[data-location="${key}"]`);
+    if (!region) return;
+    region.classList.add("last-hit");
+    if (flash) {
+      const anim = region.animate(
+        [{ fill: "rgba(255,255,255,0.7)", stroke: "#fff" }, { fill: "", stroke: "" }],
+        { duration: 600, easing: "ease-out" },
+      );
+      anim.onfinish = () => {
+        this._lastHitLocation = null;
+        region.classList.remove("last-hit");
+        this.element.querySelectorAll<HTMLElement>(".wound-row").forEach((el) => {
+          el.classList.remove("last-hit");
+        });
+      };
+    }
   }
 
   private _buildWeaponRows(

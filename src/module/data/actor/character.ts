@@ -15,6 +15,10 @@ import { SKILLS, SKILL_CATEGORIES } from "../../config/skills.js";
 import { DICE_TYPES } from "../../config/dice.js";
 import { STRAIN_VALUES, STRAIN_DEFAULT_SLOT_COUNT, STRAIN_MAX_FORTITUDE_SLOTS } from "../../config/strain.js";
 import { ENCUMBRANCE_LEVELS } from "../../config/encumbrance.js";
+import {
+  HIT_LOCATION_ORDER, WOUND_BASE_STATES, WOUND_SUB_STATUSES,
+  PAIN_PENALTY_DICE, PAIN_PENALTY_DEFAULT,
+} from "../../config/wounds.js";
 
 const { ArrayField, BooleanField, HTMLField, NumberField, ObjectField, SchemaField, StringField } =
   foundry.data.fields;
@@ -107,6 +111,27 @@ export class CharacterDataModel extends foundry.abstract.TypeDataModel<
       encumbrance: new SchemaField({
         level: new StringField({ required: true, blank: false, initial: "none", choices: Object.keys(ENCUMBRANCE_LEVELS) }),
       }),
+      painPenaltyDie: new StringField({
+        required: true, initial: PAIN_PENALTY_DEFAULT,
+        choices: Object.keys(PAIN_PENALTY_DICE),
+      }),
+      wounds: new SchemaField(
+        Object.fromEntries(
+          HIT_LOCATION_ORDER.map((key) => [
+            key,
+            new SchemaField({
+              state: new StringField({
+                required: true, initial: "uninjured",
+                choices: Object.keys(WOUND_BASE_STATES),
+              }),
+              subStatus: new StringField({
+                required: true, initial: "blunt",
+                choices: Object.keys(WOUND_SUB_STATUSES),
+              }),
+            }),
+          ]),
+        ),
+      ),
     } as CharacterDataModel.Schema;
   }
 
@@ -146,7 +171,9 @@ export interface CharacterSystemData {
   savedRolls: { id: string; name: string; dice: { label: string; die: string }[]; flat: number }[];
   customSkills: { id: string; name: string; category: string; die: string }[];
   encumbrance: { level: string };
+  painPenaltyDie: string;
   health: { value: number; max: number };
+  wounds: Record<string, { state: string; subStatus: string }>;
 }
 
 export default CharacterDataModel;
