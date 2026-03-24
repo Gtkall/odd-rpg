@@ -8,7 +8,8 @@
       "feature": "Feature",
       "spell":   "Spell",
       "weapon":  "Weapon",
-      "armor":   "Armor"
+      "armor":   "Armor",
+      "talent":  "Talent"
     }
   },
   "ODD": {
@@ -189,7 +190,8 @@
     },
     "ItemType": {
       "weapon": "Weapon",
-      "armor":  "Armor"
+      "armor":  "Armor",
+      "talent": "Talent"
     },
     "Armor": {
       "Bulk":       "Bulk",
@@ -203,6 +205,29 @@
         "oneLeg":   "1 Leg",
         "bothLegs": "Both Legs"
       }
+    },
+    "Talent": {
+      "Types": {
+        "main":      "Main",
+        "minorSide": "Minor Side",
+        "majorSide": "Major Side"
+      },
+      "Ranks": {
+        "I":   "Rank I",
+        "II":  "Rank II",
+        "III": "Rank III"
+      },
+      "type":                     "Type",
+      "rank":                     "Rank",
+      "treeName":                 "Tree",
+      "treeNamePlaceholder":      "e.g. Swordsmanship",
+      "parent":                   "Parent Talent",
+      "prerequisites":            "Prerequisites",
+      "prerequisitesPlaceholder": "e.g. Str d8, Melee d6",
+      "effects":                  "Effects",
+      "addEffect":                "Add Effect",
+      "removeEffect":             "Remove Effect",
+      "effectTitlePlaceholder":   "Effect title…"
     },
     "Weapon": {
       "Type": {

@@ -1,8 +1,10 @@
 import { WEAPON_TYPES, WEAPON_HANDS, WEAPON_DISTANCE, WEAPON_TAGS } from "../config/weapon.js";
 import { ARMOR_LOCATIONS } from "../config/armor.js";
 import { DICE_TYPES } from "../config/dice.js";
+import { TALENT_TYPES, TALENT_RANKS } from "../config/talent.js";
 import type { WeaponSystemData } from "../data/item/weapon.js";
 import type { ArmorSystemData } from "../data/item/armor.js";
+import type { TalentSystemData } from "../data/item/talent.js";
 
 const { ItemSheetV2 } = foundry.applications.sheets;
 const { HandlebarsApplicationMixin } = foundry.applications.api;
@@ -18,7 +20,10 @@ export class OddItemSheet extends OddItemSheetBase {
 
   static override readonly DEFAULT_OPTIONS = {
     classes: ["odd-rpg", "sheet", "item"],
-    position: { width: 520, height: 560 },
+    position: {
+      width:  Math.round(Math.min(window.innerWidth  * 0.385, 645)),
+      height: Math.round(Math.min(window.innerHeight * 0.595, 755)),
+    },
     form: { submitOnChange: true },
     window: { resizable: true },
   };
@@ -66,11 +71,18 @@ export class OddItemSheet extends OddItemSheetBase {
       : {};
 
     const isEditMode = this.#isEditMode;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rollData: Record<string, unknown> = (this.document as any).actor?.getRollData() ?? {};
     const enrichedDescription = isEditMode
       ? ""
       : await foundry.applications.ux.TextEditor.enrichHTML(
           ((item.system as Record<string, unknown>).description as string) || "",
+          { rollData },
         );
+
+    const talentContext = (item.type as string) === "talent"
+      ? await this._prepareTalentContext(isEditMode, rollData)
+      : {};
 
     return {
       ...context,
@@ -80,6 +92,7 @@ export class OddItemSheet extends OddItemSheetBase {
       enrichedDescription,
       ...weaponContext,
       ...armorContext,
+      ...talentContext,
     };
   }
 
@@ -111,6 +124,75 @@ export class OddItemSheet extends OddItemSheetBase {
 
     if ((this.document.type as string) === "weapon") this._onRenderWeapon();
     if ((this.document.type as string) === "armor")  this._onRenderArmor();
+    if ((this.document.type as string) === "talent") this._onRenderTalent();
+  }
+
+  private async _prepareTalentContext(isEditMode: boolean, rollData: unknown = {}) {
+    const system = this.document.system as unknown as TalentSystemData;
+    const isSide = system.talentType === "minorSide" || system.talentType === "majorSide";
+
+    // Build parent options — prefer actor's embedded items, fall back to world items
+    const parentOptions: { value: string; label: string }[] = [{ value: "", label: "—" }];
+    const actor = (this.document as unknown as { actor: { items: { values(): Iterable<Item.Implementation> } } | null }).actor;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const collection: Iterable<Item.Implementation> = actor ? actor.items.values() : (game as any).items.values();
+    for (const candidate of collection) {
+      if ((candidate.type as string) === "talent" && candidate.id !== this.document.id) {
+        parentOptions.push({ value: candidate.id!, label: candidate.name });
+      }
+    }
+
+    // Enrich effect bodies in view mode; keep raw HTML for edit mode
+    const enrichedEffects = isEditMode
+      ? system.effects.map((e) => ({ title: e.title, body: e.body }))
+      : await Promise.all(
+          system.effects.map(async (e) => ({
+            title: e.title,
+            body:  await foundry.applications.ux.TextEditor.enrichHTML(e.body || "", { rollData }),
+          })),
+        );
+
+    return {
+      talentTypes:     TALENT_TYPES,
+      talentRanks:     TALENT_RANKS,
+      isSide,
+      parentOptions,
+      enrichedEffects,
+    };
+  }
+
+  private _onRenderTalent(): void {
+    const html = this.element;
+    const doc  = this.document as unknown as { update(d: Record<string, unknown>): Promise<unknown> };
+    const system = this.document.system as unknown as TalentSystemData;
+
+    // Snapshot current effect values from the DOM (prose-mirror may have unsaved content)
+    const snapshotEffects = (): { title: string; body: string }[] =>
+      system.effects.map((e, i) => {
+        const titleEl = html.querySelector<HTMLInputElement>(`input[name="system.effects.${i}.title"]`);
+        const bodyEl  = html.querySelector<Element & { value?: string }>(`prose-mirror[name="system.effects.${i}.body"]`);
+        return {
+          title: titleEl?.value ?? e.title,
+          body:  bodyEl?.value  ?? e.body,
+        };
+      });
+
+    // Add effect
+    html.querySelector<HTMLButtonElement>("[data-add-effect]")
+      ?.addEventListener("click", () => {
+        const effects = [...snapshotEffects(), { title: "", body: "" }];
+        void doc.update({ "system.effects": effects });
+      });
+
+    // Remove effect
+    html.querySelectorAll<HTMLButtonElement>("[data-remove-effect]")
+      .forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const idx = Number(btn.dataset.removeEffect);
+          const effects = snapshotEffects().filter((_, i) => i !== idx);
+          void doc.update({ "system.effects": effects });
+        });
+      });
   }
 
   private _onRenderWeapon(): void {
