@@ -4,13 +4,15 @@
        title="{{actor.name}}" height="100" width="100" />
   <div class="header-fields">
     <h1 class="charname">
-      <input name="name" type="text" value="{{actor.name}}" placeholder="Character Name" />
+      <input name="name" type="text" value="{{actor.name}}" placeholder="Character Name"
+             {{#unless isEditMode}}disabled{{/unless}} />
     </h1>
     <div class="header-row">
       <div class="resource player-name">
         <label>{{localize "ODD.Base.playerName"}}</label>
         <input type="text" name="system.playerName"
-               value="{{system.playerName}}" placeholder="Player Name" />
+               value="{{system.playerName}}" placeholder="Player Name"
+               {{#unless isEditMode}}disabled{{/unless}} />
       </div>
       <div class="resource xp">
         <label>{{localize "ODD.Base.xp"}}</label>
@@ -19,9 +21,14 @@
                  value="{{system.xp.value}}" data-dtype="Number" />
           <span class="separator">/</span>
           <input type="number" name="system.xp.max"
-                 value="{{system.xp.max}}" data-dtype="Number" />
+                 value="{{system.xp.max}}" data-dtype="Number"
+                 {{#unless isEditMode}}disabled{{/unless}} />
         </div>
       </div>
+      <button type="button" class="item-edit-toggle" data-actor-edit-toggle
+              title="{{#if isEditMode}}Finish editing{{else}}Edit character{{/if}}">
+        {{#if isEditMode}}<i class="fas fa-check"></i>{{else}}<i class="fas fa-pen"></i>{{/if}}
+      </button>
     </div>
   </div>
 </header>

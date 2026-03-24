@@ -11,6 +11,7 @@
     --odd-color-accent: #ff6b6b;
     --odd-color-bg: #1a1a1a;
     --odd-color-border: #444;
+    --odd-color-border-subtle: #2d2d2d;
     --odd-font-primary: "Signika", sans-serif;
 }
 
@@ -316,7 +317,10 @@
 
 .odd-rpg .rollable {
     cursor: pointer;
-    transition: color 0.15s, text-shadow 0.15s;
+    padding: 0.15rem 0.3rem;
+    margin: -0.15rem -0.3rem;
+    border-radius: 3px;
+    transition: color 0.15s, text-shadow 0.15s, background 0.15s;
 }
 
 .odd-rpg .rollable:hover {
@@ -354,7 +358,8 @@
     gap: 0.35rem;
     padding: 0.4rem 0.5rem;
     min-height: 3.5rem;
-    background: #111;
+    background: var(--odd-color-bg);
+    border-top: 1px solid var(--odd-color-border-subtle);
     border-bottom: 1px solid var(--odd-color-border);
 }
 
@@ -681,6 +686,8 @@
     flex: 1;
     min-height: 0;
     overflow-y: auto;
+    padding: 0.5rem;
+    gap: 0.5rem;
 }
 
 /* ── Panel headers (Attributes / Statistics / Skills / Common Rolls) ── */
@@ -692,25 +699,30 @@
     text-align: center;
     padding: 0.25rem 0;
     margin: 0 0 0.35rem;
-    border-bottom: 1px solid var(--odd-color-border);
+    border-bottom: 1px solid var(--odd-color-border-subtle);
     color: #aaa;
 }
 
 /* ── Attributes + Statistics row ── */
 .odd-rpg .attr-stats-row {
     display: flex;
-    border-bottom: 1px solid var(--odd-color-border);
+    gap: 0.5rem;
 }
 
 .odd-rpg .attributes-panel {
-    flex: 0 0 62%;
-    border-right: 1px solid var(--odd-color-border);
-    padding: 0.25rem 0.75rem 0.5rem;
+    flex: 0 0 calc(62% - 0.25rem);
+    padding: 0.4rem 0.75rem 0.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--odd-color-border-subtle);
+    border-radius: 6px;
 }
 
 .odd-rpg .statistics-panel {
     flex: 1;
-    padding: 0.25rem 0.75rem 0.5rem;
+    padding: 0.4rem 0.75rem 0.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--odd-color-border-subtle);
+    border-radius: 6px;
 }
 
 /* Scoped under .character-main to avoid conflict with old attributes-grid rule */
@@ -729,10 +741,14 @@
 }
 
 .odd-rpg .attr-label {
-    text-align: right;
+    text-align: left;
     font-weight: 700;
     font-size: 0.9rem;
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 1.8rem;
     transition: color 0.1s;
 }
 
@@ -741,14 +757,14 @@
 }
 
 .odd-rpg .attr-select {
-    width: 3.6rem;
-    font-size: 0.82rem;
+    width: 4.1rem;
+    font-size: 0.88rem;
     padding: 0.25rem 0.4rem;
 }
 
 .odd-rpg .skill-select {
-    width: 3.2rem;
-    font-size: 0.75rem;
+    width: 3.7rem;
+    font-size: 0.82rem;
     padding: 0.15rem 0.35rem;
 }
 
@@ -768,7 +784,7 @@
 }
 
 .odd-rpg .character-main .stat-row label {
-    font-size: 0.8rem;
+    font-size: 0.82rem;
     color: #ccc;
     flex: 1;
 }
@@ -792,40 +808,50 @@
 /* ── Skills + Common Rolls row ── */
 .odd-rpg .skills-rolls-row {
     display: flex;
-    flex: 1;
+    flex: 0 0 auto;
+    gap: 0.5rem;
 }
 
 .odd-rpg .skills-panel {
-    flex: 0 0 76%;
-    border-right: 1px solid var(--odd-color-border);
-    padding: 0.25rem 0.5rem 0.5rem;
+    flex: 0 0 calc(76% - 0.25rem);
+    padding: 0.4rem 0.5rem 0.4rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--odd-color-border-subtle);
+    border-radius: 6px;
 }
 
 .odd-rpg .rolls-column {
     flex: 1;
     display: flex;
     flex-direction: column;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--odd-color-border-subtle);
+    border-radius: 6px;
 }
 
 .odd-rpg .rolls-panel {
-    padding: 0.25rem 0.6rem 0.5rem;
+    padding: 0.25rem 0.6rem 0.25rem;
 }
 
 .odd-rpg .skill-row-group {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 0 0.5rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--odd-color-border-subtle);
 }
 
 .odd-rpg .skill-row-group:last-child {
     margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
 }
 
 .odd-rpg .category-header {
     font-weight: 600;
     font-size: 0.72rem;
-    text-align: right;
+    text-align: center;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: #999;
@@ -843,14 +869,180 @@
 }
 
 .odd-rpg .skill-name {
-    font-size: 0.78rem;
+    font-size: 0.82rem;
     flex: 1;
-    text-align: right;
+    text-align: left;
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 1.6rem;
     transition: color 0.1s;
 }
 
 .odd-rpg .skill-name:hover {
+    color: var(--odd-color-accent);
+}
+
+/* ── Edit mode static values ── */
+.odd-rpg .die-value-static {
+    display: inline-block;
+    width: 4.1rem;
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: var(--odd-color-accent);
+}
+
+.odd-rpg .skill-row .die-value-static {
+    width: 3.7rem;
+    font-size: 0.82rem;
+}
+
+.odd-rpg .stat-value-static {
+    font-weight: 700;
+    font-size: 0.82rem;
+    color: var(--odd-color-accent);
+    min-width: 3rem;
+    text-align: center;
+}
+
+/* ── Custom skills ── */
+.odd-rpg .custom-skill-row {
+    gap: 0.3rem;
+}
+
+.odd-rpg .custom-badge {
+    font-size: 0.6rem;
+    color: #888;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.odd-rpg .icon-btn {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    font-size: 0.85rem;
+    padding: 0 0.1rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.odd-rpg .icon-btn:hover {
+    color: var(--odd-color-accent);
+}
+
+.odd-rpg .danger-btn {
+    background: none;
+    border: 1px solid #7a2020;
+    border-radius: 3px;
+    color: #c04040;
+    cursor: pointer;
+    font-size: 0.75rem;
+    padding: 0.05rem 0.3rem;
+    line-height: 1.4;
+    flex-shrink: 0;
+    transition: background 0.1s, color 0.1s;
+}
+
+.odd-rpg .danger-btn:hover {
+    background: #7a2020;
+    color: #fff;
+}
+
+/* two-step delete confirmation */
+.odd-rpg .custom-skill-delete-confirm {
+    display: none;
+    align-items: center;
+    gap: 0.25rem;
+    flex-shrink: 0;
+}
+
+.odd-rpg .delete-confirm-label {
+    font-size: 0.7rem;
+    color: #c04040;
+    white-space: nowrap;
+}
+
+.odd-rpg .custom-skill-row[data-confirm-delete] .custom-skill-delete {
+    display: none;
+}
+
+.odd-rpg .custom-skill-row[data-confirm-delete] .custom-skill-delete-confirm {
+    display: flex;
+}
+
+.odd-rpg .custom-skill-add-section {
+    margin-top: 0.4rem;
+    padding-top: 0.3rem;
+}
+
+.odd-rpg .custom-skill-form {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-bottom: 0.3rem;
+}
+
+.odd-rpg .custom-skill-form-spacer {
+    flex: 1;
+}
+
+.odd-rpg .custom-skill-form.hidden {
+    display: none;
+}
+
+.odd-rpg .custom-skill-name-input {
+    flex: 3 1 0;
+    min-width: 4rem;
+    background: #1e1e1e;
+    border: 1px solid #444;
+    border-radius: 3px;
+    color: var(--odd-color-primary);
+    font-size: 0.78rem;
+    padding: 0.15rem 0.3rem;
+}
+
+.odd-rpg .custom-skill-category-select {
+    flex: 2 1 0;
+    min-width: 3rem;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 3px;
+    color: var(--odd-color-primary);
+    font-size: 0.78rem;
+    padding: 0.15rem 0.2rem;
+}
+
+.odd-rpg .custom-skill-save-btn,
+.odd-rpg .custom-skill-cancel-btn {
+    font-size: 0.75rem;
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    cursor: pointer;
+    border: 1px solid #555;
+    background: #2a2a2a;
+    color: var(--odd-color-primary);
+}
+
+.odd-rpg .custom-skill-save-btn:hover {
+    background: #3a3a3a;
+    border-color: var(--odd-color-accent);
+}
+
+.odd-rpg .add-custom-skill-btn {
+    font-size: 0.72rem;
+    color: #888;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.1rem 0;
+    text-align: left;
+}
+
+.odd-rpg .add-custom-skill-btn:hover {
     color: var(--odd-color-accent);
 }
 
@@ -991,11 +1183,82 @@
     padding: 0.1rem 0.3rem;
 }
 
-/* Initiative panel on Combat tab */
+/* ── Combat tab ── */
+.odd-rpg .initiative-encumbrance-row {
+    display: flex;
+    gap: 0.5rem;
+}
+
 .odd-rpg .initiative-panel {
+    flex: 1;
     padding: 0.5rem 0.6rem;
-    border-bottom: 1px solid var(--odd-color-border);
-    max-width: 16rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--odd-color-border-subtle);
+    border-radius: 6px;
+}
+
+.odd-rpg .encumbrance-panel {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--odd-color-border-subtle);
+    border-radius: 6px;
+}
+
+.odd-rpg .enc-level-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.6rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--odd-color-border-subtle);
+}
+
+.odd-rpg .enc-label {
+    font-size: 0.82rem;
+    color: #ccc;
+}
+
+.odd-rpg .enc-select {
+    background: #2a2a2a;
+    border: 1px solid var(--odd-color-border);
+    border-radius: 4px;
+    color: var(--odd-color-primary);
+    font-family: var(--odd-font-primary);
+    font-size: 0.82rem;
+    padding: 0.2rem 0.3rem;
+    width: 8rem;
+}
+
+.odd-rpg .enc-stats {
+    display: flex;
+    justify-content: space-around;
+    gap: 0.5rem;
+}
+
+.odd-rpg .enc-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.odd-rpg .enc-stat-label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #888;
+}
+
+.odd-rpg .enc-stat-value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #555;
+}
+
+.odd-rpg .enc-stat-value.has-value {
+    color: var(--odd-color-accent);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -1004,7 +1267,9 @@
 
 .odd-rpg .strain-panel {
     padding: 0.4rem 0.5rem 0.5rem;
-    border-top: 1px solid var(--odd-color-border);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--odd-color-border-subtle);
+    border-radius: 6px;
 }
 
 .odd-rpg .strain-header {
@@ -1555,4 +1820,208 @@
     font-style: italic;
     padding: 1rem;
     text-align: center;
+}
+
+/* Armor + Dodge row */
+.odd-rpg .armor-dodge-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    align-items: flex-start;
+}
+
+.odd-rpg .armor-dodge-row .armor-card {
+    flex: 1;
+    min-width: 0;
+    margin-top: 0;
+}
+
+.odd-rpg .dodge-panel {
+    flex: 0 0 auto;
+    width: 220px;
+    padding: 0.5rem 0.6rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--odd-color-border-subtle);
+    border-radius: 6px;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Inventory Tables (Weapons / Armor)                                        */
+/* -------------------------------------------------------------------------- */
+
+.odd-rpg .inventory-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--odd-color-border-subtle);
+    border-radius: 6px;
+    margin-top: 0.75rem;
+    padding: 0.5rem 0.75rem 0.65rem;
+}
+
+.odd-rpg .inventory-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    margin-bottom: 0.25rem;
+}
+
+.odd-rpg .inventory-table th {
+    color: #888;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.2rem 0.4rem;
+    border-bottom: 1px solid var(--odd-color-border-subtle);
+    text-align: left;
+}
+
+.odd-rpg .inventory-table td {
+    padding: 0.3rem 0.4rem;
+    border-bottom: 1px solid var(--odd-color-border-subtle);
+    vertical-align: middle;
+    color: var(--odd-color-primary);
+}
+
+.odd-rpg .inventory-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.odd-rpg .inventory-table .weapon-row-secondary td {
+    padding-top: 0.1rem;
+    padding-bottom: 0.2rem;
+    color: #a0a0a0;
+}
+
+/* Column widths — weapon */
+.odd-rpg .weapon-table .col-attack  { width: 4.5rem; white-space: nowrap; }
+.odd-rpg .weapon-table .col-tempos  { width: 3.5rem; text-align: center; }
+.odd-rpg .weapon-table .col-dist    { width: 3rem;   text-align: center; }
+.odd-rpg .weapon-table .col-acc     { width: 3rem;   text-align: center; }
+.odd-rpg .weapon-table .col-dmg     { width: 4rem;   text-align: center; }
+.odd-rpg .weapon-table .col-controls{ width: 7.5rem; }
+.odd-rpg .weapon-table .col-notes   { color: #777; font-size: 0.75rem; }
+
+/* Column widths — armor */
+.odd-rpg .armor-table .col-bulk     { width: 3rem;   text-align: center; }
+.odd-rpg .armor-table .col-prot     { width: 3.5rem; text-align: center; }
+.odd-rpg .armor-table .col-loc      { width: 8rem; }
+.odd-rpg .armor-table .col-controls { width: 7.5rem; }
+.odd-rpg .armor-table .col-notes    { color: #777; font-size: 0.75rem; }
+
+/* Controls cell — keep everything on one line */
+.odd-rpg .inventory-table .item-controls {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.15rem;
+}
+
+/* Attack cell — row of two buttons */
+.odd-rpg .col-attack {
+    white-space: nowrap;
+}
+
+.odd-rpg .col-attack .attack-btns {
+    display: flex;
+    gap: 0.2rem;
+    align-items: center;
+}
+
+/* Attack buttons */
+.odd-rpg .weapon-attack-roll,
+.odd-rpg .weapon-attack-pool {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid #3a3a3a;
+    border-radius: 3px;
+    color: var(--odd-color-primary);
+    cursor: pointer;
+    font-size: 0.78rem;
+    line-height: 1;
+    padding: 0.2rem 0.35rem;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.odd-rpg .weapon-attack-roll:hover {
+    background: rgba(255, 107, 107, 0.2);
+    border-color: var(--odd-color-accent);
+    color: var(--odd-color-accent);
+}
+
+.odd-rpg .weapon-attack-pool:hover {
+    background: rgba(126, 184, 216, 0.15);
+    border-color: #7eb8d8;
+    color: #7eb8d8;
+}
+
+/* Hand label badge */
+.odd-rpg .hand-label {
+    background: rgba(255, 107, 107, 0.15);
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    border-radius: 3px;
+    color: #cc8888;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    padding: 0.1rem 0.4rem;
+    margin-left: 0.3rem;
+    vertical-align: middle;
+}
+
+/* Equipped checkbox */
+.odd-rpg .item-equipped-label {
+    cursor: pointer;
+    margin-right: 0.15rem;
+}
+
+.odd-rpg .item-equipped-label input[type="checkbox"] {
+    accent-color: var(--odd-color-accent);
+    cursor: pointer;
+}
+
+/* Controls column buttons */
+.odd-rpg .inventory-table .item-sort-up,
+.odd-rpg .inventory-table .item-sort-down,
+.odd-rpg .inventory-table .item-edit,
+.odd-rpg .inventory-table .item-delete {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: 0.1rem 0.2rem;
+    transition: color 0.15s;
+}
+
+.odd-rpg .inventory-table .item-sort-up:hover,
+.odd-rpg .inventory-table .item-sort-down:hover,
+.odd-rpg .inventory-table .item-edit:hover {
+    color: var(--odd-color-primary);
+}
+
+.odd-rpg .inventory-table .item-delete:hover {
+    color: var(--odd-color-accent);
+}
+
+/* Inline add row */
+.odd-rpg .inventory-add-row {
+    padding-top: 0.35rem;
+}
+
+.odd-rpg .inventory-add-input {
+    background: transparent;
+    border: none;
+    border-bottom: 1px dashed #3a3a3a;
+    border-radius: 0;
+    color: #666;
+    font-family: var(--odd-font-primary);
+    font-size: 0.8rem;
+    padding: 0.2rem 0.4rem;
+    width: 100%;
+    transition: border-color 0.15s, color 0.15s;
+}
+
+.odd-rpg .inventory-add-input:focus {
+    border-bottom-color: #7eb8d8;
+    color: var(--odd-color-primary);
+    outline: none;
 }

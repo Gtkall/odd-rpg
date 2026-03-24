@@ -49,6 +49,23 @@ export const COMMON_ROLLS: readonly CommonRollDef[] = Object.freeze([
     ],
   },
   {
+    key: "dodge",
+    label: "ODD.Rolls.dodge",
+    dedicated: true,
+    sources: [
+      { type: "attribute", key: "agi" },
+      { type: "skill", category: "combat", key: "reflexes" },
+    ],
+  },
+  {
+    key: "parry",
+    label: "ODD.Rolls.parry",
+    sources: [
+      { type: "attribute", key: "agi" },
+      { type: "skill", category: "combat", key: "melee" },
+    ],
+  },
+  {
     key: "fear",
     label: "ODD.Rolls.fear",
     sources: [
@@ -70,3 +87,4 @@ export const COMMON_ROLLS: readonly CommonRollDef[] = Object.freeze([
 /** Convenience accessors for rolls that also appear in dedicated sheet sections. */
 export const STAMINA_ROLL = COMMON_ROLLS.find((r) => r.key === "stamina")!;
 export const INITIATIVE_ROLL = COMMON_ROLLS.find((r) => r.key === "initiative")!;
+export const DODGE_ROLL = COMMON_ROLLS.find((r) => r.key === "dodge")!;

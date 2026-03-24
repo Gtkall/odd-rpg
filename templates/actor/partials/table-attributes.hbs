@@ -7,15 +7,23 @@
       <label class="attr-label rollable" data-roll-attribute="{{left}}">
         {{localize (lookup ../attributeConfig left)}}
       </label>
-      <select name="system.attributes.{{left}}" class="attr-select">
-        {{selectOptions ../attributeDiceTypes selected=(lookup ../system.attributes left) localize=true}}
-      </select>
+      {{#if ../isEditMode}}
+        <select name="system.attributes.{{left}}" class="attr-select">
+          {{selectOptions ../attributeDiceTypes selected=(lookup ../system.attributes left) localize=true}}
+        </select>
+      {{else}}
+        <span class="die-value-static">{{lookup ../system.attributes left}}</span>
+      {{/if}}
       <label class="attr-label rollable" data-roll-attribute="{{right}}">
         {{localize (lookup ../attributeConfig right)}}
       </label>
-      <select name="system.attributes.{{right}}" class="attr-select">
-        {{selectOptions ../attributeDiceTypes selected=(lookup ../system.attributes right) localize=true}}
-      </select>
+      {{#if ../isEditMode}}
+        <select name="system.attributes.{{right}}" class="attr-select">
+          {{selectOptions ../attributeDiceTypes selected=(lookup ../system.attributes right) localize=true}}
+        </select>
+      {{else}}
+        <span class="die-value-static">{{lookup ../system.attributes right}}</span>
+      {{/if}}
     </div>
     {{/each}}
   </div>

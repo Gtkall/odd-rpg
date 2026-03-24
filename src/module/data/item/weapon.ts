@@ -32,11 +32,13 @@ export class WeaponDataModel extends foundry.abstract.TypeDataModel<any, Item.Im
         new StringField({ required: true, blank: false }),
         { required: true, initial: [] },
       ),
+      equipped: new BooleanField({ required: true, initial: false }),
     };
   }
 }
 
 export interface WeaponSystemData extends OddItemBase {
+  equipped: boolean;
   weaponType: "melee" | "ranged";
   hands: "1h" | "2h" | "versatile";
   oneHanded: WeaponHandConfig;
