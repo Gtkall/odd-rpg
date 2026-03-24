@@ -53,23 +53,29 @@
       </div>
     {{/unless}}
 
-    {{!-- Tree Name --}}
+    {{!-- Category --}}
+    <div class="talent-row">
+      <div class="talent-row-label">{{localize "ODD.Talent.category"}}</div>
+      <select name="system.category">
+        {{selectOptions talentCategories selected=system.category localize=true}}
+      </select>
+    </div>
+
+    {{!-- Tree (combo: type new name or pick existing) --}}
     <div class="talent-row">
       <div class="talent-row-label">{{localize "ODD.Talent.treeName"}}</div>
       <input type="text" name="system.treeName" value="{{system.treeName}}"
-        placeholder="{{localize "ODD.Talent.treeNamePlaceholder"}}" />
+        placeholder="{{localize "ODD.Talent.treeNamePlaceholder"}}"
+        list="talent-tree-datalist" autocomplete="off" />
+      <datalist id="talent-tree-datalist">
+        {{#each existingTrees}}<option value="{{this}}">{{/each}}
+      </datalist>
     </div>
 
-    {{!-- Parent Talent --}}
+    {{!-- XP Cost (read-only derived) --}}
     <div class="talent-row">
-      <div class="talent-row-label">{{localize "ODD.Talent.parent"}}</div>
-      <select name="system.parentId">
-        {{#each parentOptions}}
-          <option value="{{this.value}}"{{#if (eq ../system.parentId this.value)}} selected{{/if}}>
-            {{this.label}}
-          </option>
-        {{/each}}
-      </select>
+      <div class="talent-row-label">{{localize "ODD.Talent.xpCost"}}</div>
+      <span class="talent-xp-value">{{system.xpCost}} XP</span>
     </div>
 
     {{!-- Prerequisites --}}

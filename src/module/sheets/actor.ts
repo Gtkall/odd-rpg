@@ -6,6 +6,8 @@ import type { RollResolution } from "../config/rolls.js";
 import { ENCUMBRANCE_LEVELS } from "../config/encumbrance.js";
 import { WEAPON_DISTANCE } from "../config/weapon.js";
 import { ARMOR_LOCATIONS } from "../config/armor.js";
+import { TALENT_TYPES, TALENT_CATEGORIES } from "../config/talent.js";
+import { type FLAW_SEVERITIES, FLAW_CATEGORIES } from "../config/flaw.js";
 import {
   HIT_LOCATIONS, HIT_LOCATION_ORDER, WOUND_BASE_STATES, WOUND_SUB_STATUSES,
   PAIN_PENALTY_DICE, resolveHitLocation,
@@ -228,6 +230,8 @@ export class OddActorSheet extends OddActorSheetBase {
       currentEncumbrance: ENCUMBRANCE_LEVELS[system.encumbrance.level] ?? ENCUMBRANCE_LEVELS.none,
       weaponRows: this._buildWeaponRows(system, rollModifiers),
       armorRows: this._buildArmorRows(),
+      talentGroups: this._buildTalentGroups(),
+      flawRows: this._buildFlawRows(),
       weaponDistance: WEAPON_DISTANCE,
       tabs: this._getTabs(),
       woundLocations: this._buildWoundLocations(system),
@@ -975,6 +979,76 @@ export class OddActorSheet extends OddActorSheetBase {
           location: sys.location.map((k) => game.i18n!.localize(ARMOR_LOCATIONS[k] ?? k)).join(", "),
           notes: sys.notes.join(", "),
           equipped: sys.equipped,
+        };
+      });
+  }
+
+  private _buildTalentGroups() {
+    const RANK_ORDER = ["I", "II", "III"];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const talents = ([...this.document.items] as any[]).filter((i: any) => (i.type as string) === "talent");
+
+    const groups = new Map<string, Record<string, unknown>[]>();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    for (const item of talents) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const tree: string = (item.system.treeName as string) || "";
+      if (!groups.has(tree)) groups.set(tree, []);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const talentType = item.system.talentType as keyof typeof TALENT_TYPES;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const category = item.system.category as keyof typeof TALENT_CATEGORIES;
+      groups.get(tree)!.push({
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        id:              item.id as string,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        name:            item.name as string,
+        talentType,
+        talentTypeLabel:  game.i18n!.localize(TALENT_TYPES[talentType]),
+        category,
+        categoryLabel:    game.i18n!.localize(TALENT_CATEGORIES[category] ?? category),
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        rank:            item.system.rank as string,
+        isSide:          ["minorSide", "majorSide"].includes(talentType),
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        xpCost:          item.system.xpCost as number,
+      });
+    }
+
+    return [...groups.entries()]
+      .map(([treeName, items]) => ({
+        treeName: treeName || game.i18n!.localize("ODD.Talent.ungrouped"),
+        items: items.toSorted((a, b) => {
+          if (a.isSide !== b.isSide) return (a.isSide as boolean) ? 1 : -1;
+          return RANK_ORDER.indexOf(a.rank as string) - RANK_ORDER.indexOf(b.rank as string);
+        }),
+      }))
+      .sort((a, b) => a.treeName.localeCompare(b.treeName));
+  }
+
+  private _buildFlawRows() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return ([...this.document.items] as any[])
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .filter((i: any) => (i.type as string) === "flaw")
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map((item: any) => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        const category = item.system.category as keyof typeof FLAW_CATEGORIES;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        const severity = item.system.severity as keyof typeof FLAW_SEVERITIES;
+        return {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          id:            item.id as string,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          name:          item.name as string,
+          severity,
+          categoryLabel: game.i18n!.localize(FLAW_CATEGORIES[category] ?? category),
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          xpValue:       item.system.xpValue as number,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          symbol:        item.system.symbol as string,
         };
       });
   }

@@ -1,7 +1,8 @@
 import { WEAPON_TYPES, WEAPON_HANDS, WEAPON_DISTANCE, WEAPON_TAGS } from "../config/weapon.js";
 import { ARMOR_LOCATIONS } from "../config/armor.js";
 import { DICE_TYPES } from "../config/dice.js";
-import { TALENT_TYPES, TALENT_RANKS } from "../config/talent.js";
+import { TALENT_TYPES, TALENT_RANKS, TALENT_CATEGORIES } from "../config/talent.js";
+import { FLAW_SEVERITIES, FLAW_CATEGORIES } from "../config/flaw.js";
 import type { WeaponSystemData } from "../data/item/weapon.js";
 import type { ArmorSystemData } from "../data/item/armor.js";
 import type { TalentSystemData } from "../data/item/talent.js";
@@ -84,6 +85,13 @@ export class OddItemSheet extends OddItemSheetBase {
       ? await this._prepareTalentContext(isEditMode, rollData)
       : {};
 
+    const flawContext = (item.type as string) === "flaw"
+      ? {
+          flawSeverities: FLAW_SEVERITIES,
+          flawCategories: FLAW_CATEGORIES,
+        }
+      : {};
+
     return {
       ...context,
       item,
@@ -93,6 +101,7 @@ export class OddItemSheet extends OddItemSheetBase {
       ...weaponContext,
       ...armorContext,
       ...talentContext,
+      ...flawContext,
     };
   }
 
@@ -127,20 +136,22 @@ export class OddItemSheet extends OddItemSheetBase {
     if ((this.document.type as string) === "talent") this._onRenderTalent();
   }
 
-  private async _prepareTalentContext(isEditMode: boolean, rollData: unknown = {}) {
+  private async _prepareTalentContext(isEditMode: boolean, rollData: Record<string, unknown> = {}) {
     const system = this.document.system as unknown as TalentSystemData;
     const isSide = system.talentType === "minorSide" || system.talentType === "majorSide";
 
-    // Build parent options — prefer actor's embedded items, fall back to world items
-    const parentOptions: { value: string; label: string }[] = [{ value: "", label: "—" }];
+    // Build existing tree names for datalist + auto-derive logic
     const actor = (this.document as unknown as { actor: { items: { values(): Iterable<Item.Implementation> } } | null }).actor;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const collection: Iterable<Item.Implementation> = actor ? actor.items.values() : (game as any).items.values();
+    const existingTrees: string[] = [];
     for (const candidate of collection) {
       if ((candidate.type as string) === "talent" && candidate.id !== this.document.id) {
-        parentOptions.push({ value: candidate.id!, label: candidate.name });
+        const tree = (candidate.system as unknown as TalentSystemData).treeName;
+        if (tree && !existingTrees.includes(tree)) existingTrees.push(tree);
       }
     }
+    existingTrees.sort((a, b) => a.localeCompare(b));
 
     // Enrich effect bodies in view mode; keep raw HTML for edit mode
     const enrichedEffects = isEditMode
@@ -153,18 +164,59 @@ export class OddItemSheet extends OddItemSheetBase {
         );
 
     return {
-      talentTypes:     TALENT_TYPES,
-      talentRanks:     TALENT_RANKS,
+      talentTypes:      TALENT_TYPES,
+      talentRanks:      TALENT_RANKS,
+      talentCategories: TALENT_CATEGORIES,
       isSide,
-      parentOptions,
+      existingTrees,
       enrichedEffects,
     };
   }
 
   private _onRenderTalent(): void {
-    const html = this.element;
-    const doc  = this.document as unknown as { update(d: Record<string, unknown>): Promise<unknown> };
+    const html   = this.element;
+    const doc    = this.document as unknown as { update(d: Record<string, unknown>): Promise<unknown> };
     const system = this.document.system as unknown as TalentSystemData;
+
+    // Tree combo — auto-derive parentId and suggest rank when an existing tree is selected
+    const treeInput = html.querySelector<HTMLInputElement>(`input[name="system.treeName"]`);
+    if (treeInput) {
+      treeInput.addEventListener("change", (ev) => {
+        ev.stopPropagation(); // prevent submitOnChange from double-firing
+        const treeName = treeInput.value.trim();
+
+        // For Side Talents, just update treeName; no rank/parent logic
+        if (system.talentType !== "main") {
+          void doc.update({ "system.treeName": treeName, "system.parentId": "" });
+          return;
+        }
+
+        // Find Main Talents in the same tree (excluding self)
+        const actor = (this.document as unknown as { actor: { items: { values(): Iterable<Item.Implementation> } } | null }).actor;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const collection: Iterable<Item.Implementation> = actor ? actor.items.values() : (game as any).items.values();
+        const rankOrder = ["I", "II", "III"];
+        const inTree: { id: string; rankIdx: number }[] = [];
+        for (const candidate of collection) {
+          if ((candidate.type as string) !== "talent" || candidate.id === this.document.id) continue;
+          const cs = candidate.system as unknown as TalentSystemData;
+          if (cs.treeName === treeName && cs.talentType === "main") {
+            inTree.push({ id: candidate.id!, rankIdx: rankOrder.indexOf(cs.rank) });
+          }
+        }
+
+        // Highest existing rank → next rank; that talent becomes the parent
+        const highestIdx = inTree.reduce((max, t) => t.rankIdx > max ? t.rankIdx : max, -1);
+        const nextRankIdx = Math.min(highestIdx + 1, 2);
+        const parentId   = inTree.find(t => t.rankIdx === highestIdx)?.id ?? "";
+
+        void doc.update({
+          "system.treeName": treeName,
+          "system.parentId": parentId,
+          "system.rank":     rankOrder[nextRankIdx],
+        });
+      });
+    }
 
     // Snapshot current effect values from the DOM (prose-mirror may have unsaved content)
     const snapshotEffects = (): { title: string; body: string }[] =>

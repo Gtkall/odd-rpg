@@ -1,4 +1,66 @@
 {{!-- Talents & Flaws Tab --}}
 <section class="tab character-talents-flaws {{ tab.cssClass }}" data-group="{{ tab.group }}" data-tab="{{ tab.id }}">
-  <p class="tab-placeholder">Talents &amp; Flaws — coming soon.</p>
+
+  {{!-- Talents --}}
+  <div class="tf-section talents-section">
+    <div class="tf-section-header">
+      <h3 class="panel-header">{{localize "ODD.Sheet.Tabs.talentsFlaws"}}</h3>
+      <input type="text" class="inventory-add-input" data-item-type="talent"
+        placeholder="{{localize 'ODD.Talent.addTalent'}}" />
+    </div>
+
+    {{#if talentGroups.length}}
+      {{#each talentGroups}}
+        <div class="talent-group">
+          <div class="talent-group-header">{{this.treeName}}</div>
+          {{#each this.items}}
+            <div class="item talent-entry" data-item-id="{{this.id}}">
+              <div class="talent-entry-name">{{this.name}}</div>
+              <div class="talent-entry-meta">
+                <span class="flaw-category">{{this.categoryLabel}}</span>
+                {{#unless this.isSide}}
+                  <span class="talent-badge talent-rank">{{this.rank}}</span>
+                {{/unless}}
+                <span class="talent-badge talent-type talent-type-{{this.talentType}}">
+                  {{this.talentTypeLabel}}
+                </span>
+              </div>
+              <span class="flaw-xp">{{this.xpCost}} XP</span>
+              <div class="item-controls">
+                <button type="button" class="item-edit" data-item-id="{{this.id}}" title="Edit">✎</button>
+                <button type="button" class="item-delete" data-item-id="{{this.id}}" title="Delete">✕</button>
+              </div>
+            </div>
+          {{/each}}
+        </div>
+      {{/each}}
+    {{/if}}
+  </div>
+
+  {{!-- Flaws --}}
+  <div class="tf-section flaws-section">
+    <div class="tf-section-header">
+      <h3 class="panel-header">{{localize "ODD.Flaw.sectionTitle"}}</h3>
+      <input type="text" class="inventory-add-input" data-item-type="flaw"
+        placeholder="{{localize 'ODD.Flaw.addFlaw'}}" />
+    </div>
+
+    {{#if flawRows.length}}
+      <div class="flaw-list">
+        {{#each flawRows}}
+          <div class="item flaw-entry" data-item-id="{{this.id}}">
+            <span class="flaw-symbol" title="{{this.severity}}">{{this.symbol}}</span>
+            <span class="flaw-entry-name">{{this.name}}</span>
+            <span class="flaw-category">{{this.categoryLabel}}</span>
+            <span class="flaw-xp">{{this.xpValue}} XP</span>
+            <div class="item-controls">
+              <button type="button" class="item-edit" data-item-id="{{this.id}}" title="Edit">✎</button>
+              <button type="button" class="item-delete" data-item-id="{{this.id}}" title="Delete">✕</button>
+            </div>
+          </div>
+        {{/each}}
+      </div>
+    {{/if}}
+  </div>
+
 </section>

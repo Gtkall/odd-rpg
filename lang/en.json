@@ -9,7 +9,8 @@
       "spell":   "Spell",
       "weapon":  "Weapon",
       "armor":   "Armor",
-      "talent":  "Talent"
+      "talent":  "Talent",
+      "flaw":    "Flaw"
     }
   },
   "ODD": {
@@ -191,7 +192,8 @@
     "ItemType": {
       "weapon": "Weapon",
       "armor":  "Armor",
-      "talent": "Talent"
+      "talent": "Talent",
+      "flaw":   "Flaw"
     },
     "Armor": {
       "Bulk":       "Bulk",
@@ -206,6 +208,18 @@
         "bothLegs": "Both Legs"
       }
     },
+    "Flaw": {
+      "Severities": {
+        "minor":    "Minor",
+        "moderate": "Moderate",
+        "major":    "Major"
+      },
+      "severity":     "Severity",
+      "category":     "Category",
+      "xpValue":      "XP",
+      "sectionTitle": "Flaws",
+      "addFlaw":      "Add flaw…"
+    },
     "Talent": {
       "Types": {
         "main":      "Main",
@@ -218,6 +232,8 @@
         "III": "Rank III"
       },
       "type":                     "Type",
+      "category":                 "Category",
+      "xpCost":                   "XP Cost",
       "rank":                     "Rank",
       "treeName":                 "Tree",
       "treeNamePlaceholder":      "e.g. Swordsmanship",
@@ -225,6 +241,8 @@
       "prerequisites":            "Prerequisites",
       "prerequisitesPlaceholder": "e.g. Str d8, Melee d6",
       "effects":                  "Effects",
+      "ungrouped":                "Ungrouped",
+      "addTalent":                "Add talent…",
       "addEffect":                "Add Effect",
       "removeEffect":             "Remove Effect",
       "effectTitlePlaceholder":   "Effect title…"

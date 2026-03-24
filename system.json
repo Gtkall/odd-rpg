@@ -65,6 +65,11 @@
           "description",
           "effects[].body"
         ]
+      },
+      "flaw": {
+        "htmlFields": [
+          "description"
+        ]
       }
     }
   },
