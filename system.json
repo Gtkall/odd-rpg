@@ -2,7 +2,7 @@
   "id": "odd-rpg",
   "title": "ODD RPG",
   "description": "The ODD RPG game system for Foundry Virtual Tabletop.",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "compatibility": {
     "minimum": 13,
     "verified": 13
@@ -83,5 +83,5 @@
   "secondaryTokenAttribute": "statistics.magicPoints",
   "url": "https://github.com/Gtkall/odd-rpg",
   "manifest": "https://github.com/Gtkall/odd-rpg/releases/latest/download/system.json",
-  "download": "https://github.com/Gtkall/odd-rpg/releases/download/v0.5.0/odd-rpg.zip"
+  "download": "https://github.com/Gtkall/odd-rpg/releases/download/v0.6.0/odd-rpg.zip"
 }

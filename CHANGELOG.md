@@ -1,3 +1,17 @@
+## [0.6.0](https://github.com/Gtkall/odd-rpg/compare/v0.5.0...v0.6.0) (2026-03-25)
+
+### Features
+
+* **combat:** hit location wound tracker with body diagram ([8bf09ed](https://github.com/Gtkall/odd-rpg/commit/8bf09ed72c7cc008229f823aa88f484dc9a179f4))
+* **items:** add Talent item type with tree structure and rich text effects ([d17e7e6](https://github.com/Gtkall/odd-rpg/commit/d17e7e6fdda815368f07b7458b24153508fb4580))
+* **talents-flaws:** add expandable detail panels to Talents & Flaws tab ([5b5de34](https://github.com/Gtkall/odd-rpg/commit/5b5de34cbcc63070ebf46251f4bae1f6d680ebad))
+* **talents-flaws:** add search, category filter, and fuzzy matching ([79b2a81](https://github.com/Gtkall/odd-rpg/commit/79b2a8192b9d7cb0d6f15605d37cc22abed9abd9))
+* **talents-flaws:** add Talent and Flaw item types with Talents & Flaws tab ([63d103d](https://github.com/Gtkall/odd-rpg/commit/63d103d7f1df997ccdf34552491759e8827ea9be))
+
+### Bug Fixes
+
+* **actor:** deduplicate woundLocations build, tighten combatant lookup, fix separator ([84b6f87](https://github.com/Gtkall/odd-rpg/commit/84b6f876ab3b4b243d7358ea3090cac8a893f65d))
+
 ## [0.5.0](https://github.com/Gtkall/odd-rpg/compare/v0.4.0...v0.5.0) (2026-03-24)
 
 ### Features
