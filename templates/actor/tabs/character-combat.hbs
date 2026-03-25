@@ -88,10 +88,12 @@
               <label class="item-equipped-label" title="{{localize 'ODD.Inventory.equipped'}}">
                 <input type="checkbox" class="item-equipped" data-item-id="{{row.id}}" {{#if row.equipped}}checked{{/if}}>
               </label>
+              {{#if ../isEditMode}}
               <button type="button" class="item-sort-up" data-item-id="{{row.id}}" data-item-type="weapon" title="Up">↑</button>
               <button type="button" class="item-sort-down" data-item-id="{{row.id}}" data-item-type="weapon" title="Down">↓</button>
               <button type="button" class="item-edit" data-item-id="{{row.id}}" title="Edit">✎</button>
               <button type="button" class="item-delete" data-item-id="{{row.id}}" title="Delete">✕</button>
+              {{/if}}
             </div>
             {{/if}}
           </td>
@@ -100,10 +102,12 @@
       </tbody>
     </table>
     {{/if}}
+    {{#if isEditMode}}
     <div class="inventory-add-row">
       <input type="text" class="inventory-add-input" data-item-type="weapon"
         placeholder="{{localize 'ODD.Inventory.addWeapon'}}">
     </div>
+    {{/if}}
   </div>
 
   {{!-- Armor + Dodge row --}}
@@ -136,10 +140,12 @@
                 <label class="item-equipped-label" title="{{localize 'ODD.Inventory.equipped'}}">
                   <input type="checkbox" class="item-equipped" data-item-id="{{row.id}}" {{#if row.equipped}}checked{{/if}}>
                 </label>
+                {{#if ../isEditMode}}
                 <button type="button" class="item-sort-up" data-item-id="{{row.id}}" data-item-type="armor" title="Up">↑</button>
                 <button type="button" class="item-sort-down" data-item-id="{{row.id}}" data-item-type="armor" title="Down">↓</button>
                 <button type="button" class="item-edit" data-item-id="{{row.id}}" title="Edit">✎</button>
                 <button type="button" class="item-delete" data-item-id="{{row.id}}" title="Delete">✕</button>
+                {{/if}}
               </div>
             </td>
           </tr>
@@ -147,10 +153,12 @@
         </tbody>
       </table>
       {{/if}}
+      {{#if isEditMode}}
       <div class="inventory-add-row">
         <input type="text" class="inventory-add-input" data-item-type="armor"
           placeholder="{{localize 'ODD.Inventory.addArmor'}}">
       </div>
+      {{/if}}
     </div>
 
     <div class="dodge-panel">
