@@ -2539,6 +2539,33 @@
     border-radius: 3px;
 }
 
+.tf-filter-row {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 0.5rem;
+}
+
+.tf-filter-row input,
+.tf-filter-row select {
+    font-size: 0.78rem;
+    padding: 0.2rem 0.5rem;
+    background: #1e1e1e;
+    border: 1px solid var(--odd-color-border);
+    color: var(--odd-color-primary);
+    border-radius: 3px;
+    height: 1.6rem;
+    box-sizing: border-box;
+}
+
+.tf-filter-row input {
+    flex: 1;
+    min-width: 0;
+}
+
+.tf-filter-row select {
+    flex: 0 0 9rem;
+}
+
 /* Talent groups */
 .talent-group {
     margin-bottom: 0.5rem;

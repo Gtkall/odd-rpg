@@ -21,6 +21,28 @@ import {
 import type { CharacterSystemData } from "../data/actor/character.js";
 
 const { ActorSheetV2 } = foundry.applications.sheets;
+
+function levenshtein(a: string, b: string): number {
+  const m = a.length, n = b.length;
+  const row = Array.from({ length: n + 1 }, (_, i) => i);
+  for (let i = 1; i <= m; i++) {
+    let prev = i;
+    for (let j = 1; j <= n; j++) {
+      const next = a[i - 1] === b[j - 1] ? row[j - 1] : 1 + Math.min(prev, row[j], row[j - 1]);
+      row[j - 1] = prev;
+      prev = next;
+    }
+    row[n] = prev;
+  }
+  return row[n];
+}
+
+/** Substring match first; falls back to word-level Levenshtein fuzzy match. */
+function fuzzyMatch(query: string, name: string): boolean {
+  if (name.includes(query)) return true;
+  const threshold = query.length <= 3 ? 1 : 2;
+  return name.split(/\s+/).some((word) => levenshtein(query, word.toLowerCase()) <= threshold);
+}
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 
 // HandlebarsApplicationMixin returns an opaque type; cast once here so class
@@ -232,6 +254,12 @@ export class OddActorSheet extends OddActorSheetBase {
       armorRows: this._buildArmorRows(),
       talentGroups: await this._buildTalentGroups(),
       flawRows: await this._buildFlawRows(),
+      talentCategoryOptions: Object.entries(TALENT_CATEGORIES)
+        .map(([value, labelKey]) => ({ value, label: game.i18n!.localize(labelKey) }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
+      flawCategoryOptions: Object.entries(FLAW_CATEGORIES)
+        .map(([value, labelKey]) => ({ value, label: game.i18n!.localize(labelKey) }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
       weaponDistance: WEAPON_DISTANCE,
       tabs: this._getTabs(),
       woundLocations: this._buildWoundLocations(system),
@@ -533,6 +561,44 @@ export class OddActorSheet extends OddActorSheetBase {
         btn.textContent = isOpen ? "▼" : "▶";
       });
     });
+
+    // Talent/Flaw search + category filters (debounced, min 2 chars for name search)
+    const debounce = (fn: () => void, ms: number) => {
+      let timer: ReturnType<typeof setTimeout>;
+      return () => { clearTimeout(timer); timer = setTimeout(fn, ms); };
+    };
+
+    const filterTalents = () => {
+      const raw = html.querySelector<HTMLInputElement>(".tf-talent-search")?.value ?? "";
+      const search = raw.length >= 2 ? raw.toLowerCase() : "";
+      const category = html.querySelector<HTMLSelectElement>(".tf-talent-category")?.value ?? "";
+      for (const group of html.querySelectorAll<HTMLElement>(".talent-group")) {
+        let anyVisible = false;
+        for (const entry of group.querySelectorAll<HTMLElement>(".talent-entry")) {
+          const nameMatch = !search || fuzzyMatch(search, (entry.dataset.name ?? "").toLowerCase());
+          const catMatch = !category || entry.dataset.category === category;
+          const show = nameMatch && catMatch;
+          entry.style.display = show ? "" : "none";
+          if (show) anyVisible = true;
+        }
+        group.style.display = anyVisible ? "" : "none";
+      }
+    };
+    html.querySelector(".tf-talent-search")?.addEventListener("input", debounce(filterTalents, 300));
+    html.querySelector(".tf-talent-category")?.addEventListener("change", filterTalents);
+
+    const filterFlaws = () => {
+      const raw = html.querySelector<HTMLInputElement>(".tf-flaw-search")?.value ?? "";
+      const search = raw.length >= 2 ? raw.toLowerCase() : "";
+      const category = html.querySelector<HTMLSelectElement>(".tf-flaw-category")?.value ?? "";
+      for (const entry of html.querySelectorAll<HTMLElement>(".flaw-entry")) {
+        const nameMatch = !search || fuzzyMatch(search, (entry.dataset.name ?? "").toLowerCase());
+        const catMatch = !category || entry.dataset.category === category;
+        entry.style.display = nameMatch && catMatch ? "" : "none";
+      }
+    };
+    html.querySelector(".tf-flaw-search")?.addEventListener("input", debounce(filterFlaws, 300));
+    html.querySelector(".tf-flaw-category")?.addEventListener("change", filterFlaws);
 
     // Weapon attack roll
     html.querySelectorAll<HTMLElement>(".weapon-attack-roll[data-attack-key]").forEach((el) => {
@@ -1073,6 +1139,7 @@ export class OddActorSheet extends OddActorSheetBase {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           name:                item.name as string,
           severity,
+          category,
           categoryLabel:       game.i18n!.localize(FLAW_CATEGORIES[category] ?? category),
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           xpValue:             item.system.xpValue as number,

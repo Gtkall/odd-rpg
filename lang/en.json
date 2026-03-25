@@ -14,6 +14,10 @@
     }
   },
   "ODD": {
+    "Filter": {
+      "searchName":     "Search by name…",
+      "allCategories":  "All categories"
+    },
     "ActorType": {
       "character": "Character"
     },

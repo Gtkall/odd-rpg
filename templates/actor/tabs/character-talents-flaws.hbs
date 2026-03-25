@@ -9,12 +9,23 @@
         placeholder="{{localize 'ODD.Talent.addTalent'}}" />
     </div>
 
+    <div class="tf-filter-row">
+      <input type="text" class="tf-talent-search" placeholder="{{localize 'ODD.Filter.searchName'}}" />
+      <select class="tf-talent-category">
+        <option value="">{{localize "ODD.Filter.allCategories"}}</option>
+        {{#each talentCategoryOptions}}
+          <option value="{{this.value}}">{{this.label}}</option>
+        {{/each}}
+      </select>
+    </div>
+
     {{#if talentGroups.length}}
       {{#each talentGroups}}
         <div class="talent-group">
           <div class="talent-group-header">{{this.treeName}}</div>
           {{#each this.items}}
-            <div class="item talent-entry" data-item-id="{{this.id}}">
+            <div class="item talent-entry" data-item-id="{{this.id}}"
+              data-name="{{this.name}}" data-category="{{this.category}}">
               <div class="talent-entry-summary">
                 <button type="button" class="tf-expand-toggle" data-target="talent-detail-{{this.id}}" title="Details">▶</button>
                 <span class="talent-entry-name">{{this.name}}</span>
@@ -65,10 +76,21 @@
         placeholder="{{localize 'ODD.Flaw.addFlaw'}}" />
     </div>
 
+    <div class="tf-filter-row">
+      <input type="text" class="tf-flaw-search" placeholder="{{localize 'ODD.Filter.searchName'}}" />
+      <select class="tf-flaw-category">
+        <option value="">{{localize "ODD.Filter.allCategories"}}</option>
+        {{#each flawCategoryOptions}}
+          <option value="{{this.value}}">{{this.label}}</option>
+        {{/each}}
+      </select>
+    </div>
+
     {{#if flawRows.length}}
       <div class="flaw-list">
         {{#each flawRows}}
-          <div class="item flaw-entry" data-item-id="{{this.id}}">
+          <div class="item flaw-entry" data-item-id="{{this.id}}"
+            data-name="{{this.name}}" data-category="{{this.category}}">
             <div class="flaw-entry-summary">
               <button type="button" class="tf-expand-toggle" data-target="flaw-detail-{{this.id}}" title="Details">▶</button>
               <span class="flaw-symbol" title="{{this.severity}}">{{this.symbol}}</span>
