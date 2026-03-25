@@ -1937,6 +1937,7 @@
 
 /* Column widths — weapon */
 .odd-rpg .weapon-table .col-attack  { width: 4.5rem; white-space: nowrap; }
+.odd-rpg .weapon-table .col-name    { white-space: nowrap; }
 .odd-rpg .weapon-table .col-tempos  { width: 3.5rem; text-align: center; }
 .odd-rpg .weapon-table .col-dist    { width: 3rem;   text-align: center; }
 .odd-rpg .weapon-table .col-acc     { width: 3rem;   text-align: center; }
@@ -2008,6 +2009,9 @@
     padding: 0.1rem 0.4rem;
     margin-left: 0.3rem;
     vertical-align: middle;
+    white-space: nowrap;
+    display: inline-block;
+    flex-shrink: 0;
 }
 
 /* Equipped checkbox */
@@ -2673,6 +2677,131 @@
     color: #888;
     min-width: 3rem;
     text-align: right;
+}
+
+/* -------------------------------------------------------------------------- */
+/* [[/oddPool]] and [[/oddPenalty]] enricher button groups                    */
+/* -------------------------------------------------------------------------- */
+
+.odd-pool-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.05rem 0.25rem;
+    border-radius: 3px;
+    vertical-align: middle;
+    font-size: 0.82em;
+    border: 1px solid transparent;
+}
+
+.odd-pool-link--bonus {
+    background: rgba(100, 180, 100, 0.1);
+    border-color: rgba(100, 180, 100, 0.3);
+}
+
+.odd-pool-link--penalty {
+    background: rgba(200, 80, 80, 0.1);
+    border-color: rgba(200, 80, 80, 0.3);
+}
+
+.odd-die-badge {
+    font-weight: bold;
+    font-family: var(--odd-font-primary);
+    padding: 0 0.15rem;
+}
+
+.odd-pool-link--bonus  .odd-die-badge { color: #8bc48b; }
+.odd-pool-link--penalty .odd-die-badge { color: #c87070; }
+
+.odd-pool-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.1rem;
+    cursor: pointer;
+    padding: 0.05rem 0.25rem;
+    border-radius: 2px;
+    color: #888;
+    font-size: 0.75em;
+    transition: background 0.1s, color 0.1s;
+    white-space: nowrap;
+}
+
+.odd-pool-btn:hover {
+    background: rgba(255,255,255,0.1);
+    color: #e0e0e0;
+}
+
+.odd-pool-link--bonus  .odd-pool-btn:hover { color: #8bc48b; }
+.odd-pool-link--penalty .odd-pool-btn:hover { color: #c87070; }
+
+/* Enricher syntax hint tooltip (talent effect editor) */
+.odd-enricher-hint {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: help;
+    color: #666;
+    font-size: 0.85rem;
+    margin-right: auto;
+    padding: 0 0.25rem;
+}
+
+.odd-enricher-hint:hover {
+    color: #aaa;
+}
+
+.odd-enricher-hint-popup {
+    display: none;
+    position: absolute;
+    top: calc(100% + 0.4rem);
+    left: 0;
+    z-index: 100;
+    min-width: 30rem;
+    background: #1a1a1a;
+    border: 1px solid #555;
+    border-radius: 4px;
+    padding: 0.6rem 0.75rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+    pointer-events: none;
+}
+
+.odd-enricher-hint:hover .odd-enricher-hint-popup {
+    display: block;
+}
+
+.odd-enricher-hint-title {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #888;
+    margin-bottom: 0.4rem;
+}
+
+.odd-enricher-hint-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.odd-enricher-hint-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+}
+
+.odd-enricher-hint-row code {
+    font-size: 0.75rem;
+    color: #8bc48b;
+    background: rgba(100,180,100,0.08);
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.odd-enricher-hint-row span {
+    font-size: 0.72rem;
+    color: #777;
 }
 
 /* Expand toggle button */

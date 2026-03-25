@@ -12,6 +12,7 @@ import { OddActor } from "./module/documents/actor.js";
 import { OddItem } from "./module/documents/item.js";
 import { OddActorSheet } from "./module/sheets/actor.js";
 import { OddItemSheet } from "./module/sheets/item.js";
+import { registerEnrichers } from "./module/enrichers.js";
 
 const loadTemplates = foundry.applications.handlebars.loadTemplates;
 const DocumentSheetConfig = foundry.applications.apps.DocumentSheetConfig;
@@ -35,6 +36,7 @@ Hooks.once("init", () => {
   console.warn("ODD RPG | Initializing the ODD RPG game system");
 
   void loadTemplates(templatePaths);
+  registerEnrichers();
 
   // ---- System configuration ----
   // CONFIG.ODD is a system-specific extension not in fvtt-types; cast is unavoidable here.
