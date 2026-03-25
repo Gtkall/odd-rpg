@@ -2675,6 +2675,61 @@
     text-align: right;
 }
 
+/* -------------------------------------------------------------------------- */
+/* [[/oddPool]] and [[/oddPenalty]] enricher button groups                    */
+/* -------------------------------------------------------------------------- */
+
+.odd-pool-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.05rem 0.25rem;
+    border-radius: 3px;
+    vertical-align: middle;
+    font-size: 0.82em;
+    border: 1px solid transparent;
+}
+
+.odd-pool-link--bonus {
+    background: rgba(100, 180, 100, 0.1);
+    border-color: rgba(100, 180, 100, 0.3);
+}
+
+.odd-pool-link--penalty {
+    background: rgba(200, 80, 80, 0.1);
+    border-color: rgba(200, 80, 80, 0.3);
+}
+
+.odd-die-badge {
+    font-weight: bold;
+    font-family: var(--odd-font-primary);
+    padding: 0 0.15rem;
+}
+
+.odd-pool-link--bonus  .odd-die-badge { color: #8bc48b; }
+.odd-pool-link--penalty .odd-die-badge { color: #c87070; }
+
+.odd-pool-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.1rem;
+    cursor: pointer;
+    padding: 0.05rem 0.25rem;
+    border-radius: 2px;
+    color: #888;
+    font-size: 0.75em;
+    transition: background 0.1s, color 0.1s;
+    white-space: nowrap;
+}
+
+.odd-pool-btn:hover {
+    background: rgba(255,255,255,0.1);
+    color: #e0e0e0;
+}
+
+.odd-pool-link--bonus  .odd-pool-btn:hover { color: #8bc48b; }
+.odd-pool-link--penalty .odd-pool-btn:hover { color: #c87070; }
+
 /* Expand toggle button */
 .tf-expand-toggle {
     all: unset;

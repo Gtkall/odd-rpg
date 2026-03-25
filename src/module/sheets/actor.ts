@@ -562,6 +562,38 @@ export class OddActorSheet extends OddActorSheetBase {
       });
     });
 
+    // Enricher pool buttons ([[/oddPool]] and [[/oddPenalty]] in talent/flaw effect text)
+    html.querySelectorAll<HTMLElement>(".odd-pool-btn[data-action]").forEach((btn) => {
+      btn.addEventListener("click", (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        const link = btn.closest<HTMLElement>(".odd-pool-link");
+        if (!link) return;
+        const storedDie = link.dataset.die!;
+        const label = link.dataset.label ?? "Bonus";
+        const action = btn.dataset.action!;
+
+        if (action === "roll") {
+          const dieToRoll = storedDie.startsWith("-") ? storedDie.slice(1) : storedDie;
+          void (async () => {
+            const r = await new Roll(dieToRoll).evaluate();
+            /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
+            await (ChatMessage as any).create({
+              speaker: (ChatMessage as any).getSpeaker({ actor: this.document }),
+            /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
+              flavor: label,
+              rolls: [r],
+            });
+          })();
+        } else if (action === "add-generic") {
+          const poolLabel = storedDie.startsWith("-") ? "Penalty" : "Bonus";
+          void this._addToDicePool(poolLabel, storedDie);
+        } else if (action === "add-named") {
+          void this._addToDicePool(label, storedDie);
+        }
+      });
+    });
+
     // Talent/Flaw search + category filters (debounced, min 2 chars for name search)
     const debounce = (fn: () => void, ms: number) => {
       let timer: ReturnType<typeof setTimeout>;
