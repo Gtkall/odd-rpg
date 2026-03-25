@@ -1,3 +1,14 @@
+## [0.7.0](https://github.com/Gtkall/odd-rpg/compare/v0.6.0...v0.7.0) (2026-03-25)
+
+### Features
+
+* **enrichers:** add [[/oddPool]] and [[/oddPenalty]] inline dice tokens ([a818e42](https://github.com/Gtkall/odd-rpg/commit/a818e42672360838a2c844ab783e9f83a72cdd22))
+* **enrichers:** add syntax hint tooltip to talent effect editor ([c21fc87](https://github.com/Gtkall/odd-rpg/commit/c21fc87501e5b8c6dbde7bf995dd32e4b8dd5162))
+
+### Bug Fixes
+
+* **combat:** prevent 1H/2H hand label from wrapping in weapon table ([1db9b19](https://github.com/Gtkall/odd-rpg/commit/1db9b193365a0ecb922ab4ad97a4af50fc8f2687))
+
 ## [0.6.0](https://github.com/Gtkall/odd-rpg/compare/v0.5.0...v0.6.0) (2026-03-25)
 
 ### Features
