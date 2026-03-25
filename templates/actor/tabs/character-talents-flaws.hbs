@@ -4,9 +4,11 @@
   {{!-- Talents --}}
   <div class="tf-section talents-section">
     <div class="tf-section-header">
-      <h3 class="panel-header">{{localize "ODD.Sheet.Tabs.talentsFlaws"}}</h3>
+      <h3 class="panel-header">{{localize "ODD.Talent.sectionTitle"}}</h3>
+      {{#if isEditMode}}
       <input type="text" class="inventory-add-input" data-item-type="talent"
         placeholder="{{localize 'ODD.Talent.addTalent'}}" />
+      {{/if}}
     </div>
 
     <div class="tf-filter-row">
@@ -27,7 +29,7 @@
             <div class="item talent-entry" data-item-id="{{this.id}}"
               data-name="{{this.name}}" data-category="{{this.category}}">
               <div class="talent-entry-summary">
-                <button type="button" class="tf-expand-toggle" data-target="talent-detail-{{this.id}}" title="Details">▶</button>
+                <button type="button" class="tf-expand-toggle" data-target="talent-detail-{{this.id}}" title="Details">▼</button>
                 <span class="talent-entry-name">{{this.name}}</span>
                 <div class="talent-entry-meta">
                   <span class="flaw-category">{{this.categoryLabel}}</span>
@@ -39,12 +41,14 @@
                   </span>
                 </div>
                 <span class="flaw-xp">{{this.xpCost}} XP</span>
+                {{#if ../../isEditMode}}
                 <div class="item-controls">
                   <button type="button" class="item-edit" data-item-id="{{this.id}}" title="Edit">✎</button>
                   <button type="button" class="item-delete" data-item-id="{{this.id}}" title="Delete">✕</button>
                 </div>
+                {{/if}}
               </div>
-              <div class="tf-entry-detail" id="talent-detail-{{this.id}}">
+              <div class="tf-entry-detail open" id="talent-detail-{{this.id}}">
                 {{#if this.prerequisites}}
                   <div class="tf-detail-row tf-prerequisites">
                     <span class="tf-detail-label">{{localize "ODD.Talent.prerequisites"}}</span>
@@ -72,8 +76,10 @@
   <div class="tf-section flaws-section">
     <div class="tf-section-header">
       <h3 class="panel-header">{{localize "ODD.Flaw.sectionTitle"}}</h3>
+      {{#if isEditMode}}
       <input type="text" class="inventory-add-input" data-item-type="flaw"
         placeholder="{{localize 'ODD.Flaw.addFlaw'}}" />
+      {{/if}}
     </div>
 
     <div class="tf-filter-row">
@@ -97,13 +103,15 @@
               <span class="flaw-entry-name">{{this.name}}</span>
               <span class="flaw-category">{{this.categoryLabel}}</span>
               <span class="flaw-xp">{{this.xpValue}} XP</span>
+              {{#if ../isEditMode}}
               <div class="item-controls">
                 <button type="button" class="item-edit" data-item-id="{{this.id}}" title="Edit">✎</button>
                 <button type="button" class="item-delete" data-item-id="{{this.id}}" title="Delete">✕</button>
               </div>
+              {{/if}}
             </div>
             {{#if this.enrichedDescription}}
-              <div class="tf-entry-detail" id="flaw-detail-{{this.id}}">
+              <div class="tf-entry-detail open" id="flaw-detail-{{this.id}}">
                 <div class="tf-detail-description">{{{this.enrichedDescription}}}</div>
               </div>
             {{/if}}

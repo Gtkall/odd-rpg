@@ -246,6 +246,7 @@
       "prerequisitesPlaceholder": "e.g. Str d8, Melee d6",
       "effects":                  "Effects",
       "ungrouped":                "Ungrouped",
+      "sectionTitle":             "Talents",
       "addTalent":                "Add talent…",
       "addEffect":                "Add Effect",
       "removeEffect":             "Remove Effect",

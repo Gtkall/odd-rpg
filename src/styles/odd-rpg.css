@@ -1513,11 +1513,22 @@
     border-bottom: 1px solid var(--odd-color-border);
 }
 
-.odd-rpg .weapon-header .item-img {
+.odd-rpg .weapon-header .item-img,
+.odd-rpg .flaw-header .item-img,
+.odd-rpg .talent-header .item-img {
     border-radius: 4px;
-    border: 1px solid var(--odd-color-border);
+    border: 2px solid var(--odd-color-border);
     cursor: pointer;
     flex-shrink: 0;
+    object-fit: cover;
+    transition: border-color 0.15s, opacity 0.15s;
+}
+
+.odd-rpg .weapon-header .item-img:hover,
+.odd-rpg .flaw-header .item-img:hover,
+.odd-rpg .talent-header .item-img:hover {
+    border-color: var(--odd-color-accent);
+    opacity: 0.85;
 }
 
 .odd-rpg .weapon-header .item-name {
@@ -2029,7 +2040,11 @@
 .odd-rpg .inventory-table .item-sort-up,
 .odd-rpg .inventory-table .item-sort-down,
 .odd-rpg .inventory-table .item-edit,
-.odd-rpg .inventory-table .item-delete {
+.odd-rpg .inventory-table .item-delete,
+.odd-rpg .talent-entry .item-edit,
+.odd-rpg .talent-entry .item-delete,
+.odd-rpg .flaw-entry .item-edit,
+.odd-rpg .flaw-entry .item-delete {
     background: none;
     border: none;
     color: #666;
@@ -2041,11 +2056,15 @@
 
 .odd-rpg .inventory-table .item-sort-up:hover,
 .odd-rpg .inventory-table .item-sort-down:hover,
-.odd-rpg .inventory-table .item-edit:hover {
+.odd-rpg .inventory-table .item-edit:hover,
+.odd-rpg .talent-entry .item-edit:hover,
+.odd-rpg .flaw-entry .item-edit:hover {
     color: var(--odd-color-primary);
 }
 
-.odd-rpg .inventory-table .item-delete:hover {
+.odd-rpg .inventory-table .item-delete:hover,
+.odd-rpg .talent-entry .item-delete:hover,
+.odd-rpg .flaw-entry .item-delete:hover {
     color: var(--odd-color-accent);
 }
 
