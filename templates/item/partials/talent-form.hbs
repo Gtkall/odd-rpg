@@ -92,6 +92,30 @@
     <div class="talent-effects-header">
       <span class="talent-effects-title">{{localize "ODD.Talent.effects"}}</span>
       {{#if isEditMode}}
+        <span class="odd-enricher-hint">
+          <i class="fa-solid fa-circle-info"></i>
+          <div class="odd-enricher-hint-popup">
+            <div class="odd-enricher-hint-title">Dice Pool Tokens</div>
+            <div class="odd-enricher-hint-rows">
+              <div class="odd-enricher-hint-row">
+                <code>[[/oddPool d8 "Label"]]</code>
+                <span>bonus die with label</span>
+              </div>
+              <div class="odd-enricher-hint-row">
+                <code>[[/oddPool @attributes.dex "Dex"]]</code>
+                <span>live attribute die</span>
+              </div>
+              <div class="odd-enricher-hint-row">
+                <code>[[/oddPenalty d8 "Label"]]</code>
+                <span>penalty die</span>
+              </div>
+              <div class="odd-enricher-hint-row">
+                <code>[[/oddPool d8]]</code>
+                <span>no label → generic Bonus</span>
+              </div>
+            </div>
+          </div>
+        </span>
         <button type="button" class="talent-add-effect" data-add-effect
           title="{{localize "ODD.Talent.addEffect"}}">
           <i class="fas fa-plus"></i>
