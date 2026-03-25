@@ -1560,9 +1560,6 @@
 
 /* Description area */
 .odd-rpg .item-description {
-    min-height: 4rem;
-    max-height: 10rem;
-    overflow-y: auto;
     font-size: 0.85rem;
     color: #aaa;
 }
@@ -2559,14 +2556,19 @@
 
 .talent-entry {
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.25rem 0.4rem;
+    flex-direction: column;
     border-radius: 3px;
 }
 
 .talent-entry:hover {
     background: rgba(255,255,255,0.03);
+}
+
+.talent-entry-summary {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.4rem;
 }
 
 .talent-entry-name {
@@ -2605,14 +2607,19 @@
 
 .flaw-entry {
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.25rem 0.4rem;
+    flex-direction: column;
     border-radius: 3px;
 }
 
 .flaw-entry:hover {
     background: rgba(255,255,255,0.03);
+}
+
+.flaw-entry-summary {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.4rem;
 }
 
 .flaw-symbol {
@@ -2639,6 +2646,79 @@
     color: #888;
     min-width: 3rem;
     text-align: right;
+}
+
+/* Expand toggle button */
+.tf-expand-toggle {
+    all: unset;
+    cursor: pointer;
+    font-size: 0.55rem;
+    color: #666;
+    width: 1rem;
+    text-align: center;
+    flex-shrink: 0;
+    transition: color 0.15s;
+}
+
+.tf-expand-toggle:hover {
+    color: #aaa;
+}
+
+/* Collapsible detail panel */
+.tf-entry-detail {
+    display: none;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 0.4rem 0.75rem 0.5rem 2.2rem;
+    border-top: 1px solid #333;
+    font-size: 0.85rem;
+    color: #bbb;
+}
+
+.tf-entry-detail.open {
+    display: flex;
+}
+
+.tf-detail-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: baseline;
+}
+
+.tf-detail-label {
+    font-size: 0.75rem;
+    color: #777;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.tf-detail-value {
+    color: #ccc;
+    font-style: italic;
+}
+
+.tf-detail-description p {
+    margin: 0;
+}
+
+.tf-effect-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.3rem 0.5rem;
+    background: rgba(255,255,255,0.03);
+    border-left: 2px solid #444;
+    border-radius: 0 3px 3px 0;
+}
+
+.tf-effect-title {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #e0e0e0;
+}
+
+.tf-effect-body p {
+    margin: 0;
 }
 
 /* Flaw item sheet */

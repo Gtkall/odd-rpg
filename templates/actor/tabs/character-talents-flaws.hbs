@@ -15,20 +15,40 @@
           <div class="talent-group-header">{{this.treeName}}</div>
           {{#each this.items}}
             <div class="item talent-entry" data-item-id="{{this.id}}">
-              <div class="talent-entry-name">{{this.name}}</div>
-              <div class="talent-entry-meta">
-                <span class="flaw-category">{{this.categoryLabel}}</span>
-                {{#unless this.isSide}}
-                  <span class="talent-badge talent-rank">{{this.rank}}</span>
-                {{/unless}}
-                <span class="talent-badge talent-type talent-type-{{this.talentType}}">
-                  {{this.talentTypeLabel}}
-                </span>
+              <div class="talent-entry-summary">
+                <button type="button" class="tf-expand-toggle" data-target="talent-detail-{{this.id}}" title="Details">▶</button>
+                <span class="talent-entry-name">{{this.name}}</span>
+                <div class="talent-entry-meta">
+                  <span class="flaw-category">{{this.categoryLabel}}</span>
+                  {{#unless this.isSide}}
+                    <span class="talent-badge talent-rank">{{this.rank}}</span>
+                  {{/unless}}
+                  <span class="talent-badge talent-type talent-type-{{this.talentType}}">
+                    {{this.talentTypeLabel}}
+                  </span>
+                </div>
+                <span class="flaw-xp">{{this.xpCost}} XP</span>
+                <div class="item-controls">
+                  <button type="button" class="item-edit" data-item-id="{{this.id}}" title="Edit">✎</button>
+                  <button type="button" class="item-delete" data-item-id="{{this.id}}" title="Delete">✕</button>
+                </div>
               </div>
-              <span class="flaw-xp">{{this.xpCost}} XP</span>
-              <div class="item-controls">
-                <button type="button" class="item-edit" data-item-id="{{this.id}}" title="Edit">✎</button>
-                <button type="button" class="item-delete" data-item-id="{{this.id}}" title="Delete">✕</button>
+              <div class="tf-entry-detail" id="talent-detail-{{this.id}}">
+                {{#if this.prerequisites}}
+                  <div class="tf-detail-row tf-prerequisites">
+                    <span class="tf-detail-label">{{localize "ODD.Talent.prerequisites"}}</span>
+                    <span class="tf-detail-value">{{this.prerequisites}}</span>
+                  </div>
+                {{/if}}
+                {{#if this.enrichedDescription}}
+                  <div class="tf-detail-description">{{{this.enrichedDescription}}}</div>
+                {{/if}}
+                {{#each this.enrichedEffects}}
+                  <div class="tf-effect-block">
+                    {{#if this.title}}<div class="tf-effect-title">{{this.title}}</div>{{/if}}
+                    <div class="tf-effect-body">{{{this.body}}}</div>
+                  </div>
+                {{/each}}
               </div>
             </div>
           {{/each}}
@@ -49,14 +69,22 @@
       <div class="flaw-list">
         {{#each flawRows}}
           <div class="item flaw-entry" data-item-id="{{this.id}}">
-            <span class="flaw-symbol" title="{{this.severity}}">{{this.symbol}}</span>
-            <span class="flaw-entry-name">{{this.name}}</span>
-            <span class="flaw-category">{{this.categoryLabel}}</span>
-            <span class="flaw-xp">{{this.xpValue}} XP</span>
-            <div class="item-controls">
-              <button type="button" class="item-edit" data-item-id="{{this.id}}" title="Edit">✎</button>
-              <button type="button" class="item-delete" data-item-id="{{this.id}}" title="Delete">✕</button>
+            <div class="flaw-entry-summary">
+              <button type="button" class="tf-expand-toggle" data-target="flaw-detail-{{this.id}}" title="Details">▶</button>
+              <span class="flaw-symbol" title="{{this.severity}}">{{this.symbol}}</span>
+              <span class="flaw-entry-name">{{this.name}}</span>
+              <span class="flaw-category">{{this.categoryLabel}}</span>
+              <span class="flaw-xp">{{this.xpValue}} XP</span>
+              <div class="item-controls">
+                <button type="button" class="item-edit" data-item-id="{{this.id}}" title="Edit">✎</button>
+                <button type="button" class="item-delete" data-item-id="{{this.id}}" title="Delete">✕</button>
+              </div>
             </div>
+            {{#if this.enrichedDescription}}
+              <div class="tf-entry-detail" id="flaw-detail-{{this.id}}">
+                <div class="tf-detail-description">{{{this.enrichedDescription}}}</div>
+              </div>
+            {{/if}}
           </div>
         {{/each}}
       </div>

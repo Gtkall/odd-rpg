@@ -230,8 +230,8 @@ export class OddActorSheet extends OddActorSheetBase {
       currentEncumbrance: ENCUMBRANCE_LEVELS[system.encumbrance.level] ?? ENCUMBRANCE_LEVELS.none,
       weaponRows: this._buildWeaponRows(system, rollModifiers),
       armorRows: this._buildArmorRows(),
-      talentGroups: this._buildTalentGroups(),
-      flawRows: this._buildFlawRows(),
+      talentGroups: await this._buildTalentGroups(),
+      flawRows: await this._buildFlawRows(),
       weaponDistance: WEAPON_DISTANCE,
       tabs: this._getTabs(),
       woundLocations: this._buildWoundLocations(system),
@@ -519,6 +519,18 @@ export class OddActorSheet extends OddActorSheetBase {
           // eslint-disable-next-line sonarjs/deprecation -- fvtt-types stubs don't model v13 render(options) overload
           void item?.sheet?.render(true);
         }
+      });
+    });
+
+    // Talent/Flaw expand toggles
+    html.querySelectorAll<HTMLElement>(".tf-expand-toggle").forEach((btn) => {
+      btn.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        const targetId = btn.dataset.target!;
+        const detail = html.querySelector<HTMLElement>(`#${targetId}`);
+        if (!detail) return;
+        const isOpen = detail.classList.toggle("open");
+        btn.textContent = isOpen ? "▼" : "▶";
       });
     });
 
@@ -983,13 +995,13 @@ export class OddActorSheet extends OddActorSheetBase {
       });
   }
 
-  private _buildTalentGroups() {
+  private async _buildTalentGroups() {
     const RANK_ORDER = ["I", "II", "III"];
+    const rollData = (this.document as unknown as ActorWithRollData).getRollData();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const talents = ([...this.document.items] as any[]).filter((i: any) => (i.type as string) === "talent");
 
     const groups = new Map<string, Record<string, unknown>[]>();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     for (const item of talents) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       const tree: string = (item.system.treeName as string) || "";
@@ -998,20 +1010,37 @@ export class OddActorSheet extends OddActorSheetBase {
       const talentType = item.system.talentType as keyof typeof TALENT_TYPES;
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       const category = item.system.category as keyof typeof TALENT_CATEGORIES;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const rawEffects = (item.system.effects as { title: string; body: string }[] | undefined) ?? [];
+      const enrichedEffects = await Promise.all(
+        rawEffects.map(async (e) => ({
+          title: e.title,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+          body: await (foundry.applications.ux as any).TextEditor.enrichHTML(e.body || "", { rollData }) as string,
+        })),
+      );
       groups.get(tree)!.push({
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        id:              item.id as string,
+        id:                   item.id as string,
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        name:            item.name as string,
+        name:                 item.name as string,
         talentType,
-        talentTypeLabel:  game.i18n!.localize(TALENT_TYPES[talentType]),
+        talentTypeLabel:      game.i18n!.localize(TALENT_TYPES[talentType]),
         category,
-        categoryLabel:    game.i18n!.localize(TALENT_CATEGORIES[category] ?? category),
+        categoryLabel:        game.i18n!.localize(TALENT_CATEGORIES[category] ?? category),
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        rank:            item.system.rank as string,
-        isSide:          ["minorSide", "majorSide"].includes(talentType),
+        rank:                 item.system.rank as string,
+        isSide:               ["minorSide", "majorSide"].includes(talentType),
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        xpCost:          item.system.xpCost as number,
+        xpCost:               item.system.xpCost as number,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        prerequisites:        (item.system.prerequisites as string) || "",
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        enrichedDescription:  await (foundry.applications.ux as any).TextEditor.enrichHTML(
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          (item.system.description as string) || "", { rollData },
+        ) as string,
+        enrichedEffects,
       });
     }
 
@@ -1026,31 +1055,37 @@ export class OddActorSheet extends OddActorSheetBase {
       .sort((a, b) => a.treeName.localeCompare(b.treeName));
   }
 
-  private _buildFlawRows() {
+  private async _buildFlawRows() {
+    const rollData = (this.document as unknown as ActorWithRollData).getRollData();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return ([...this.document.items] as any[])
+    return Promise.all(([...this.document.items] as any[])
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .filter((i: any) => (i.type as string) === "flaw")
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .map((item: any) => {
+      .map(async (item: any) => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         const category = item.system.category as keyof typeof FLAW_CATEGORIES;
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         const severity = item.system.severity as keyof typeof FLAW_SEVERITIES;
         return {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          id:            item.id as string,
+          id:                  item.id as string,
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          name:          item.name as string,
+          name:                item.name as string,
           severity,
-          categoryLabel: game.i18n!.localize(FLAW_CATEGORIES[category] ?? category),
+          categoryLabel:       game.i18n!.localize(FLAW_CATEGORIES[category] ?? category),
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          xpValue:       item.system.xpValue as number,
+          xpValue:             item.system.xpValue as number,
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          symbol:        item.system.symbol as string,
+          symbol:              item.system.symbol as string,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+          enrichedDescription: await (foundry.applications.ux as any).TextEditor.enrichHTML(
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            (item.system.description as string) || "", { rollData },
+          ) as string,
         };
-      });
+      }),
+    );
   }
 
   private async _sortItem(id: string, type: string, direction: number): Promise<void> {
