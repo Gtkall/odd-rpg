@@ -1,3 +1,9 @@
+## [0.8.0](https://github.com/Gtkall/odd-rpg/compare/v0.7.0...v0.8.0) (2026-03-25)
+
+### Features
+
+* **sheets:** isEditMode pass for Combat and Talents/Flaws tabs ([124447b](https://github.com/Gtkall/odd-rpg/commit/124447b458612c47f1b63aa1cc7c575790289ca6))
+
 ## [0.7.0](https://github.com/Gtkall/odd-rpg/compare/v0.6.0...v0.7.0) (2026-03-25)
 
 ### Features
