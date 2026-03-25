@@ -6,6 +6,12 @@ import type { RollResolution } from "../config/rolls.js";
 import { ENCUMBRANCE_LEVELS } from "../config/encumbrance.js";
 import { WEAPON_DISTANCE } from "../config/weapon.js";
 import { ARMOR_LOCATIONS } from "../config/armor.js";
+import { TALENT_TYPES, TALENT_CATEGORIES } from "../config/talent.js";
+import { type FLAW_SEVERITIES, FLAW_CATEGORIES } from "../config/flaw.js";
+import {
+  HIT_LOCATIONS, HIT_LOCATION_ORDER, WOUND_BASE_STATES, WOUND_SUB_STATUSES,
+  PAIN_PENALTY_DICE, resolveHitLocation,
+} from "../config/wounds.js";
 import type { WeaponSystemData, WeaponHandConfig } from "../data/item/weapon.js";
 import type { ArmorSystemData } from "../data/item/armor.js";
 import {
@@ -15,6 +21,28 @@ import {
 import type { CharacterSystemData } from "../data/actor/character.js";
 
 const { ActorSheetV2 } = foundry.applications.sheets;
+
+function levenshtein(a: string, b: string): number {
+  const m = a.length, n = b.length;
+  const row = Array.from({ length: n + 1 }, (_, i) => i);
+  for (let i = 1; i <= m; i++) {
+    let prev = i;
+    for (let j = 1; j <= n; j++) {
+      const next = a[i - 1] === b[j - 1] ? row[j - 1] : 1 + Math.min(prev, row[j], row[j - 1]);
+      row[j - 1] = prev;
+      prev = next;
+    }
+    row[n] = prev;
+  }
+  return row[n];
+}
+
+/** Substring match first; falls back to word-level Levenshtein fuzzy match. */
+function fuzzyMatch(query: string, name: string): boolean {
+  if (name.includes(query)) return true;
+  const threshold = query.length <= 3 ? 1 : 2;
+  return name.split(/\s+/).some((word) => levenshtein(query, word.toLowerCase()) <= threshold);
+}
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 
 // HandlebarsApplicationMixin returns an opaque type; cast once here so class
@@ -196,6 +224,8 @@ export class OddActorSheet extends OddActorSheetBase {
       },
     );
 
+    const woundLocations = this._buildWoundLocations(system);
+
     return {
       ...context,
       actor,
@@ -224,8 +254,27 @@ export class OddActorSheet extends OddActorSheetBase {
       currentEncumbrance: ENCUMBRANCE_LEVELS[system.encumbrance.level] ?? ENCUMBRANCE_LEVELS.none,
       weaponRows: this._buildWeaponRows(system, rollModifiers),
       armorRows: this._buildArmorRows(),
+      talentGroups: await this._buildTalentGroups(),
+      flawRows: await this._buildFlawRows(),
+      talentCategoryOptions: Object.entries(TALENT_CATEGORIES)
+        .map(([value, labelKey]) => ({ value, label: game.i18n!.localize(labelKey) }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
+      flawCategoryOptions: Object.entries(FLAW_CATEGORIES)
+        .map(([value, labelKey]) => ({ value, label: game.i18n!.localize(labelKey) }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
       weaponDistance: WEAPON_DISTANCE,
       tabs: this._getTabs(),
+      woundLocations,
+      woundsMap: Object.fromEntries(woundLocations.map((loc) => [loc.key, loc])),
+      woundBaseStateOptions: Object.fromEntries(
+        Object.entries(WOUND_BASE_STATES).map(([k, v]) => [k, v]),
+      ),
+      woundSubStatusOptions: Object.fromEntries(
+        Object.entries(WOUND_SUB_STATUSES).map(([k, v]) => [k, v]),
+      ),
+      painPenaltyDieOptions: Object.fromEntries(
+        Object.entries(PAIN_PENALTY_DICE).map(([k, v]) => [k, v]),
+      ),
     };
   }
 
@@ -244,11 +293,29 @@ export class OddActorSheet extends OddActorSheetBase {
   _rollHistory: { pool: { id: string; label: string; die: string }[]; flat: number }[] = [];
   _rollHistoryIndex = -1;
   _saveRollName = "";
+  _scrollPositions = new Map<string, number>();
+
+  // eslint-disable-next-line @typescript-eslint/require-await -- Foundry API requires async signature
+  override async _preRender(_context: unknown, _options: unknown): Promise<void> {
+    if (!this.rendered) return;
+    for (const selector of [".character-main", ".character-combat", ".character-talents-flaws"]) {
+      const el = this.element.querySelector<HTMLElement>(selector);
+      if (el) this._scrollPositions.set(selector, el.scrollTop);
+    }
+  }
 
   override async _onRender(_context: any, _options: any) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     await super._onRender(_context, _options);
     const html = this.element;
+
+    for (const [selector, top] of this._scrollPositions) {
+      const el = html.querySelector<HTMLElement>(selector);
+      if (el) el.scrollTop = top;
+    }
+    this._scrollPositions.clear();
+
+    if (this._lastHitLocation) this._applyLastHitHighlight(this._lastHitLocation);
 
     html.querySelectorAll(".sheet-tabs [data-tab]").forEach((el) => {
       el.addEventListener("click", (ev: Event) => {
@@ -393,6 +460,46 @@ export class OddActorSheet extends OddActorSheetBase {
       });
     });
 
+    // Hit location roll
+    html.querySelector(".hit-location-roll")?.addEventListener("click", () => {
+      void this._rollHitLocation();
+    });
+
+    // SVG body region click → cycle base state
+    html.querySelectorAll<SVGElement>(".body-region[data-location]").forEach((el) => {
+      el.addEventListener("click", () => {
+        const loc = el.dataset.location!;
+        const order = ["uninjured", "wounded", "crippled"] as const;
+        const current = this.characterSystem.wounds[loc].state as typeof order[number];
+        const next = order[(order.indexOf(current) + 1) % order.length];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        void this.document.update({ [`system.wounds.${loc}.state`]: next } as any);
+      });
+    });
+
+    // Pain penalty die select
+    html.querySelector<HTMLSelectElement>(".pain-penalty-die-select")?.addEventListener("change", (ev) => {
+      const select = ev.currentTarget as HTMLSelectElement;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      void this.document.update({ "system.painPenaltyDie": select.value } as any);
+    });
+
+    // Wound state dropdown change
+    html.querySelectorAll<HTMLSelectElement>(".wound-state-select[data-location]").forEach((el) => {
+      el.addEventListener("change", () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        void this.document.update({ [`system.wounds.${el.dataset.location!}.state`]: el.value } as any);
+      });
+    });
+
+    // Wound sub-status dropdown change
+    html.querySelectorAll<HTMLSelectElement>(".wound-substatus-select[data-location]").forEach((el) => {
+      el.addEventListener("change", () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        void this.document.update({ [`system.wounds.${el.dataset.location!}.subStatus`]: el.value } as any);
+      });
+    });
+
     if (!this.isEditable) return;
 
     // Avatar click → FilePicker
@@ -442,6 +549,56 @@ export class OddActorSheet extends OddActorSheetBase {
         }
       });
     });
+
+    // Talent/Flaw expand toggles
+    html.querySelectorAll<HTMLElement>(".tf-expand-toggle").forEach((btn) => {
+      btn.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        const targetId = btn.dataset.target!;
+        const detail = html.querySelector<HTMLElement>(`#${targetId}`);
+        if (!detail) return;
+        const isOpen = detail.classList.toggle("open");
+        btn.textContent = isOpen ? "▼" : "▶";
+      });
+    });
+
+    // Talent/Flaw search + category filters (debounced, min 2 chars for name search)
+    const debounce = (fn: () => void, ms: number) => {
+      let timer: ReturnType<typeof setTimeout>;
+      return () => { clearTimeout(timer); timer = setTimeout(fn, ms); };
+    };
+
+    const filterTalents = () => {
+      const raw = html.querySelector<HTMLInputElement>(".tf-talent-search")?.value ?? "";
+      const search = raw.length >= 2 ? raw.toLowerCase() : "";
+      const category = html.querySelector<HTMLSelectElement>(".tf-talent-category")?.value ?? "";
+      for (const group of html.querySelectorAll<HTMLElement>(".talent-group")) {
+        let anyVisible = false;
+        for (const entry of group.querySelectorAll<HTMLElement>(".talent-entry")) {
+          const nameMatch = !search || fuzzyMatch(search, (entry.dataset.name ?? "").toLowerCase());
+          const catMatch = !category || entry.dataset.category === category;
+          const show = nameMatch && catMatch;
+          entry.style.display = show ? "" : "none";
+          if (show) anyVisible = true;
+        }
+        group.style.display = anyVisible ? "" : "none";
+      }
+    };
+    html.querySelector(".tf-talent-search")?.addEventListener("input", debounce(filterTalents, 300));
+    html.querySelector(".tf-talent-category")?.addEventListener("change", filterTalents);
+
+    const filterFlaws = () => {
+      const raw = html.querySelector<HTMLInputElement>(".tf-flaw-search")?.value ?? "";
+      const search = raw.length >= 2 ? raw.toLowerCase() : "";
+      const category = html.querySelector<HTMLSelectElement>(".tf-flaw-category")?.value ?? "";
+      for (const entry of html.querySelectorAll<HTMLElement>(".flaw-entry")) {
+        const nameMatch = !search || fuzzyMatch(search, (entry.dataset.name ?? "").toLowerCase());
+        const catMatch = !category || entry.dataset.category === category;
+        entry.style.display = nameMatch && catMatch ? "" : "none";
+      }
+    };
+    html.querySelector(".tf-flaw-search")?.addEventListener("input", debounce(filterFlaws, 300));
+    html.querySelector(".tf-flaw-category")?.addEventListener("change", filterFlaws);
 
     // Weapon attack roll
     html.querySelectorAll<HTMLElement>(".weapon-attack-roll[data-attack-key]").forEach((el) => {
@@ -744,6 +901,78 @@ export class OddActorSheet extends OddActorSheetBase {
     return entries.map(({ label, die }, i) => ({ label, die, result: roll.dice[i]?.total ?? "?" }));
   }
 
+  /** Last hit location resolved from a d20 roll — client-side transient. */
+  _lastHitLocation: string | null = null;
+
+  private _buildWoundLocations(system: CharacterSystemData) {
+    return HIT_LOCATION_ORDER.map((key) => {
+      const def = HIT_LOCATIONS[key];
+      const loc = system.wounds[key];
+      return {
+        key,
+        svgRegion: def.svgRegion,
+        label: def.label,
+        rangeLabel: `${def.rangeMin}–${def.rangeMax}`,
+        rangeFootnote: def.rangeFootnote ?? null,
+        state: loc.state,
+        subStatus: loc.subStatus,
+        isInjured: loc.state !== "uninjured",
+        woundedEffect: def.woundedEffect,
+        crippledEffect: def.crippledEffect,
+      };
+    });
+  }
+
+  private async _rollHitLocation(): Promise<void> {
+    const roll = await new Roll("1d20").evaluate();
+    const total = roll.total;
+    const key = resolveHitLocation(total);
+    this._lastHitLocation = key;
+
+    const def = HIT_LOCATIONS[key];
+    const content = await foundry.applications.handlebars.renderTemplate(
+      "systems/odd-rpg/templates/chat/hit-location-roll.hbs",
+      {
+        total,
+        locationKey: key,
+        locationLabel: game.i18n!.localize(def.label),
+      },
+    );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (ChatMessage as any).create({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      speaker: (ChatMessage as any).getSpeaker({ actor: this.document }),
+      content,
+      rolls: [roll],
+    });
+
+    // Apply persistent highlight + one-shot flash (Web Animations, not CSS animation)
+    this._applyLastHitHighlight(key, true);
+  }
+
+  private _applyLastHitHighlight(key: string, flash = false): void {
+    this.element.querySelectorAll<Element>(".body-region").forEach((el) => el.classList.remove("last-hit"));
+    this.element.querySelectorAll<HTMLElement>(".wound-row").forEach((el) => {
+      el.classList.toggle("last-hit", el.dataset.location === key);
+    });
+    const region = this.element.querySelector<Element>(`[data-location="${key}"]`);
+    if (!region) return;
+    region.classList.add("last-hit");
+    if (flash) {
+      const anim = region.animate(
+        [{ fill: "rgba(255,255,255,0.7)", stroke: "#fff" }, { fill: "", stroke: "" }],
+        { duration: 600, easing: "ease-out" },
+      );
+      anim.onfinish = () => {
+        this._lastHitLocation = null;
+        region.classList.remove("last-hit");
+        this.element.querySelectorAll<HTMLElement>(".wound-row").forEach((el) => {
+          el.classList.remove("last-hit");
+        });
+      };
+    }
+  }
+
   private _buildWeaponRows(
     system: CharacterSystemData,
     rollModifiers: Record<string, string>,
@@ -767,7 +996,7 @@ export class OddActorSheet extends OddActorSheetBase {
       return {
         key,
         formula: sources.map((s) => s.die).join("+"),
-        sourceLabels: sources.map((s) => s.label).join(","),
+        sourceLabels: sources.map((s) => s.label).join(" · "),
         sourceLabelsDisplay: sources.map((s) => s.label).join(" + "),
         modifier: rollModifiers[key] ?? "",
       };
@@ -832,6 +1061,100 @@ export class OddActorSheet extends OddActorSheetBase {
       });
   }
 
+  private async _buildTalentGroups() {
+    const RANK_ORDER = ["I", "II", "III"];
+    const rollData = (this.document as unknown as ActorWithRollData).getRollData();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const talents = ([...this.document.items] as any[]).filter((i: any) => (i.type as string) === "talent");
+
+    const groups = new Map<string, Record<string, unknown>[]>();
+    for (const item of talents) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const tree: string = (item.system.treeName as string) || "";
+      if (!groups.has(tree)) groups.set(tree, []);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const talentType = item.system.talentType as keyof typeof TALENT_TYPES;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const category = item.system.category as keyof typeof TALENT_CATEGORIES;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const rawEffects = (item.system.effects as { title: string; body: string }[] | undefined) ?? [];
+      const enrichedEffects = await Promise.all(
+        rawEffects.map(async (e) => ({
+          title: e.title,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+          body: await (foundry.applications.ux as any).TextEditor.enrichHTML(e.body || "", { rollData }) as string,
+        })),
+      );
+      groups.get(tree)!.push({
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        id:                   item.id as string,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        name:                 item.name as string,
+        talentType,
+        talentTypeLabel:      game.i18n!.localize(TALENT_TYPES[talentType]),
+        category,
+        categoryLabel:        game.i18n!.localize(TALENT_CATEGORIES[category] ?? category),
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        rank:                 item.system.rank as string,
+        isSide:               ["minorSide", "majorSide"].includes(talentType),
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        xpCost:               item.system.xpCost as number,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        prerequisites:        (item.system.prerequisites as string) || "",
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        enrichedDescription:  await (foundry.applications.ux as any).TextEditor.enrichHTML(
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          (item.system.description as string) || "", { rollData },
+        ) as string,
+        enrichedEffects,
+      });
+    }
+
+    return [...groups.entries()]
+      .map(([treeName, items]) => ({
+        treeName: treeName || game.i18n!.localize("ODD.Talent.ungrouped"),
+        items: items.toSorted((a, b) => {
+          if (a.isSide !== b.isSide) return (a.isSide as boolean) ? 1 : -1;
+          return RANK_ORDER.indexOf(a.rank as string) - RANK_ORDER.indexOf(b.rank as string);
+        }),
+      }))
+      .sort((a, b) => a.treeName.localeCompare(b.treeName));
+  }
+
+  private async _buildFlawRows() {
+    const rollData = (this.document as unknown as ActorWithRollData).getRollData();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return Promise.all(([...this.document.items] as any[])
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .filter((i: any) => (i.type as string) === "flaw")
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map(async (item: any) => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        const category = item.system.category as keyof typeof FLAW_CATEGORIES;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        const severity = item.system.severity as keyof typeof FLAW_SEVERITIES;
+        return {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          id:                  item.id as string,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          name:                item.name as string,
+          severity,
+          category,
+          categoryLabel:       game.i18n!.localize(FLAW_CATEGORIES[category] ?? category),
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          xpValue:             item.system.xpValue as number,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          symbol:              item.system.symbol as string,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+          enrichedDescription: await (foundry.applications.ux as any).TextEditor.enrichHTML(
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            (item.system.description as string) || "", { rollData },
+          ) as string,
+        };
+      }),
+    );
+  }
+
   private async _sortItem(id: string, type: string, direction: number): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const items = ([...this.document.items] as any[])
@@ -857,7 +1180,7 @@ export class OddActorSheet extends OddActorSheetBase {
     const key = el.dataset.attackKey!;
     const formula = el.dataset.attackFormula ?? "";
     const sourcesRaw = el.dataset.attackSources ?? "";
-    const labels = sourcesRaw.split(",").filter(Boolean);
+    const labels = sourcesRaw.split(" · ").filter(Boolean);
     const dice = formula.split("+").filter(Boolean);
     const entries = dice.map((die, i) => ({ label: labels[i] ?? die, die }));
     const bonus = (this.characterSystem.rollModifiers[key] ?? "").trim() || undefined;
@@ -883,7 +1206,7 @@ export class OddActorSheet extends OddActorSheetBase {
     if (tokens.length === 0) return; // no placed token — cannot create/find combatant
     const token = tokens[0];
     const existing = (combat.combatants as any[]).find(
-      (c: any) => c.actorId === this.document.id || c.tokenId === token.id,
+      (c: any) => c.tokenId === token.id,
     );
     const combatant = existing ?? (await combat.createEmbeddedDocuments("Combatant", [{ actorId: this.document.id, tokenId: token.id }]))[0];
     await combatant.update({ initiative: value });

@@ -59,6 +59,17 @@
         "htmlFields": [
           "description"
         ]
+      },
+      "talent": {
+        "htmlFields": [
+          "description",
+          "effects[].body"
+        ]
+      },
+      "flaw": {
+        "htmlFields": [
+          "description"
+        ]
       }
     }
   },

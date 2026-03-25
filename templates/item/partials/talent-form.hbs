@@ -1,0 +1,129 @@
+<div class="odd-rpg talent-form">
+
+  {{!-- Header --}}
+  <header class="talent-header">
+    <img class="item-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" width="48" height="48" />
+    <input class="item-name" name="name" type="text" value="{{item.name}}" placeholder="Talent Name"
+      {{#unless isEditMode}}disabled{{/unless}} />
+    <button type="button" class="item-edit-toggle" data-edit-toggle
+      title="{{#if isEditMode}}Finish editing{{else}}Edit item{{/if}}">
+      {{#if isEditMode}}<i class="fas fa-check"></i>{{else}}<i class="fas fa-pen"></i>{{/if}}
+    </button>
+  </header>
+
+  {{!-- Description --}}
+  <div class="item-description">
+    {{#if isEditMode}}
+      <prose-mirror name="system.description" value="{{system.description}}" compact></prose-mirror>
+    {{else}}
+      <div class="item-description-view">{{{enrichedDescription}}}</div>
+    {{/if}}
+  </div>
+
+  {{!-- Fields (disabled in view mode) --}}
+  <fieldset class="item-fields talent-fields" {{#unless isEditMode}}disabled{{/unless}}>
+
+    {{!-- Talent Type --}}
+    <div class="talent-row">
+      <div class="talent-row-label">{{localize "ODD.Talent.type"}}</div>
+      <div class="toggle-group">
+        {{#each talentTypes}}
+          <label class="toggle-btn{{#if (eq ../system.talentType @key)}} active{{/if}}">
+            <input type="radio" name="system.talentType" value="{{@key}}"
+              {{#if (eq ../system.talentType @key)}}checked{{/if}}>
+            {{localize this}}
+          </label>
+        {{/each}}
+      </div>
+    </div>
+
+    {{!-- Rank (hidden for Side Talents) --}}
+    {{#unless isSide}}
+      <div class="talent-row">
+        <div class="talent-row-label">{{localize "ODD.Talent.rank"}}</div>
+        <div class="toggle-group">
+          {{#each talentRanks}}
+            <label class="toggle-btn{{#if (eq ../system.rank @key)}} active{{/if}}">
+              <input type="radio" name="system.rank" value="{{@key}}"
+                {{#if (eq ../system.rank @key)}}checked{{/if}}>
+              {{localize this}}
+            </label>
+          {{/each}}
+        </div>
+      </div>
+    {{/unless}}
+
+    {{!-- Category --}}
+    <div class="talent-row">
+      <div class="talent-row-label">{{localize "ODD.Talent.category"}}</div>
+      <select name="system.category">
+        {{selectOptions talentCategories selected=system.category localize=true}}
+      </select>
+    </div>
+
+    {{!-- Tree (combo: type new name or pick existing) --}}
+    <div class="talent-row">
+      <div class="talent-row-label">{{localize "ODD.Talent.treeName"}}</div>
+      <input type="text" name="system.treeName" value="{{system.treeName}}"
+        placeholder="{{localize "ODD.Talent.treeNamePlaceholder"}}"
+        list="talent-tree-datalist" autocomplete="off" />
+      <datalist id="talent-tree-datalist">
+        {{#each existingTrees}}<option value="{{this}}">{{/each}}
+      </datalist>
+    </div>
+
+    {{!-- XP Cost (read-only derived) --}}
+    <div class="talent-row">
+      <div class="talent-row-label">{{localize "ODD.Talent.xpCost"}}</div>
+      <span class="talent-xp-value">{{system.xpCost}} XP</span>
+    </div>
+
+    {{!-- Prerequisites --}}
+    <div class="talent-row">
+      <div class="talent-row-label">{{localize "ODD.Talent.prerequisites"}}</div>
+      <input type="text" name="system.prerequisites" value="{{system.prerequisites}}"
+        placeholder="{{localize "ODD.Talent.prerequisitesPlaceholder"}}" />
+    </div>
+
+  </fieldset>
+
+  {{!-- Effects --}}
+  <div class="talent-effects">
+    <div class="talent-effects-header">
+      <span class="talent-effects-title">{{localize "ODD.Talent.effects"}}</span>
+      {{#if isEditMode}}
+        <button type="button" class="talent-add-effect" data-add-effect
+          title="{{localize "ODD.Talent.addEffect"}}">
+          <i class="fas fa-plus"></i>
+        </button>
+      {{/if}}
+    </div>
+
+    {{#each enrichedEffects}}
+      <div class="talent-effect-entry">
+        <div class="talent-effect-header">
+          {{#if ../isEditMode}}
+            <input type="text" name="system.effects.{{@index}}.title"
+              value="{{this.title}}" placeholder="{{localize "ODD.Talent.effectTitlePlaceholder"}}" />
+            <button type="button" class="talent-remove-effect" data-remove-effect="{{@index}}"
+              title="{{localize "ODD.Talent.removeEffect"}}">
+              <i class="fas fa-trash"></i>
+            </button>
+          {{else}}
+            {{#if this.title}}<strong class="talent-effect-title">{{this.title}}</strong>{{/if}}
+          {{/if}}
+        </div>
+        <div class="talent-effect-body">
+          {{#if ../isEditMode}}
+            <prose-mirror name="system.effects.{{@index}}.body"
+              value="{{this.body}}" compact></prose-mirror>
+          {{else}}
+            {{{this.body}}}
+          {{/if}}
+        </div>
+      </div>
+    {{/each}}
+
+  </div>
+
+</div>

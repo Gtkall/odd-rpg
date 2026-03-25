@@ -1,0 +1,57 @@
+<div class="odd-rpg flaw-form">
+
+  {{!-- Header --}}
+  <header class="flaw-header">
+    <img class="item-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" width="48" height="48" />
+    <input class="item-name" name="name" type="text" value="{{item.name}}" placeholder="Flaw Name"
+      {{#unless isEditMode}}disabled{{/unless}} />
+    <button type="button" class="item-edit-toggle" data-edit-toggle
+      title="{{#if isEditMode}}Finish editing{{else}}Edit item{{/if}}">
+      {{#if isEditMode}}<i class="fas fa-check"></i>{{else}}<i class="fas fa-pen"></i>{{/if}}
+    </button>
+  </header>
+
+  {{!-- Fields --}}
+  <fieldset class="item-fields flaw-fields" {{#unless isEditMode}}disabled{{/unless}}>
+
+    {{!-- Severity --}}
+    <div class="flaw-row">
+      <div class="flaw-row-label">{{localize "ODD.Flaw.severity"}}</div>
+      <div class="toggle-group">
+        {{#each flawSeverities}}
+          <label class="toggle-btn{{#if (eq ../system.severity @key)}} active{{/if}}">
+            <input type="radio" name="system.severity" value="{{@key}}"
+              {{#if (eq ../system.severity @key)}}checked{{/if}}>
+            <span class="flaw-severity-symbol">{{this.symbol}}</span>
+            {{localize this.label}}
+          </label>
+        {{/each}}
+      </div>
+    </div>
+
+    {{!-- Category --}}
+    <div class="flaw-row">
+      <div class="flaw-row-label">{{localize "ODD.Flaw.category"}}</div>
+      <select name="system.category">
+        {{selectOptions flawCategories selected=system.category localize=true}}
+      </select>
+    </div>
+
+    {{!-- XP (read-only derived) --}}
+    <div class="flaw-row">
+      <div class="flaw-row-label">{{localize "ODD.Flaw.xpValue"}}</div>
+      <span class="flaw-xp-value">{{system.xpValue}} XP</span>
+    </div>
+
+  </fieldset>
+
+  {{!-- Description --}}
+  <div class="item-description">
+    {{#if isEditMode}}
+      <prose-mirror name="system.description" value="{{system.description}}" compact></prose-mirror>
+    {{else}}
+      <div class="item-description-view">{{{enrichedDescription}}}</div>
+    {{/if}}
+  </div>
+
+</div>

@@ -1,0 +1,61 @@
+{{!-- Body diagram SVG — 6 clickable hit location zones.
+     CSS classes per region:
+       state-uninjured | state-wounded | state-crippled
+       substatus-healthy | substatus-blunt | substatus-bleeding | substatus-bandaged
+       last-hit  — applied/removed via JS only (never baked into template)
+
+     "Right" / "Left" in data-location are from the CHARACTER's POV.
+     Viewer's left = character's right arm / leg.
+--}}
+<svg class="body-diagram-svg"
+     xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 100 220"
+     role="img"
+     aria-label="Hit location diagram">
+
+  {{!-- HEAD --}}
+  <circle
+    id="region-head"
+    class="body-region state-{{woundsMap.head.state}} substatus-{{woundsMap.head.subStatus}}"
+    data-location="head"
+    cx="50" cy="16" r="12" />
+
+  {{!-- NECK (decorative) --}}
+  <rect class="body-neck" x="46" y="28" width="8" height="7" rx="2" />
+
+  {{!-- TORSO --}}
+  <path
+    id="region-torso"
+    class="body-region state-{{woundsMap.torso.state}} substatus-{{woundsMap.torso.subStatus}}"
+    data-location="torso"
+    d="M36,37 L64,37 L64,106 Q64,111 59,113 L41,113 Q36,111 36,106 Z" />
+
+  {{!-- RIGHT ARM (character's right = viewer's left) --}}
+  <path
+    id="region-left-arm"
+    class="body-region state-{{woundsMap.rightArm.state}} substatus-{{woundsMap.rightArm.subStatus}}"
+    data-location="rightArm"
+    d="M33,40 L18,46 L10,74 L10,106 Q10,111 15,113 L20,113 Q25,111 26,106 L26,76 L32,51 Z" />
+
+  {{!-- LEFT ARM (character's left = viewer's right) --}}
+  <path
+    id="region-right-arm"
+    class="body-region state-{{woundsMap.leftArm.state}} substatus-{{woundsMap.leftArm.subStatus}}"
+    data-location="leftArm"
+    d="M67,40 L82,46 L90,74 L90,106 Q90,111 85,113 L80,113 Q75,111 74,106 L74,76 L68,51 Z" />
+
+  {{!-- RIGHT LEG (character's right = viewer's left) --}}
+  <path
+    id="region-left-leg"
+    class="body-region state-{{woundsMap.rightLeg.state}} substatus-{{woundsMap.rightLeg.subStatus}}"
+    data-location="rightLeg"
+    d="M37,116 L47,116 L48,158 L46,198 Q46,206 42,208 L36,208 Q32,206 32,198 L33,158 Z" />
+
+  {{!-- LEFT LEG (character's left = viewer's right) --}}
+  <path
+    id="region-right-leg"
+    class="body-region state-{{woundsMap.leftLeg.state}} substatus-{{woundsMap.leftLeg.subStatus}}"
+    data-location="leftLeg"
+    d="M53,116 L63,116 L67,158 L68,198 Q68,206 64,208 L58,208 Q54,206 54,198 L52,158 Z" />
+
+</svg>

@@ -1,0 +1,87 @@
+{{!-- Hit Location Tracker --}}
+<div class="hit-location-panel">
+
+  <div class="panel-header-row">
+    <h3 class="panel-header">{{localize "ODD.Wounds.sectionTitle"}}</h3>
+    <span class="pain-penalty-badge" title="{{localize 'ODD.Wounds.painPenaltyHint'}}">
+      {{localize "ODD.Wounds.painPenaltyLabel"}}:
+      <select class="pain-penalty-die-select">
+        {{selectOptions painPenaltyDieOptions selected=system.painPenaltyDie localize=true}}
+      </select>
+    </span>
+  </div>
+
+  <div class="hit-location-layout">
+
+    {{!-- Body diagram --}}
+    <div class="body-diagram-wrap">
+      {{> "systems/odd-rpg/templates/actor/partials/body-diagram.hbs" woundsMap=woundsMap}}
+    </div>
+
+    {{!-- Table --}}
+    <div class="wound-table-wrap">
+
+      <div class="hit-roll-row">
+        <button type="button" class="hit-location-roll">
+          {{localize "ODD.Wounds.rollD20"}}
+        </button>
+      </div>
+
+      <table class="wound-table">
+        <thead>
+          <tr>
+            <th class="col-range">{{localize "ODD.Wounds.colRange"}}</th>
+            <th class="col-loc">{{localize "ODD.Wounds.colLocation"}}</th>
+            <th class="col-effect">{{localize "ODD.Wounds.colEffect"}}</th>
+            <th class="col-state">{{localize "ODD.Wounds.colState"}}</th>
+            <th class="col-substatus">{{localize "ODD.Wounds.colSubStatus"}}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each woundLocations as |loc|}}
+          <tr class="wound-row state-{{loc.state}}" data-location="{{loc.key}}">
+
+            <td class="col-range">
+              {{loc.rangeLabel}}{{#if loc.rangeFootnote}}*{{/if}}
+            </td>
+
+            <td class="col-loc">{{localize loc.label}}</td>
+
+            <td class="col-effect">
+              {{#if (eq loc.state "wounded")}}
+              <span class="wound-effect-text">{{localize loc.woundedEffect}}</span>
+              {{else if (eq loc.state "crippled")}}
+              <span class="wound-effect-text state-crippled">{{localize loc.crippledEffect}}</span>
+              {{else}}
+              <span class="substatus-empty">—</span>
+              {{/if}}
+            </td>
+
+            <td class="col-state">
+              <select class="wound-state-select" data-location="{{loc.key}}">
+                {{selectOptions ../woundBaseStateOptions selected=loc.state localize=true}}
+              </select>
+            </td>
+
+            <td class="col-substatus">
+              {{#if loc.isInjured}}
+              <select class="wound-substatus-select" data-location="{{loc.key}}">
+                {{selectOptions ../woundSubStatusOptions selected=loc.subStatus localize=true}}
+              </select>
+              {{else}}
+              <span class="substatus-empty">—</span>
+              {{/if}}
+            </td>
+
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+
+      {{!-- Footnote for torso ranged overlap --}}
+      <p class="wound-footnote">* {{localize "ODD.Wounds.TorsoRangedNote"}}</p>
+
+    </div>
+  </div>
+
+</div>
