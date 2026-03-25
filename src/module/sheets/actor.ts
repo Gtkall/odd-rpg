@@ -224,6 +224,8 @@ export class OddActorSheet extends OddActorSheetBase {
       },
     );
 
+    const woundLocations = this._buildWoundLocations(system);
+
     return {
       ...context,
       actor,
@@ -262,10 +264,8 @@ export class OddActorSheet extends OddActorSheetBase {
         .sort((a, b) => a.label.localeCompare(b.label)),
       weaponDistance: WEAPON_DISTANCE,
       tabs: this._getTabs(),
-      woundLocations: this._buildWoundLocations(system),
-      woundsMap: Object.fromEntries(
-        this._buildWoundLocations(system).map((loc) => [loc.key, loc]),
-      ),
+      woundLocations,
+      woundsMap: Object.fromEntries(woundLocations.map((loc) => [loc.key, loc])),
       woundBaseStateOptions: Object.fromEntries(
         Object.entries(WOUND_BASE_STATES).map(([k, v]) => [k, v]),
       ),
@@ -996,7 +996,7 @@ export class OddActorSheet extends OddActorSheetBase {
       return {
         key,
         formula: sources.map((s) => s.die).join("+"),
-        sourceLabels: sources.map((s) => s.label).join(","),
+        sourceLabels: sources.map((s) => s.label).join(" · "),
         sourceLabelsDisplay: sources.map((s) => s.label).join(" + "),
         modifier: rollModifiers[key] ?? "",
       };
@@ -1180,7 +1180,7 @@ export class OddActorSheet extends OddActorSheetBase {
     const key = el.dataset.attackKey!;
     const formula = el.dataset.attackFormula ?? "";
     const sourcesRaw = el.dataset.attackSources ?? "";
-    const labels = sourcesRaw.split(",").filter(Boolean);
+    const labels = sourcesRaw.split(" · ").filter(Boolean);
     const dice = formula.split("+").filter(Boolean);
     const entries = dice.map((die, i) => ({ label: labels[i] ?? die, die }));
     const bonus = (this.characterSystem.rollModifiers[key] ?? "").trim() || undefined;
@@ -1206,7 +1206,7 @@ export class OddActorSheet extends OddActorSheetBase {
     if (tokens.length === 0) return; // no placed token — cannot create/find combatant
     const token = tokens[0];
     const existing = (combat.combatants as any[]).find(
-      (c: any) => c.actorId === this.document.id || c.tokenId === token.id,
+      (c: any) => c.tokenId === token.id,
     );
     const combatant = existing ?? (await combat.createEmbeddedDocuments("Combatant", [{ actorId: this.document.id, tokenId: token.id }]))[0];
     await combatant.update({ initiative: value });
