@@ -121,13 +121,22 @@ export class OddInitiativeTracker extends HandlebarsApplicationMixin(Application
     html.querySelector<HTMLButtonElement>(".odd-tracker-new-round")
       ?.addEventListener("click", () => { void this._onNewRound(); });
 
-    // ---- Token click → focus on canvas ----
-    for (const el of html.querySelectorAll<HTMLElement>(".odd-cbt[data-combatant-id]")) {
+    // ---- Token click → toggle action overlay; click away to close ----
+    const allTokens = html.querySelectorAll<HTMLElement>(".odd-cbt[data-combatant-id]");
+    for (const el of allTokens) {
       el.addEventListener("click", (e) => {
         if ((e.target as HTMLElement).closest("button")) return;
-        this._focusToken(el.dataset.combatantId ?? "");
+        const isOpen = el.classList.contains("odd-cbt--open");
+        for (const t of allTokens) t.classList.remove("odd-cbt--open");
+        if (!isOpen) el.classList.add("odd-cbt--open");
+        else this._focusToken(el.dataset.combatantId ?? "");
       });
     }
+    html.addEventListener("click", (e) => {
+      if (!(e.target as HTMLElement).closest(".odd-cbt")) {
+        for (const t of allTokens) t.classList.remove("odd-cbt--open");
+      }
+    });
 
     // ---- Tempo spend buttons (−1 / −2 / −3) ----
     for (const btn of html.querySelectorAll<HTMLButtonElement>(".odd-cbt-tempo")) {
@@ -151,6 +160,16 @@ export class OddInitiativeTracker extends HandlebarsApplicationMixin(Application
     for (const el of html.querySelectorAll<HTMLElement>(".odd-cbt[data-combatant-id]")) {
       el.addEventListener("dragstart", (e) => {
         e.dataTransfer?.setData("text/plain", el.dataset.combatantId ?? "");
+        const srcImg = el.querySelector<HTMLImageElement>("img.odd-cbt-img");
+        if (srcImg && e.dataTransfer) {
+          // Use a detached element so the browser doesn't capture the hover overlay
+          const ghost = new Image(34, 34);
+          ghost.src = srcImg.src;
+          ghost.style.cssText = "position:fixed;top:-100px;left:-100px;border-radius:4px;";
+          document.body.appendChild(ghost);
+          e.dataTransfer.setDragImage(ghost, 17, 17);
+          requestAnimationFrame(() => ghost.remove());
+        }
       });
     }
 
