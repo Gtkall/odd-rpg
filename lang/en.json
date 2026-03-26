@@ -252,6 +252,18 @@
       "removeEffect":             "Remove Effect",
       "effectTitlePlaceholder":   "Effect title…"
     },
+    "Tracker": {
+      "title":          "Initiative Tracker",
+      "waiting":        "Waiting",
+      "newRound":       "New Round",
+      "newRoundPrompt": "All combatants: roll Initiative (Agility + Cunning + Reflexes, keep highest die).",
+      "rollFromSheet":  "Roll initiative from your character sheet.",
+      "wait":           "Move to Waiting",
+      "remove":         "Remove from combat",
+      "noCombat":       "No active combat encounter.",
+      "keybindName":    "Open Initiative Tracker",
+      "keybindHint":    "Opens the ODD Initiative Tracker window"
+    },
     "Weapon": {
       "Type": {
         "melee":  "Melee",

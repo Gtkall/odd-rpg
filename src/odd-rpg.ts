@@ -10,9 +10,11 @@
 import { ODD } from "./module/config/index.js";
 import { OddActor } from "./module/documents/actor.js";
 import { OddItem } from "./module/documents/item.js";
+import { OddCombat } from "./module/documents/combat.js";
 import { OddActorSheet } from "./module/sheets/actor.js";
 import { OddItemSheet } from "./module/sheets/item.js";
 import { registerEnrichers } from "./module/enrichers.js";
+import { OddInitiativeTracker } from "./module/tracker/initiative-tracker.js";
 
 const loadTemplates = foundry.applications.handlebars.loadTemplates;
 const DocumentSheetConfig = foundry.applications.apps.DocumentSheetConfig;
@@ -48,6 +50,8 @@ Hooks.once("init", () => {
   (CONFIG as any).Actor.documentClass = OddActor;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
   (CONFIG as any).Item.documentClass = OddItem;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+  (CONFIG as any).Combat.documentClass = OddCombat;
 
   // ---- Data Models ----
   // model is unknown (glob return); cast to the record's value type to avoid bare `any`.
@@ -88,4 +92,30 @@ Hooks.once("init", () => {
 
 Hooks.once("ready", () => {
   console.warn("ODD RPG | System ready");
+});
+
+/* -------------------------------------------------------------------------- */
+/*  Initiative Tracker — re-render on combat changes                         */
+/* -------------------------------------------------------------------------- */
+
+for (const hookName of ["createCombatant", "deleteCombatant", "updateCombatant", "createCombat", "deleteCombat"]) {
+  Hooks.on(hookName, () => {
+    const tracker = OddInitiativeTracker.instance;
+    if (tracker.rendered) void tracker.render();
+  });
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Keybinding — open the initiative tracker (registered during init)        */
+/* -------------------------------------------------------------------------- */
+// Keybindings must be registered in the init hook.
+// Default: Shift+I (configurable by the user in Foundry's Configure Controls dialog).
+Hooks.once("init", () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+  (game as any).keybindings.register("odd-rpg", "initiative-tracker", {
+    name: "ODD.Tracker.keybindName",
+    hint: "ODD.Tracker.keybindHint",
+    editable: [{ key: "KeyI", modifiers: ["Shift"] }],
+    onDown: () => { void OddInitiativeTracker.instance.render({ force: true }); return true; },
+  });
 });

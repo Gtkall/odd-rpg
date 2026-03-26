@@ -1,0 +1,67 @@
+{{!-- ODD Initiative Tracker --}}
+<div class="odd-tracker-inner">
+
+  {{!-- Toolbar --}}
+  <div class="odd-tracker-toolbar">
+    <button type="button" class="odd-tracker-new-round">
+      <i class="fa-solid fa-rotate"></i>
+      {{localize "ODD.Tracker.newRound"}}
+    </button>
+  </div>
+
+  {{#if hasCombat}}
+  <div class="odd-tracker-body">
+
+    {{!-- Waiting column (drag tokens here to park them) --}}
+    <aside class="odd-waiting-col">
+      <div class="odd-waiting-title">{{localize "ODD.Tracker.waiting"}}</div>
+      {{#each waitingCombatants}}
+        <div class="odd-cbt" draggable="true" data-combatant-id="{{this.id}}">
+          <img class="odd-cbt-img" draggable="false" src="{{this.img}}" alt="{{this.name}}" title="{{this.name}}">
+          <span class="odd-cbt-label">{{this.name}}</span>
+        </div>
+      {{else}}
+        <div class="odd-waiting-empty">—</div>
+      {{/each}}
+    </aside>
+
+    {{!-- Initiative slots --}}
+    <div class="odd-slots">
+      {{#each slots}}
+        <div class="odd-slot {{this.cssClass}}" data-value="{{this.value}}">
+          <div class="odd-slot-num">{{this.value}}</div>
+          <div class="odd-slot-bar">
+            {{#each this.combatants}}
+              <div class="odd-cbt" draggable="true" data-combatant-id="{{this.id}}">
+                <img class="odd-cbt-img" draggable="false" src="{{this.img}}" alt="{{this.name}}" title="{{this.name}}">
+                <div class="odd-cbt-overlay">
+                  <span class="odd-cbt-name">{{this.name}}</span>
+                  <div class="odd-cbt-btns odd-cbt-tempo-btns">
+                    <button type="button" class="odd-cbt-tempo" data-combatant-id="{{this.id}}" data-delta="-1" title="−1">−1</button>
+                    <button type="button" class="odd-cbt-tempo" data-combatant-id="{{this.id}}" data-delta="-2" title="−2">−2</button>
+                    <button type="button" class="odd-cbt-tempo" data-combatant-id="{{this.id}}" data-delta="-3" title="−3">−3</button>
+                  </div>
+                  <div class="odd-cbt-btns">
+                    <button type="button" class="odd-cbt-wait" data-combatant-id="{{this.id}}" title="{{localize 'ODD.Tracker.wait'}}">⏸</button>
+                    <button type="button" class="odd-cbt-remove" data-combatant-id="{{this.id}}" title="{{localize 'ODD.Tracker.remove'}}">✕</button>
+                  </div>
+                </div>
+              </div>
+            {{/each}}
+          </div>
+          {{#if this.penaltyLabel}}
+            <div class="odd-slot-penalty">{{this.penaltyLabel}}</div>
+          {{/if}}
+        </div>
+      {{/each}}
+    </div>
+
+  </div>
+  {{else}}
+  <div class="odd-tracker-empty">
+    <i class="fa-solid fa-swords"></i>
+    <p>{{localize "ODD.Tracker.noCombat"}}</p>
+  </div>
+  {{/if}}
+
+</div>
