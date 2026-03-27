@@ -6,6 +6,7 @@ import { FLAW_SEVERITIES, FLAW_CATEGORIES } from "../config/flaw.js";
 import type { WeaponSystemData } from "../data/item/weapon.js";
 import type { ArmorSystemData } from "../data/item/armor.js";
 import type { TalentSystemData } from "../data/item/talent.js";
+import type { ItemSystemData } from "../data/item/item.js";
 
 const { ItemSheetV2 } = foundry.applications.sheets;
 const { HandlebarsApplicationMixin } = foundry.applications.api;
@@ -134,6 +135,7 @@ export class OddItemSheet extends OddItemSheetBase {
     if ((this.document.type as string) === "weapon") this._onRenderWeapon();
     if ((this.document.type as string) === "armor")  this._onRenderArmor();
     if ((this.document.type as string) === "talent") this._onRenderTalent();
+    if ((this.document.type as string) === "item")   this._onRenderItem();
   }
 
   private async _prepareTalentContext(isEditMode: boolean, rollData: Record<string, unknown> = {}) {
@@ -243,6 +245,33 @@ export class OddItemSheet extends OddItemSheetBase {
           const idx = Number(btn.dataset.removeEffect);
           const effects = snapshotEffects().filter((_, i) => i !== idx);
           void doc.update({ "system.effects": effects });
+        });
+      });
+  }
+
+  private _onRenderItem(): void {
+    const html = this.element;
+    const doc = this.document as unknown as { update(d: Record<string, unknown>): Promise<unknown> };
+
+    html.querySelector<HTMLInputElement>(".tag-input")
+      ?.addEventListener("keydown", (ev: KeyboardEvent) => {
+        if (ev.key !== "Enter") return;
+        ev.preventDefault();
+        const input = ev.currentTarget as HTMLInputElement;
+        const tag = input.value.trim();
+        if (!tag) return;
+        input.value = "";
+        const notes = [...(this.document.system as unknown as ItemSystemData).notes, tag];
+        void doc.update({ "system.notes": notes });
+      });
+
+    html.querySelectorAll<HTMLButtonElement>("[data-remove-tag]")
+      .forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const tag = btn.dataset.removeTag!;
+          const notes = (this.document.system as unknown as ItemSystemData).notes
+            .filter((t) => t !== tag);
+          void doc.update({ "system.notes": notes });
         });
       });
   }

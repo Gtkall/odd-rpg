@@ -1,0 +1,40 @@
+<div class="odd-rpg armor-form">
+
+  {{!-- Header --}}
+  <header class="weapon-header">
+    <img class="item-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" width="48" height="48" />
+    <input class="item-name" name="name" type="text" value="{{item.name}}" placeholder="Item Name"
+      {{#unless isEditMode}}disabled{{/unless}} />
+    <button type="button" class="item-edit-toggle" data-edit-toggle
+      title="{{#if isEditMode}}Finish editing{{else}}Edit item{{/if}}">
+      {{#if isEditMode}}<i class="fas fa-check"></i>{{else}}<i class="fas fa-pen"></i>{{/if}}
+    </button>
+  </header>
+
+  {{!-- Description --}}
+  <div class="item-description">
+    {{#if isEditMode}}
+      <prose-mirror name="system.description" value="{{system.description}}" compact></prose-mirror>
+    {{else}}
+      <div class="item-description-view">{{{enrichedDescription}}}</div>
+    {{/if}}
+  </div>
+
+  {{!-- Notes / Tags --}}
+  <fieldset class="item-fields" {{#unless isEditMode}}disabled{{/unless}}>
+    <div class="weapon-tags">
+      <div class="tags-label">{{localize "ODD.Weapon.Notes"}}</div>
+      <div class="tag-pills">
+        {{#each system.notes}}
+          <span class="tag-pill">
+            {{this}}
+            <button type="button" class="tag-remove" data-remove-tag="{{this}}" title="Remove">✕</button>
+          </span>
+        {{/each}}
+      </div>
+      <input class="tag-input" type="text"
+        placeholder="{{localize "ODD.Weapon.TagPlaceholder"}}" />
+    </div>
+  </fieldset>
+
+</div>
