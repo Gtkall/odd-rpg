@@ -1,3 +1,16 @@
+## [0.9.0](https://github.com/Gtkall/odd-rpg/compare/v0.8.0...v0.9.0) (2026-03-27)
+
+### Features
+
+* **items:** filter Create Item dialog to hide unsupported types ([79063e8](https://github.com/Gtkall/odd-rpg/commit/79063e8c7db470694a750f2e1057abc9cb2238c6))
+* **items:** implement generic Item type with notes and description ([3dc9622](https://github.com/Gtkall/odd-rpg/commit/3dc9622985c209a269f5fae5b271d83ab6f1fcad))
+* **tracker): add scene control button; feat(items:** filter creation dialog types ([a694466](https://github.com/Gtkall/odd-rpg/commit/a6944661399536e58b8e0a013ae840c6e060311a))
+* **tracker:** add floating ODD Initiative Tracker ([1195936](https://github.com/Gtkall/odd-rpg/commit/1195936112aff7d27437417a6115fa50a0d48452))
+
+### Bug Fixes
+
+* **tracker:** click-to-open overlay, clean drag ghost, dynamic row height ([d81b327](https://github.com/Gtkall/odd-rpg/commit/d81b327345c4577e7d474e7e907d43f906b3476a))
+
 ## [0.8.0](https://github.com/Gtkall/odd-rpg/compare/v0.7.0...v0.8.0) (2026-03-25)
 
 ### Features
