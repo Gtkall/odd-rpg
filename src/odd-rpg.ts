@@ -119,3 +119,23 @@ Hooks.once("init", () => {
     onDown: () => { void OddInitiativeTracker.instance.render({ force: true }); return true; },
   });
 });
+
+/* -------------------------------------------------------------------------- */
+/*  Scene control button — adds a tracker button to the Token controls bar   */
+/* -------------------------------------------------------------------------- */
+// In Foundry v13, controls is a Record<string, SceneControl>; tools live inside each control.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+Hooks.on("getSceneControlButtons", (controls: any) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  const tokens = controls.tokens;
+  if (!tokens) return;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  tokens.tools["odd-initiative-tracker"] = {
+    name: "odd-initiative-tracker",
+    title: "ODD.Tracker.title",
+    icon: "fa-solid fa-list-ol",
+    order: 9,
+    button: true,
+    onChange: () => { void OddInitiativeTracker.instance.render({ force: true }); },
+  };
+});
