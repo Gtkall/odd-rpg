@@ -6,6 +6,8 @@
   {{> "systems/odd-rpg/templates/item/partials/talent-form.hbs"}}
 {{else if (eq item.type "flaw")}}
   {{> "systems/odd-rpg/templates/item/partials/flaw-form.hbs"}}
+{{else if (eq item.type "item")}}
+  {{> "systems/odd-rpg/templates/item/partials/item-form.hbs"}}
 {{else}}
   <div class="odd-rpg sheet item">
     <header class="item-header">

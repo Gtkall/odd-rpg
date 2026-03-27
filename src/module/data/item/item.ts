@@ -1,16 +1,23 @@
-import { BaseItemDataModel } from "../_base.js";
+import type { OddItemBase } from "../_base.js";
 
-const { NumberField } = foundry.data.fields;
+const { ArrayField, HTMLField, StringField } = foundry.data.fields;
 
-/** Generic Item — equipment, consumable, loot, etc. */
-export class ItemDataModel extends BaseItemDataModel {
+/** Generic Item — holds notes (tags) and a description. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export class ItemDataModel extends foundry.abstract.TypeDataModel<any, Item.Implementation> {
   static override defineSchema() {
     return {
-      ...super.defineSchema(),
-      quantity: new NumberField({ required: true, integer: true, min: 0, initial: 1 }),
-      weight: new NumberField({ required: true, min: 0, initial: 0 }),
+      description: new HTMLField({ required: true, blank: true }),
+      notes: new ArrayField(
+        new StringField({ required: true, blank: false }),
+        { required: true, initial: [] },
+      ),
     };
   }
+}
+
+export interface ItemSystemData extends OddItemBase {
+  notes: string[];
 }
 
 export default ItemDataModel;

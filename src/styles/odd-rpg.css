@@ -2984,3 +2984,301 @@
     color: #8bc48b;
     font-weight: 600;
 }
+
+/* ============================================================================
+   ODD Initiative Tracker
+   ============================================================================ */
+
+.odd-initiative-tracker .window-content {
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: #1a1a1a;
+}
+
+.odd-tracker-inner {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    font-family: var(--odd-font-primary);
+    color: var(--odd-color-primary);
+}
+
+/* Toolbar */
+.odd-tracker-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0.35rem 0.6rem;
+    border-bottom: 1px solid #2d2d2d;
+    flex-shrink: 0;
+}
+
+.odd-tracker-new-round {
+    background: #252525;
+    border: 1px solid #555;
+    color: #e0e0e0;
+    border-radius: 4px;
+    padding: 0.25rem 0.65rem;
+    cursor: pointer;
+    font-size: 0.78rem;
+    font-family: var(--odd-font-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.odd-tracker-new-round:hover {
+    background: #333;
+    border-color: var(--odd-color-accent);
+    color: var(--odd-color-accent);
+}
+
+/* Body */
+.odd-tracker-body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* ---- Waiting column ---- */
+.odd-waiting-col {
+    width: 84px;
+    flex-shrink: 0;
+    border-right: 1px solid #2d2d2d;
+    display: flex;
+    flex-direction: column;
+    padding: 4px;
+    gap: 4px;
+    overflow-y: auto;
+    transition: background 0.15s;
+}
+
+.odd-waiting-col--drag-over {
+    background: rgba(0, 188, 212, 0.07);
+    outline: 1px dashed rgba(0, 188, 212, 0.4);
+    outline-offset: -2px;
+}
+
+.odd-waiting-title {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #777;
+    text-align: center;
+    padding: 2px 0 4px;
+    border-bottom: 1px solid #2d2d2d;
+    flex-shrink: 0;
+}
+
+.odd-waiting-empty {
+    color: #444;
+    text-align: center;
+    font-size: 0.75rem;
+    padding: 6px 0;
+}
+
+/* Waiting column token */
+.odd-waiting-col .odd-cbt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 4px;
+    border: 1px solid #333;
+    border-radius: 4px;
+    background: #222;
+    cursor: grab;
+}
+
+.odd-waiting-col .odd-cbt:active { cursor: grabbing; }
+
+.odd-waiting-col .odd-cbt-img {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 3px;
+    border: 2px solid #444;
+    display: block;
+}
+
+.odd-waiting-col .odd-cbt-label {
+    font-size: 0.58rem;
+    color: #aaa;
+    text-align: center;
+    line-height: 1.2;
+    max-width: 68px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ---- Slots column ---- */
+.odd-slots {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 4px 6px;
+    gap: 2px;
+    overflow-y: auto;
+}
+
+/* Individual slot row */
+.odd-slot {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 5px 0.35rem;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    transition: border-color 0.1s, background 0.1s;
+}
+
+.odd-slot--high         { background: rgba(0, 188, 212, 0.08);  border-color: rgba(0, 188, 212, 0.25); }
+.odd-slot--normal       { background: #232323;                   border-color: #2e2e2e; }
+.odd-slot--zero         { background: #2a2a2a;                   border: 2px solid #555; }
+.odd-slot--overextended { background: rgba(239, 83, 80, 0.08);  border-color: rgba(239, 83, 80, 0.25); }
+
+/* Drag-over highlight */
+.odd-slot--drag-over {
+    border-color: rgba(0, 188, 212, 0.7) !important;
+    background: rgba(0, 188, 212, 0.12) !important;
+}
+
+/* Slot number */
+.odd-slot-num {
+    width: 24px;
+    text-align: right;
+    font-weight: 700;
+    font-size: 0.82rem;
+    flex-shrink: 0;
+    color: #999;
+}
+
+.odd-slot--high         .odd-slot-num { color: #00bcd4; }
+.odd-slot--zero         .odd-slot-num { color: #ddd; font-size: 0.9rem; }
+.odd-slot--overextended .odd-slot-num { color: #ef5350; }
+
+/* Slot bar (token area) */
+.odd-slot-bar {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 4px;
+    align-items: flex-start;
+}
+
+/* Penalty label */
+.odd-slot-penalty {
+    width: 34px;
+    text-align: right;
+    font-size: 0.68rem;
+    color: #ef5350;
+    flex-shrink: 0;
+    font-weight: 600;
+}
+
+/* ---- Token (in slot bar) ---- */
+.odd-slot-bar .odd-cbt {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    width: 34px;
+    cursor: grab;
+    flex-shrink: 0;
+}
+
+.odd-slot-bar .odd-cbt:active { cursor: grabbing; }
+
+.odd-slot-bar .odd-cbt-img {
+    width: 34px;
+    height: 34px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 2px solid #444;
+    display: block;
+    transition: border-color 0.15s;
+    flex-shrink: 0;
+}
+
+.odd-slot-bar .odd-cbt:hover .odd-cbt-img,
+.odd-slot-bar .odd-cbt--open .odd-cbt-img {
+    border-color: var(--odd-color-accent);
+}
+
+/* Hover overlay: action buttons */
+.odd-cbt-overlay {
+    display: none;
+    position: absolute;
+    bottom: calc(100% - 10px); /* slight overlap so mouse can reach it without gap */
+    left: 50%;
+    transform: translateX(-50%);
+    background: #111;
+    border: 1px solid #555;
+    border-radius: 4px;
+    padding: 4px 6px 12px;   /* extra bottom padding bridges to the token */
+    white-space: nowrap;
+    z-index: 200;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.odd-slot-bar .odd-cbt--open .odd-cbt-overlay {
+    display: flex;
+}
+
+/* Name always visible below the token avatar */
+.odd-slot-bar .odd-cbt-name {
+    font-size: 0.6rem;
+    color: #bbb;
+    text-align: center;
+    max-width: 50px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.1;
+}
+
+.odd-cbt-btns {
+    display: flex;
+    gap: 4px;
+}
+
+.odd-cbt-btns button {
+    all: unset;
+    cursor: pointer;
+    font-size: 0.65rem;
+    padding: 2px 5px;
+    border-radius: 3px;
+    border: 1px solid #555;
+    background: #1e1e1e;
+    color: #aaa;
+    transition: color 0.1s, border-color 0.1s;
+}
+
+.odd-cbt-wait:hover   { color: #00bcd4; border-color: #00bcd4; }
+.odd-cbt-remove:hover { color: #ef5350; border-color: #ef5350; }
+
+.odd-cbt-tempo:hover { color: #ff9800; border-color: #ff9800; }
+
+/* Empty state */
+.odd-tracker-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    gap: 0.75rem;
+    color: #555;
+    padding: 2rem;
+    text-align: center;
+}
+
+.odd-tracker-empty i { font-size: 2rem; }
+.odd-tracker-empty p { font-style: italic; font-size: 0.85rem; margin: 0; }
