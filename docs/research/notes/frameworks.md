@@ -108,6 +108,7 @@ The standout 2026 entrant is **VTTForge**: an MIT, TypeScript-first SDK + CLI + 
 - Not verified: how VTTForge types interoperate with fvtt-types, and whether any published system uses VTTForge in production.
 - The League of Foundry Developers "FoundryVTT-System-Template" repo could not be checked (GitHub API blocked; no raw package.json found), so its status is unknown.
 - Could not confirm whether asacolips' Boilerplate has a newer v13/v14 ApplicationV2 branch.
+- This pass missed a DSL-based system generator, ISDL (Intelligent System Design Language), likely because its npm description presents it as a VS Code extension. Follow-up (2026-09-26): see [isdl.md](isdl.md).
 
 ## 5. Reference-architecture systems as de facto frameworks (dnd5e, pf2e, Draw Steel, Daggerheart, Cosmere, Lancer, SWADE)
 
@@ -142,6 +143,7 @@ Not researched in depth within the tool budget. These are user-facing, in-Foundr
 
 ### Cited Findings
 - No sources gathered in this pass.
+- Follow-up (2026-09-26): ISDL's README places Simple World Building, Custom System Builder and Sandbox as the no-code tier below it. See [isdl.md](isdl.md) §2.
 
 ### Inferences
 - Based on general design, not verified here: these builders are themselves game systems that users configure inside Foundry. Porting odd-rpg onto one would mean giving up the codebase (TypeScript, custom Document classes, enrichers, the custom initiative tracker) in exchange for runtime-configured templates. That is the opposite of what a senior engineer wants.
