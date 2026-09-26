@@ -47,6 +47,9 @@ export default tseslint.config(
       // void-use conflicts with @typescript-eslint/no-floating-promises:
       // we use void to explicitly discard promises in event handlers.
       "sonarjs/void-use": "off",
+      // tsc --strict already checks argument types, and this rule crashes on the
+      // v14 fvtt-types Math augmentation (it assumes every declaration has parameters).
+      "sonarjs/argument-type": "off",
 
       // --- Unused vars: allow _-prefixed params (intentionally unused overrides) ---
       "@typescript-eslint/no-unused-vars": [

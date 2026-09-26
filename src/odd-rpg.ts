@@ -50,26 +50,27 @@ Hooks.once("init", () => {
   CONFIG.Combat.documentClass = OddCombat;
 
   // ---- Data Models ----
-  // model is unknown (glob return); cast to the record's value type to avoid bare `any`.
-  type ActorDataModel = (typeof CONFIG.Actor.dataModels)[string];
-  type ItemDataModel  = (typeof CONFIG.Item.dataModels)[string];
-  for (const [path, model] of Object.entries(actorModels)) {
-    CONFIG.Actor.dataModels[typeName(path)] = model as ActorDataModel;
-  }
-  for (const [path, model] of Object.entries(itemModels)) {
-    CONFIG.Item.dataModels[typeName(path)] = model as ItemDataModel;
-  }
+  // The typed shape of these records comes from DataModelConfig (src/types/fvtt-config.d.ts).
+  const byTypeName = (models: Record<string, unknown>) =>
+    Object.fromEntries(Object.entries(models).map(([path, model]) => [typeName(path), model]));
+  Object.assign(CONFIG.Actor.dataModels, byTypeName(actorModels));
+  Object.assign(CONFIG.Item.dataModels, byTypeName(itemModels));
 
   // ---- Trackable token attributes ----
-  CONFIG.Actor.trackableAttributes = {
+  // fvtt-types 14.366 beta types this as a single entry, but Foundry keys it by
+  // actor type (TokenDocument._getConfiguredTrackedAttributes(type); dnd5e does the same).
+  Object.assign(CONFIG.Actor.trackableAttributes, {
     character: {
       bar: ["xp", "statistics.magicPoints"],
       value: ["statistics.movementRate", "statistics.composureThreshold", "statistics.healingRate"],
     },
-  };
+  });
 
   // ---- Register sheets ----
+  // Core still registers its deprecated V1 sheets as defaults (until v16); removing them is the point.
+  // eslint-disable-next-line sonarjs/deprecation
   DocumentSheetConfig.unregisterSheet(Actor, "core", foundry.appv1.sheets.ActorSheet);
+  // eslint-disable-next-line sonarjs/deprecation
   DocumentSheetConfig.unregisterSheet(Item, "core", foundry.appv1.sheets.ItemSheet);
 
   DocumentSheetConfig.registerSheet(Actor, "odd-rpg", OddActorSheet, {
