@@ -1,5 +1,7 @@
-import { INJURY_MAX_WOUNDS, INJURY_SEVERITIES } from "../../config/wounds.js";
+import { INJURY_MAX_WOUNDS, INJURY_SEVERITIES, INJURY_WOUNDED_PENALTY } from "../../config/wounds.js";
 import { isItemType } from "../../utils/item-type.js";
+import type { PoolEntry } from "../abstract/character-base.js";
+import type { DicePoolSource } from "../abstract/dice-pool-source.js";
 import { OddItemDataBase, defineItemBaseSchema } from "../abstract/item-base.js";
 
 const { StringField } = foundry.data.fields;
@@ -14,9 +16,17 @@ function defineInjurySchema() {
 type InjurySchema = ReturnType<typeof defineInjurySchema>;
 
 /** ODDEasy Injury — a named Wound or Crippling injury. */
-export class InjuryDataModel extends OddItemDataBase<InjurySchema> {
+export class InjuryDataModel extends OddItemDataBase<InjurySchema> implements DicePoolSource {
   static override defineSchema(): InjurySchema {
     return defineInjurySchema();
+  }
+
+  /**
+   * A Wound is a Penalty on a Test it would hinder. A Crippling injury adds no
+   * die: when it applies, the Test is simply a Failure.
+   */
+  toPoolEntry(): PoolEntry | null {
+    return this.severity === "wounded" ? { label: this.parent.name, die: `-${INJURY_WOUNDED_PENALTY}` } : null;
   }
 
   /** A Wound beyond the maximum a character can carry becomes Crippling instead. */

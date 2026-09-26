@@ -34,3 +34,9 @@ export const EASY_ATTRIBUTES: Record<string, string> = Object.freeze({
   wits:    "ODD.Attributes.wits",
   spirit:  "ODD.Attributes.spirit",
 });
+
+/** Attribute key pairs defining the 2-column layout on the ODDEasy sheet. */
+export const EASY_ATTRIBUTE_LAYOUT: readonly (readonly [string, string])[] = Object.freeze([
+  ["might", "finesse"],
+  ["wits", "spirit"],
+]);
