@@ -1,7 +1,8 @@
 import { WEAPON_TYPES, WEAPON_HANDS, WEAPON_DISTANCE, WEAPON_TEMPO_MIN, WEAPON_TEMPO_MAX } from "../../config/weapon.js";
 import { DICE_TYPES } from "../../config/dice.js";
+import { OddItemDataBase, defineItemBaseSchema } from "../abstract/item-base.js";
 
-const { ArrayField, BooleanField, HTMLField, NumberField, SchemaField, StringField } =
+const { ArrayField, BooleanField, NumberField, SchemaField, StringField } =
   foundry.data.fields;
 
 function weaponHandSchema() {
@@ -19,7 +20,7 @@ function weaponHandSchema() {
 
 function defineWeaponSchema() {
   return {
-    description: new HTMLField({ required: true, blank: true }),
+    ...defineItemBaseSchema(),
     weaponType: new StringField({ required: true, initial: "melee", choices: Object.keys(WEAPON_TYPES) }),
     hands: new StringField({ required: true, initial: "versatile", choices: Object.keys(WEAPON_HANDS) }),
     oneHanded: weaponHandSchema(),
@@ -35,7 +36,7 @@ function defineWeaponSchema() {
 type WeaponSchema = ReturnType<typeof defineWeaponSchema>;
 
 /** Weapon — a melee or ranged attack item. */
-export class WeaponDataModel extends foundry.abstract.TypeDataModel<WeaponSchema, Item.Implementation> {
+export class WeaponDataModel extends OddItemDataBase<WeaponSchema> {
   static override defineSchema(): WeaponSchema {
     return defineWeaponSchema();
   }

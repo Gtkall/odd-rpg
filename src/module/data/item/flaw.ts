@@ -1,11 +1,11 @@
-import type { EmptyObject } from "fvtt-types/utils";
 import { FLAW_SEVERITIES, FLAW_CATEGORIES } from "../../config/flaw.js";
+import { OddItemDataBase, defineItemBaseSchema } from "../abstract/item-base.js";
 
-const { HTMLField, StringField } = foundry.data.fields;
+const { StringField } = foundry.data.fields;
 
 function defineFlawSchema() {
   return {
-    description: new HTMLField({ required: true, blank: true }),
+    ...defineItemBaseSchema(),
     severity:    new StringField({ required: true, initial: "minor",  choices: Object.keys(FLAW_SEVERITIES) }),
     category:    new StringField({ required: true, initial: "mental", choices: Object.keys(FLAW_CATEGORIES) }),
   };
@@ -20,9 +20,7 @@ type FlawDerivedData = {
 };
 
 /** Flaw — a character hindrance that grants XP. */
-export class FlawDataModel extends foundry.abstract.TypeDataModel<
-  FlawSchema, Item.Implementation, EmptyObject, FlawDerivedData
-> {
+export class FlawDataModel extends OddItemDataBase<FlawSchema, FlawDerivedData> {
   static override defineSchema(): FlawSchema {
     return defineFlawSchema();
   }
