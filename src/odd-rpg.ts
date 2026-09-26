@@ -77,11 +77,12 @@ Hooks.once("init", () => {
   DocumentSheetConfig.unregisterSheet(Item, "core", foundry.appv1.sheets.ItemSheet);
 
   DocumentSheetConfig.registerSheet(Actor, "odd-rpg", OddActorSheet, {
-    types: Object.keys(actorModels).map(typeName),
+    // Type names come from auto-discovered file names, so the compiler only sees string[].
+    types: Object.keys(actorModels).map(typeName) as Actor.SubType[],
     makeDefault: true,
   });
   DocumentSheetConfig.registerSheet(Item, "odd-rpg", OddItemSheet, {
-    types: Object.keys(itemModels).map(typeName),
+    types: Object.keys(itemModels).map(typeName) as Item.SubType[],
     makeDefault: true,
   });
 });
@@ -98,7 +99,7 @@ Hooks.once("ready", () => {
 /*  Initiative Tracker — re-render on combat changes                         */
 /* -------------------------------------------------------------------------- */
 
-for (const hookName of ["createCombatant", "deleteCombatant", "updateCombatant", "createCombat", "deleteCombat"]) {
+for (const hookName of ["createCombatant", "deleteCombatant", "updateCombatant", "createCombat", "deleteCombat"] as const) {
   Hooks.on(hookName, () => {
     const tracker = OddInitiativeTracker.instance;
     if (tracker.rendered) void tracker.render();
