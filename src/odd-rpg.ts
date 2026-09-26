@@ -16,6 +16,7 @@ import { OddActorSheet } from "./module/sheets/actor.js";
 import { OddItemSheet } from "./module/sheets/item.js";
 import { registerEnrichers } from "./module/enrichers.js";
 import { OddInitiativeTracker } from "./module/tracker/initiative-tracker.js";
+import { migrations } from "./module/migrations/index.js";
 
 const loadTemplates = foundry.applications.handlebars.loadTemplates;
 const DocumentSheetConfig = foundry.applications.apps.DocumentSheetConfig;
@@ -40,6 +41,7 @@ Hooks.once("init", () => {
 
   void loadTemplates(templatePaths);
   registerEnrichers();
+  migrations.register();
 
   // ---- System configuration ----
   CONFIG.ODD = ODD;
@@ -90,6 +92,9 @@ Hooks.once("init", () => {
 
 Hooks.once("ready", () => {
   console.warn("ODD RPG | System ready");
+  if (game.user.isGM) {
+    migrations.run().catch((err: unknown) => { console.error("ODD RPG | World migration failed", err); });
+  }
 });
 
 /* -------------------------------------------------------------------------- */

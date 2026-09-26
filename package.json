@@ -34,5 +34,8 @@
     "vite-plugin-static-copy": "^2.2.0"
   },
   "author": "George Karettas",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@vttforge/core": "0.20.7"
+  }
 }
