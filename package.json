@@ -9,6 +9,7 @@
     "clean": "rm -rf dist",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
+    "typecheck": "tsc --noEmit",
     "prepare": "husky"
   },
   "devDependencies": {
@@ -28,9 +29,6 @@
     "typescript-eslint": "^8.57.1",
     "vite": "^6.0.0",
     "vite-plugin-static-copy": "^2.2.0"
-  },
-  "lint-staged": {
-    "src/**/*.ts": "eslint"
   },
   "author": "George Karettas",
   "license": "MIT"
