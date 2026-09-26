@@ -211,6 +211,22 @@
       },
       "becameCrippled": "A third Wound becomes Crippling: {name}."
     },
+    "Easy": {
+      "notes": "Notes",
+      "talents": "Talents",
+      "flaws": "Flaws",
+      "injuries": "Injuries",
+      "addTalent": "Add talent…",
+      "addFlaw": "Add flaw…",
+      "addInjury": "Add injury…",
+      "die": "Die",
+      "severity": "Severity",
+      "strainPenalty": "Strain Penalty",
+      "strainFull": "No empty slot: the next Fatigue or Exhaustion leaves you Incapacitated",
+      "crippledEffect": "A Test it applies to fails; constantly Incapacitated",
+      "addBonusHint": "Click to add this die to the dice pool",
+      "addPenaltyHint": "Click to add this Penalty to the dice pool"
+    },
     "ItemType": {
       "weapon": "Weapon",
       "armor":  "Armor",

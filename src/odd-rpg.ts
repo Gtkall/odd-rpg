@@ -14,6 +14,7 @@ import { OddActor } from "./module/documents/actor.js";
 import { OddItem } from "./module/documents/item.js";
 import { OddCombat } from "./module/documents/combat.js";
 import { OddActorSheet } from "./module/sheets/actor.js";
+import { OddEasyActorSheet } from "./module/sheets/easy-actor.js";
 import { OddItemSheet } from "./module/sheets/item.js";
 import { registerEnrichers } from "./module/enrichers.js";
 import { OddInitiativeTracker } from "./module/tracker/initiative-tracker.js";
@@ -78,6 +79,10 @@ Hooks.once("init", () => {
 
   DocumentSheetConfig.registerSheet(Actor, "odd-rpg", OddActorSheet, {
     types: ["character"],
+    makeDefault: true,
+  });
+  DocumentSheetConfig.registerSheet(Actor, "odd-rpg", OddEasyActorSheet, {
+    types: ["easyCharacter"],
     makeDefault: true,
   });
   DocumentSheetConfig.registerSheet(Item, "odd-rpg", OddItemSheet, {

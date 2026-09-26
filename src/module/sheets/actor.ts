@@ -397,19 +397,6 @@ export class OddActorSheet extends OddActorSheetBase {
       });
     });
 
-    // Inline add row
-    html.querySelectorAll<HTMLInputElement>(".inventory-add-input[data-item-type]").forEach((el) => {
-      el.addEventListener("keydown", (ev: Event) => {
-        const ke = ev as KeyboardEvent;
-        if (ke.key !== "Enter") return;
-        const name = el.value.trim();
-        if (!name) return;
-        // data-item-type is rendered from the item subtypes this sheet lists.
-        void this.document.createEmbeddedDocuments("Item", [{ name, type: el.dataset.itemType as Item.SubType }]);
-        el.value = "";
-      });
-    });
-
   }
 
   /** Last hit location resolved from a d20 roll — client-side transient. */
