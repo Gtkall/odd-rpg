@@ -283,6 +283,12 @@ export class OddActorSheet extends OddActorSheetBase {
     return context;
   }
 
+  /** Chat speaker for this sheet's actor. */
+  private _speaker(): ChatMessage.SpeakerData {
+    // The v14 types want a stored Actor; a sheet only ever renders a persisted one.
+    return ChatMessage.getSpeaker({ actor: this.document as Actor.Stored });
+  }
+
   private get characterSystem(): CharacterDataModel {
     return this.document.system;
   }
@@ -566,7 +572,7 @@ export class OddActorSheet extends OddActorSheetBase {
           void (async () => {
             const r = await new Roll(dieToRoll).evaluate();
             await ChatMessage.create({
-              speaker: ChatMessage.getSpeaker({ actor: this.document }),
+              speaker: this._speaker(),
               flavor: label,
               rolls: [r],
             });
@@ -902,7 +908,7 @@ export class OddActorSheet extends OddActorSheetBase {
     );
 
     await ChatMessage.create({
-      speaker: ChatMessage.getSpeaker({ actor: this.document }),
+      speaker: this._speaker(),
       content,
       rolls: [roll],
     });
@@ -955,7 +961,7 @@ export class OddActorSheet extends OddActorSheetBase {
       },
     );
     await ChatMessage.create({
-      speaker: ChatMessage.getSpeaker({ actor: this.document }),
+      speaker: this._speaker(),
       content,
       rolls: [roll],
     });
