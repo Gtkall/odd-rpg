@@ -1,10 +1,11 @@
 import { ARMOR_LOCATIONS } from "../../config/armor.js";
+import { OddItemDataBase, defineItemBaseSchema } from "../abstract/item-base.js";
 
-const { ArrayField, BooleanField, HTMLField, NumberField, StringField } = foundry.data.fields;
+const { ArrayField, BooleanField, NumberField, StringField } = foundry.data.fields;
 
 function defineArmorSchema() {
   return {
-    description: new HTMLField({ required: true, blank: true }),
+    ...defineItemBaseSchema(),
     bulk: new NumberField({ required: true, min: 0, initial: 0 }),
     protection: new NumberField({ required: true, integer: true, min: 0, initial: 0 }),
     location: new ArrayField(
@@ -22,7 +23,7 @@ function defineArmorSchema() {
 type ArmorSchema = ReturnType<typeof defineArmorSchema>;
 
 /** Armor / Shield — protective equipment with body-location coverage. */
-export class ArmorDataModel extends foundry.abstract.TypeDataModel<ArmorSchema, Item.Implementation> {
+export class ArmorDataModel extends OddItemDataBase<ArmorSchema> {
   static override defineSchema(): ArmorSchema {
     return defineArmorSchema();
   }

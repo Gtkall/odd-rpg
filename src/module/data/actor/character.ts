@@ -20,8 +20,13 @@ import {
   PAIN_PENALTY_DICE, PAIN_PENALTY_DEFAULT,
 } from "../../config/wounds.js";
 import type { WoundLocationKey } from "../../config/wounds.js";
+import { COMMON_ROLLS, type CommonRollDef, type RollSource } from "../../config/rolls.js";
+import {
+  OddCharacterDataBase, defineCharacterBaseSchema,
+  type CharacterBaseKeyedData, type PoolEntry, type RollingActor,
+} from "../abstract/character-base.js";
 
-const { ArrayField, BooleanField, HTMLField, NumberField, ObjectField, SchemaField, StringField } =
+const { ArrayField, BooleanField, NumberField, SchemaField, StringField } =
   foundry.data.fields;
 
 function defineCharacterSchema() {
@@ -56,11 +61,7 @@ function defineCharacterSchema() {
   );
 
   return {
-    playerName: new StringField({ required: true, blank: true, initial: "" }),
-    xp: new SchemaField({
-      value: new NumberField({ required: true, integer: true, min: 0, initial: 0 }),
-      max: new NumberField({ required: true, integer: true, min: 0, initial: 0 }),
-    }),
+    ...defineCharacterBaseSchema(),
     attributes: new SchemaField(attributeFields),
     skills: new SchemaField(skillCategoryFields),
     statistics: new SchemaField({
@@ -84,22 +85,6 @@ function defineCharacterSchema() {
         { initial: Array(STRAIN_MAX_FORTITUDE_SLOTS).fill(false) as boolean[] },
       ),
     }),
-    biography: new HTMLField({ required: true, blank: true }),
-    rollModifiers: new ObjectField({ initial: {} }),
-    savedRolls: new ArrayField(
-      new SchemaField({
-        id:   new StringField({ required: true, blank: false }),
-        name: new StringField({ required: true, blank: true, initial: "Saved Roll" }),
-        dice: new ArrayField(
-          new SchemaField({
-            label: new StringField({ required: true, blank: true }),
-            die:   new StringField({ required: true, blank: false }),
-          }),
-        ),
-        flat: new NumberField({ required: true, initial: 0 }),
-      }),
-      { initial: [] },
-    ),
     customSkills: new ArrayField(
       new SchemaField({
         id:       new StringField({ required: true, blank: false }),
@@ -139,23 +124,32 @@ function defineCharacterSchema() {
 type CharacterSchema = ReturnType<typeof defineCharacterSchema>;
 
 // fvtt-types infers a SchemaField whose keys come from config (via
-// Object.fromEntries) as `{}`, and an ObjectField as an untyped object, so the
-// real shapes of those fields are declared here.
-// eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- TypeDataModel requires AnyObject, which interfaces do not satisfy.
-type CharacterConfigKeyedData = {
+// Object.fromEntries) as `{}`, so the real shapes of those fields are declared here.
+type CharacterConfigKeyedData = CharacterBaseKeyedData & {
   attributes:    Record<string, string>;
   skills:        Record<string, Record<string, string>>;
   wounds:        Record<WoundLocationKey, { state: string; subStatus: string }>;
-  rollModifiers: Record<string, string>;
 };
 
-export class CharacterDataModel extends foundry.abstract.TypeDataModel<
-  CharacterSchema,
-  Actor.Implementation,
-  CharacterConfigKeyedData
-> {
+export class CharacterDataModel
+  extends OddCharacterDataBase<CharacterSchema, CharacterConfigKeyedData>
+  implements RollingActor {
   static override defineSchema(): CharacterSchema {
     return defineCharacterSchema();
+  }
+
+  get commonRolls(): readonly CommonRollDef[] {
+    return COMMON_ROLLS;
+  }
+
+  resolveRollSource(source: RollSource): PoolEntry {
+    if (source.type === "attribute") {
+      return { label: game.i18n.localize(ATTRIBUTES[source.key]), die: this.attributes[source.key] };
+    }
+    return {
+      label: game.i18n.localize(SKILLS[source.category][source.key] ?? source.key),
+      die: this.skills[source.category][source.key] ?? "",
+    };
   }
 
   override prepareDerivedData(): void {

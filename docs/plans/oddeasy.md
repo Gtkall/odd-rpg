@@ -142,6 +142,13 @@ Decides the root of the class hierarchy: our own `OddDataModel` / `OddActorSheet
 - Add Vitest with the first type-level tests for the existing models.
 - **Verify:** typecheck, lint, build and tests pass; the ODD smoke test from phase 0 behaves identically.
 
+#### Phase 1 notes
+- Built: `OddItemDataBase` (replaces the unused `BaseItemDataModel`; every item model takes `description` from it) and `OddCharacterDataBase` (player name, XP, biography, roll modifiers, saved rolls) in `data/abstract/`; `OddActorSheetBase` in `sheets/actor-base.ts` (sheet 1,189 → 687 + 551 lines); `RollingActor`; Vitest type tests (`npm test`, in CI).
+- Deferred to phase 2, because nothing would use them yet: `OddDataModel` (its job, the nested-schema merge helper, is first needed by the Easy strain), `TalentDataBase` / `FlawDataBase` (ODD and Easy talents and flaws share only `description`, which the item base already has) and `DicePoolSource` (its first implementers are `easyTalent` / `easyFlaw`).
+- `RollingActor` is declared on the concrete classes (`CharacterDataModel implements RollingActor`), not on the abstract base: under a generic schema, fvtt-types can't resolve fields to their declared types, so the check only works once the schema is fixed.
+- The ODD rule in the roll flow (a keep-highest roll sets initiative in the active combat) sits behind `OddActorSheetBase._onCommonRollTotal()`, which `OddActorSheet` overrides. The Easy sheet will inherit the no-op.
+- Dedicated rolls (initiative, stamina, dodge) come from the base context as `dedicatedRolls[key]`; each sheet picks the ones it shows.
+
 ### 2. Easy data and items
 - Config: `EASY_ATTRIBUTES`, `EASY_SKILLS`, `EASY_STRAIN_VALUES` and `EASY_COMMON_ROLLS` in their domain files.
 - Models: `EasyCharacterData`, `EasyTalentData`, `EasyFlawData` and `InjuryData`, plus `DataModelConfig`, `system.json` `documentTypes` / `htmlFields`, and lang keys (including TYPES labels, audit rule `-009`).

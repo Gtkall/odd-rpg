@@ -1,11 +1,11 @@
-import type { EmptyObject } from "fvtt-types/utils";
 import { TALENT_TYPES, TALENT_RANKS, TALENT_CATEGORIES, TALENT_XP_COSTS } from "../../config/talent.js";
+import { OddItemDataBase, defineItemBaseSchema } from "../abstract/item-base.js";
 
 const { ArrayField, HTMLField, SchemaField, StringField } = foundry.data.fields;
 
 function defineTalentSchema() {
   return {
-    description:   new HTMLField({ required: true, blank: true }),
+    ...defineItemBaseSchema(),
     talentType:    new StringField({ required: true, initial: "main", choices: Object.keys(TALENT_TYPES) }),
     rank:          new StringField({ required: true, blank: true, initial: "I", choices: Object.keys(TALENT_RANKS) }),
     category:      new StringField({ required: true, initial: "combat", choices: Object.keys(TALENT_CATEGORIES) }),
@@ -30,9 +30,7 @@ type TalentDerivedData = {
 };
 
 /** Talent — a node in a character's talent tree. */
-export class TalentDataModel extends foundry.abstract.TypeDataModel<
-  TalentSchema, Item.Implementation, EmptyObject, TalentDerivedData
-> {
+export class TalentDataModel extends OddItemDataBase<TalentSchema, TalentDerivedData> {
   override prepareDerivedData(): void {
     super.prepareDerivedData();
     const key = this.talentType === "main" ? `main:${this.rank}` : this.talentType;

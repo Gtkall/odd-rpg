@@ -1,7 +1,7 @@
-import { BaseItemDataModel } from "../_base.js";
+import { OddItemDataBase } from "../abstract/item-base.js";
 
 /** Feature — a special ability or trait. */
-export class FeatureDataModel extends BaseItemDataModel {
+export class FeatureDataModel extends OddItemDataBase {
   static override defineSchema() {
     return { ...super.defineSchema() };
   }

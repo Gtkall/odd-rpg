@@ -10,6 +10,7 @@
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run --typecheck.only",
     "foundry:audit": "vttforge audit",
     "foundry:migrate": "vttforge migrate",
     "prepare": "husky"
@@ -31,7 +32,8 @@
     "typescript": "^5.7.0",
     "typescript-eslint": "^8.57.1",
     "vite": "^6.0.0",
-    "vite-plugin-static-copy": "^2.2.0"
+    "vite-plugin-static-copy": "^2.2.0",
+    "vitest": "5.0.2"
   },
   "author": "George Karettas",
   "license": "MIT",
