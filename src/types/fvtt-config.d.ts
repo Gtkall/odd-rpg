@@ -7,6 +7,7 @@
  */
 
 import type { ODD } from "../module/config/index.js";
+import type { RulesetKey } from "../module/config/rulesets.js";
 import type { OddActor } from "../module/documents/actor.js";
 import type { OddItem } from "../module/documents/item.js";
 import type { OddCombat } from "../module/documents/combat.js";
@@ -49,6 +50,11 @@ declare module "fvtt-types/configuration" {
   interface SystemConfig {
     Actor: { moduleSubtype: "ignore"; base: "ignore" };
     Item: { moduleSubtype: "ignore"; base: "ignore" };
+  }
+
+  interface SettingConfig {
+    /** The ruleset whose document types the "Create" dialogs offer. */
+    "odd-rpg.ruleset": RulesetKey;
   }
 
   // Set by the initiative tracker when a combatant is parked in the Waiting column.

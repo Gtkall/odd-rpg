@@ -1,3 +1,5 @@
+import { creatableTypes } from "../settings.js";
+
 // Item types hidden from the "Create Item" dialog.
 // "feature" is removed from the ODD system entirely.
 // "spell" and "item" are commented out here — planned for future implementation.
@@ -8,11 +10,12 @@ const HIDDEN_TYPES = new Set([
 ]);
 
 export class OddItem<SubType extends Item.SubType = Item.SubType> extends Item<SubType> {
-  /** Filter the types shown in Foundry's "Create Item" dialog. */
+  /** Offer only the active ruleset's item types, minus hidden ones, in the "Create Item" dialog. */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   static override createDialog(...args: any[]): Promise<Item | null | undefined> {
     const [data, createOptions, options] = args as [Record<string, unknown>?, Record<string, unknown>?, Record<string, unknown>?];
-    const allowedTypes = (Item.TYPES as string[]).filter(t => t !== "base" && !HIDDEN_TYPES.has(t));
+    const rulesetTypes = creatableTypes("Item");
+    const allowedTypes = (Item.TYPES as string[]).filter(t => rulesetTypes.includes(t) && !HIDDEN_TYPES.has(t));
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
     return super.createDialog(data, createOptions, { ...options, types: allowedTypes } as any);
   }

@@ -182,6 +182,11 @@ Decides the root of the class hierarchy: our own `OddDataModel` / `OddActorSheet
 - Existing actors of the other type stay fully usable; the setting only changes what can be created.
 - **Verify:** switching the setting changes the offered types in both directions; actors of both types still open and roll.
 
+#### Phase 4 notes
+- `RULESETS` (`config/rulesets.ts`) maps each ruleset to its actor and item types; the `odd-rpg.ruleset` world setting picks one (default `odd`), typed as `RulesetKey` through a `SettingConfig` merge.
+- `OddActor.createDialog` and `OddItem.createDialog` pass the active ruleset's types as the dialog's `types` whitelist, the v14 core mechanism (dnd5e wraps the same idea in its own `CreateDocumentDialog`). `OddItem` still hides `feature`. The setting is read when the dialog opens, so switching it needs no reload.
+- Nothing else reads the setting: existing documents of either ruleset open, roll and accept their own item types as before.
+
 ## Deferred
 
 - **ODD → ODDEasy conversion** (one-way, creates a new actor and leaves the original). Mapping findings are kept here for when it's picked up:
