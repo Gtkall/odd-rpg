@@ -63,7 +63,7 @@
       "talent": {
         "htmlFields": [
           "description",
-          "effects[].body"
+          "effects.*.body"
         ]
       },
       "flaw": {
