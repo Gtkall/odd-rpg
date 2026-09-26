@@ -21,6 +21,7 @@ import {
 } from "../../config/wounds.js";
 import type { WoundLocationKey } from "../../config/wounds.js";
 import { COMMON_ROLLS, type CommonRollDef, type RollSource } from "../../config/rolls.js";
+import { ODD_ITEM_TYPES } from "../../config/item-types.js";
 import {
   OddCharacterDataBase, defineCharacterBaseSchema,
   type CharacterBaseKeyedData, type PoolEntry, type RollingActor,
@@ -140,6 +141,10 @@ export class CharacterDataModel
 
   get commonRolls(): readonly CommonRollDef[] {
     return COMMON_ROLLS;
+  }
+
+  acceptsItemType(type: string): boolean {
+    return ODD_ITEM_TYPES.includes(type);
   }
 
   resolveRollSource(source: RollSource): PoolEntry {

@@ -18,7 +18,7 @@ import {
   STRAIN_VALUES, STRAIN_DEFAULT_SLOT_COUNT,
   STRAIN_MAX_FORTITUDE_SLOTS, STRAIN_FATIGUE_PENALTIES,
 } from "../config/strain.js";
-import type { CharacterDataModel } from "../data/actor/character.js";
+import { CharacterDataModel } from "../data/actor/character.js";
 import { isItemType } from "../utils/item-type.js";
 import { updateByPath } from "../utils/update.js";
 import { OddActorSheetBase } from "./actor-base.js";
@@ -195,7 +195,9 @@ export class OddActorSheet extends OddActorSheetBase {
   }
 
   private get characterSystem(): CharacterDataModel {
-    return this.document.system;
+    const { system } = this.document;
+    if (!(system instanceof CharacterDataModel)) throw new Error("OddActorSheet only renders ODD characters");
+    return system;
   }
 
   override async _onRender(_context: unknown, _options: unknown) {

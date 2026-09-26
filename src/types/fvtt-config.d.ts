@@ -11,9 +11,13 @@ import type { OddActor } from "../module/documents/actor.js";
 import type { OddItem } from "../module/documents/item.js";
 import type { OddCombat } from "../module/documents/combat.js";
 import type CharacterDataModel from "../module/data/actor/character.js";
+import type EasyCharacterDataModel from "../module/data/actor/easyCharacter.js";
 import type ArmorDataModel from "../module/data/item/armor.js";
+import type EasyFlawDataModel from "../module/data/item/easyFlaw.js";
+import type EasyTalentDataModel from "../module/data/item/easyTalent.js";
 import type FeatureDataModel from "../module/data/item/feature.js";
 import type FlawDataModel from "../module/data/item/flaw.js";
+import type InjuryDataModel from "../module/data/item/injury.js";
 import type ItemDataModel from "../module/data/item/item.js";
 import type SpellDataModel from "../module/data/item/spell.js";
 import type TalentDataModel from "../module/data/item/talent.js";
@@ -57,11 +61,15 @@ declare module "fvtt-types/configuration" {
   interface DataModelConfig {
     Actor: {
       character: typeof CharacterDataModel;
+      easyCharacter: typeof EasyCharacterDataModel;
     };
     Item: {
       armor: typeof ArmorDataModel;
+      easyFlaw: typeof EasyFlawDataModel;
+      easyTalent: typeof EasyTalentDataModel;
       feature: typeof FeatureDataModel;
       flaw: typeof FlawDataModel;
+      injury: typeof InjuryDataModel;
       item: typeof ItemDataModel;
       spell: typeof SpellDataModel;
       talent: typeof TalentDataModel;

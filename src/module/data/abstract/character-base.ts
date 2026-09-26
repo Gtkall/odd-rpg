@@ -85,4 +85,7 @@ export abstract class OddCharacterDataBase<
   abstract get commonRolls(): readonly CommonRollDef[];
 
   abstract resolveRollSource(source: RollSource): PoolEntry;
+
+  /** Whether an Item of this type may be created on, or dropped onto, this character. */
+  abstract acceptsItemType(type: string): boolean;
 }

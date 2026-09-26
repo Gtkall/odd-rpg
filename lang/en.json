@@ -1,7 +1,8 @@
 {
   "TYPES": {
     "Actor": {
-      "character": "Character"
+      "character":     "Character",
+      "easyCharacter": "ODDEasy Character"
     },
     "Item": {
       "item":    "Item",
@@ -10,7 +11,10 @@
       "weapon":  "Weapon",
       "armor":   "Armor",
       "talent":  "Talent",
-      "flaw":    "Flaw"
+      "flaw":    "Flaw",
+      "easyTalent": "ODDEasy Talent",
+      "easyFlaw":   "ODDEasy Flaw",
+      "injury":     "Injury"
     }
   },
   "ODD": {
@@ -29,7 +33,11 @@
       "dex": "Dexterity",
       "wil": "Willpower",
       "vit": "Vitality",
-      "per": "Personality"
+      "per": "Personality",
+      "might": "Might",
+      "finesse": "Finesse",
+      "wits": "Wits",
+      "spirit": "Spirit"
     },
     "SkillCategories": {
       "combat": "Combat",
@@ -130,6 +138,7 @@
       "exhaustion": "E",
       "armor": "A",
       "bleeding": "BL",
+      "bulk": "B",
       "fatiguePenalty": "Fatigue Penalty",
       "staminaSources": "Vitality + Willpower + Endurance",
       "fortitudeManualOverride": "Manual",
@@ -141,7 +150,8 @@
       "parry": "Parry",
       "fear": "Fear",
       "selfControl": "Self-Control",
-      "initiative": "Initiative"
+      "initiative": "Initiative",
+      "shock": "Shock"
     },
     "Sheet": {
       "Tabs": {
@@ -191,7 +201,15 @@
       }
     },
     "Item": {
-      "description": "Description"
+      "description": "Description",
+      "notAccepted": "{type} items can’t be added to {actor} actors."
+    },
+    "Injury": {
+      "Severities": {
+        "wounded": "Wounded",
+        "crippled": "Crippled"
+      },
+      "becameCrippled": "A third Wound becomes Crippling: {name}."
     },
     "ItemType": {
       "weapon": "Weapon",
