@@ -1,3 +1,21 @@
+## [0.10.0](https://github.com/Gtkall/odd-rpg/compare/v0.9.0...v0.10.0) (2026-09-26)
+
+### Features
+
+* add a ruleset world setting for ODD and ODDEasy ([8419834](https://github.com/Gtkall/odd-rpg/commit/84198344ee4560b1e45bce4e215f3f88b245f01f))
+* **config:** add ODDEasy attributes, skills, strain, rolls and injuries ([5d32d41](https://github.com/Gtkall/odd-rpg/commit/5d32d417cb2053528c60666e2ff6a86e880bbe9b))
+* **data:** add ODDEasy character, talent, flaw and injury types ([24e1cac](https://github.com/Gtkall/odd-rpg/commit/24e1cac4667a80b9ae923bc70d00272425c39e55))
+* **data:** add ODDEasy strain penalty and injury pool entries ([759aa23](https://github.com/Gtkall/odd-rpg/commit/759aa236fdaaa8f898acf9c40c039d4d3ea49612))
+* **migrations:** add world data migration runner ([4538fb5](https://github.com/Gtkall/odd-rpg/commit/4538fb582b61a83c2fc6b47b4349c962000aca7b))
+* require Foundry v14 ([ad70c9e](https://github.com/Gtkall/odd-rpg/commit/ad70c9eeff0987627fb5ac271cd83d58352dfeb9))
+* **sheets:** add the ODDEasy character sheet and item forms ([6a6e85d](https://github.com/Gtkall/odd-rpg/commit/6a6e85d1806d8d3f79a637675058a2d06f82ecdb))
+
+### Bug Fixes
+
+* **build:** keep class names through minification ([f7f0926](https://github.com/Gtkall/odd-rpg/commit/f7f0926960aceb043761af064905f7f0d3cad269))
+* **manifest:** declare talent effect HTML with wildcard path ([c293000](https://github.com/Gtkall/odd-rpg/commit/c2930002c8440883a54a4e33d90d79adfd1ccfae))
+* **types:** resolve tsc errors in system entry point ([f38cb4b](https://github.com/Gtkall/odd-rpg/commit/f38cb4bec0a88b94c7b833af03d121c5837724d6))
+
 ## [0.9.0](https://github.com/Gtkall/odd-rpg/compare/v0.8.0...v0.9.0) (2026-03-27)
 
 ### Features
