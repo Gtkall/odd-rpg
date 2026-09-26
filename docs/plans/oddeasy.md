@@ -170,6 +170,13 @@ Decides the root of the class hierarchy: our own `OddDataModel` / `OddActorSheet
 - Clicking a talent or flaw adds its die through `DicePoolSource`. An applicable Wound adds its d10 penalty.
 - **Verify:** every roll on p. 34 works (Awareness, Shock, and an attribute + skill + talent pool); the strain penalty follows slots 3–7; a full strain track shows Incapacitated; injury penalties apply.
 
+#### Phase 3 notes
+- A full strain track is **not** Incapacitated: per the rules, a character is Incapacitated when they must fill a slot and none is empty. The sheet warns when the track is full instead (the phase's verify wording above was imprecise).
+- Strain Penalty is derived on the model (`EasyCharacterDataModel.strainPenalty`, `isStrainFull`), not computed in the sheet.
+- `injury` is also a `DicePoolSource`: a Wound adds `-d10`, a Crippling injury adds nothing (`toPoolEntry()` returns `null`, its first use). One base-sheet handler (`[data-pool-item]`) adds any such item's die.
+- The dice tray sits below the header on a sheet without tabs; the inline add-item input moved into the base sheet.
+- `esbuild.keepNames` is on. Foundry keys a registered sheet by `scope.ClassName`, and minified names (e.g. `we`) changed on rebuild, silently resetting a document's chosen sheet. Existing per-document sheet choices reset once more, to the default sheet.
+
 ### 4. Ruleset world setting
 - A GM-only world setting, `ruleset: "odd" | "easy"`. It filters which actor and item types the create dialogs offer. Check the exact v14 hook for this against the API docs and dnd5e before implementing.
 - Existing actors of the other type stay fully usable; the setting only changes what can be created.
@@ -190,4 +197,4 @@ Decides the root of the class hierarchy: our own `OddDataModel` / `OddActorSheet
 ## Open questions
 
 - Does ODD's shared engine already apply the 5-dice cap and Hitch/Botch detection? If not, both rulesets need it, so it belongs in phase 1 or a follow-up, not in Easy-only code.
-- Should Easy Wounds apply their d10 automatically, or only when the player toggles "applies" per roll? The rule is "if they would hinder you in a Test", which is a GM call.
+- ~~Should Easy Wounds apply their d10 automatically?~~ Resolved in phase 3: no. Whether a Wound hinders a Test is a GM call, so clicking the Wound adds its Penalty to the pool.

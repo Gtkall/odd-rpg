@@ -3,6 +3,11 @@ import { viteStaticCopy } from "vite-plugin-static-copy";
 import path from "path";
 
 export default defineConfig({
+  // Foundry keys each registered sheet by "<scope>.<class name>" and saves a
+  // document's chosen sheet under that key, so class names must survive minification.
+  esbuild: {
+    keepNames: true,
+  },
   build: {
     outDir: "dist",
     emptyOutDir: true,

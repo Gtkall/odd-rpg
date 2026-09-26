@@ -1,0 +1,16 @@
+{{!-- ODDEasy skills: a flat list; no die means untrained --}}
+<div class="easy-panel easy-skills-panel">
+  <h3 class="panel-header">{{localize "ODD.Sections.skills"}}</h3>
+  {{#each skills}}
+  <div class="skill-row">
+    <span class="skill-name rollable" data-roll-skill="{{key}}">{{localize label}}</span>
+    {{#if ../isEditMode}}
+      <select name="system.skills.{{key}}" class="skill-select">
+        {{selectOptions ../diceTypes selected=die localize=true}}
+      </select>
+    {{else}}
+      <span class="die-value-static">{{#if die}}{{die}}{{else}}—{{/if}}</span>
+    {{/if}}
+  </div>
+  {{/each}}
+</div>

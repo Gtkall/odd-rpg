@@ -1,0 +1,27 @@
+{{!-- ODDEasy character: one page, following the ODDEasy character sheet (p. 34) --}}
+<section class="character-main easy-main">
+
+  <div class="attr-stats-row">
+    {{> "systems/odd-rpg/templates/actor/partials/table-attributes.hbs"}}
+    {{> "systems/odd-rpg/templates/actor/easy/partials/easy-skills.hbs"}}
+  </div>
+
+  {{> "systems/odd-rpg/templates/actor/easy/partials/easy-strain.hbs"}}
+
+  <div class="skills-rolls-row">
+    {{> "systems/odd-rpg/templates/actor/easy/partials/easy-traits.hbs"}}
+    {{> "systems/odd-rpg/templates/actor/partials/table-rolls.hbs"}}
+  </div>
+
+  {{> "systems/odd-rpg/templates/actor/easy/partials/easy-injuries.hbs"}}
+
+  <div class="easy-panel easy-notes">
+    <h3 class="panel-header">{{localize "ODD.Easy.notes"}}</h3>
+    {{#if isEditMode}}
+      <prose-mirror name="system.biography" value="{{system.biography}}" compact></prose-mirror>
+    {{else}}
+      <div class="easy-notes-view">{{{enrichedBiography}}}</div>
+    {{/if}}
+  </div>
+
+</section>

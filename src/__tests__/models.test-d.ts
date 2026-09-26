@@ -9,7 +9,7 @@
 
 import { describe, expectTypeOf, it } from "vitest";
 import type { PoolEntry, RollingActor } from "../module/data/abstract/character-base.js";
-import type { DicePoolSource } from "../module/data/abstract/die-trait-base.js";
+import type { DicePoolSource } from "../module/data/abstract/dice-pool-source.js";
 import type CharacterDataModel from "../module/data/actor/character.js";
 import type EasyCharacterDataModel from "../module/data/actor/easyCharacter.js";
 import type ArmorDataModel from "../module/data/item/armor.js";
@@ -78,6 +78,8 @@ describe("easyCharacter", () => {
 
   it("types the Easy-only fields", () => {
     expectTypeOf<EasySystem["strain"]["slots"]>().toEqualTypeOf<string[]>();
+    expectTypeOf<EasySystem["strainPenalty"]>().toEqualTypeOf<string | null>();
+    expectTypeOf<EasySystem["isStrainFull"]>().toEqualTypeOf<boolean>();
   });
 });
 
@@ -113,8 +115,9 @@ describe("items", () => {
     expectTypeOf<EasyFlawDataModel>().toExtend<DicePoolSource>();
   });
 
-  it("types an injury's severity", () => {
+  it("types an injury's severity and pool entry", () => {
     expectTypeOf<Item.SystemOfType<"injury">["severity"]>().toEqualTypeOf<string>();
+    expectTypeOf<InjuryDataModel>().toExtend<DicePoolSource>();
   });
 
   it("types derived data", () => {

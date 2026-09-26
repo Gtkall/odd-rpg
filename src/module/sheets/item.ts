@@ -1,6 +1,8 @@
 import { WEAPON_TYPES, WEAPON_HANDS, WEAPON_DISTANCE, WEAPON_TAGS } from "../config/weapon.js";
 import { ARMOR_LOCATIONS } from "../config/armor.js";
 import { DICE_TYPES } from "../config/dice.js";
+import { ATTRIBUTE_DICE_TYPES } from "../config/attributes.js";
+import { INJURY_SEVERITIES } from "../config/wounds.js";
 import { TALENT_TYPES, TALENT_RANKS, TALENT_CATEGORIES } from "../config/talent.js";
 import { FLAW_SEVERITIES, FLAW_CATEGORIES } from "../config/flaw.js";
 import { isItemType } from "../utils/item-type.js";
@@ -88,6 +90,14 @@ export class OddItemSheet extends OddItemSheetBase {
         }
       : {};
 
+    const dieTraitContext = isItemType(item, "easyTalent") || isItemType(item, "easyFlaw")
+      ? { dieTypes: ATTRIBUTE_DICE_TYPES }
+      : {};
+
+    const injuryContext = isItemType(item, "injury")
+      ? { injurySeverities: INJURY_SEVERITIES }
+      : {};
+
     return {
       ...context,
       item,
@@ -98,6 +108,8 @@ export class OddItemSheet extends OddItemSheetBase {
       ...armorContext,
       ...talentContext,
       ...flawContext,
+      ...dieTraitContext,
+      ...injuryContext,
     };
   }
 

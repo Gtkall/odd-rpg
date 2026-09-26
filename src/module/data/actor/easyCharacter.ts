@@ -12,7 +12,7 @@
 import { ATTRIBUTE_DICE_TYPES, DEFAULT_DIE, EASY_ATTRIBUTES } from "../../config/attributes.js";
 import { EASY_SKILLS } from "../../config/skills.js";
 import { DICE_TYPES } from "../../config/dice.js";
-import { EASY_STRAIN_VALUES, STRAIN_DEFAULT_SLOT_COUNT } from "../../config/strain.js";
+import { EASY_STRAIN_VALUES, STRAIN_DEFAULT_SLOT_COUNT, STRAIN_FATIGUE_PENALTIES } from "../../config/strain.js";
 import { EASY_COMMON_ROLLS, type CommonRollDef, type RollSource } from "../../config/rolls.js";
 import { EASY_ITEM_TYPES } from "../../config/item-types.js";
 import {
@@ -68,6 +68,17 @@ export class EasyCharacterDataModel
 
   get commonRolls(): readonly CommonRollDef[] {
     return EASY_COMMON_ROLLS;
+  }
+
+  /** Strain Penalty die for the filled slots: none below three, d4 at three up to d12 when full. */
+  get strainPenalty(): string | null {
+    const filled = this.strain.slots.filter(Boolean).length;
+    return STRAIN_FATIGUE_PENALTIES[filled - 1] ?? null;
+  }
+
+  /** With no empty slot left, the next Fatigue or Exhaustion leaves the character Incapacitated. */
+  get isStrainFull(): boolean {
+    return this.strain.slots.every(Boolean);
   }
 
   acceptsItemType(type: string): boolean {

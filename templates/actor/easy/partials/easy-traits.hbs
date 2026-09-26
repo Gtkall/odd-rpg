@@ -1,0 +1,30 @@
+{{!-- ODDEasy Talents (Bonus dice) and Flaws (Penalty dice); click a name to add its die to the pool --}}
+<div class="easy-panel easy-traits-panel">
+  {{#each traitGroups}}
+  <div class="easy-trait-group">
+    <div class="tf-section-header">
+      <h3 class="panel-header">{{localize title}}</h3>
+      {{#if ../isEditMode}}
+      <input type="text" class="inventory-add-input" data-item-type="{{itemType}}"
+        placeholder="{{localize addPlaceholder}}" />
+      {{/if}}
+    </div>
+    {{#each entries}}
+    <div class="item easy-trait-row" data-item-id="{{id}}">
+      <span class="easy-trait-name rollable" data-pool-item="{{id}}"
+            title="{{localize ../poolHint}}">{{name}}</span>
+      <span class="die-value-static{{#if ../isPenalty}} is-penalty{{/if}}">{{#if ../isPenalty}}−{{/if}}{{die}}</span>
+      {{#if ../../isEditMode}}
+      <div class="item-controls">
+        <button type="button" class="item-edit" title="Edit">✎</button>
+        <button type="button" class="item-delete" title="Delete">✕</button>
+      </div>
+      {{/if}}
+    </div>
+    {{#if enrichedDescription}}
+      <div class="tf-detail-description easy-trait-description">{{{enrichedDescription}}}</div>
+    {{/if}}
+    {{/each}}
+  </div>
+  {{/each}}
+</div>

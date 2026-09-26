@@ -105,6 +105,7 @@ export const EASY_COMMON_ROLLS: readonly CommonRollDef[] = Object.freeze([
   {
     key: "shock",
     label: "ODD.Rolls.shock",
+    dedicated: true,
     sources: [
       { type: "attribute", key: "might" },
       { type: "attribute", key: "spirit" },
@@ -112,3 +113,6 @@ export const EASY_COMMON_ROLLS: readonly CommonRollDef[] = Object.freeze([
     ],
   },
 ]);
+
+/** ODDEasy's Shock roll, shown in the strain panel. */
+export const EASY_SHOCK_ROLL = EASY_COMMON_ROLLS.find((r) => r.key === "shock")!;

@@ -5,14 +5,10 @@
 
 import { ATTRIBUTE_DICE_TYPES, DEFAULT_DIE } from "../../config/attributes.js";
 import type { PoolEntry } from "./character-base.js";
+import type { DicePoolSource } from "./dice-pool-source.js";
 import { OddItemDataBase, defineItemBaseSchema } from "./item-base.js";
 
 const { StringField } = foundry.data.fields;
-
-/** Something that contributes one die to a dice pool. */
-export interface DicePoolSource {
-  toPoolEntry(): PoolEntry;
-}
 
 function defineDieTraitSchema() {
   return {

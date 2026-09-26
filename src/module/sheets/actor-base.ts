@@ -9,6 +9,7 @@
 
 import type { CommonRollDef, RollResolution, RollSource } from "../config/rolls.js";
 import type { PoolEntry, RollingActor } from "../data/abstract/character-base.js";
+import { isDicePoolSource } from "../data/abstract/dice-pool-source.js";
 import { updateByPath } from "../utils/update.js";
 
 const { ActorSheetV2 } = foundry.applications.sheets;
@@ -177,11 +178,12 @@ export abstract class OddActorSheetBase extends HandlebarsActorSheet {
     });
 
     if (!html.querySelector(".dice-pool-tray")) {
-      const nav = html.querySelector(".sheet-tabs");
-      if (nav) {
+      // Below the tabs, or below the header on a sheet without tabs.
+      const anchor = html.querySelector(".sheet-tabs") ?? html.querySelector(".sheet-header");
+      if (anchor) {
         const tray = document.createElement("div");
         tray.className = "dice-pool-tray";
-        nav.after(tray);
+        anchor.after(tray);
       }
     }
     await this._updateDicePoolTray();
@@ -202,6 +204,22 @@ export abstract class OddActorSheetBase extends HandlebarsActorSheet {
         const source: RollSource = category ? { type: "skill", category, key } : { type: "skill", key };
         const { label, die } = this.rollingSystem.resolveRollSource(source);
         if (die) void this._addToDicePool(label, die);
+      });
+    });
+
+    // Items whose data model is a DicePoolSource (talents, flaws, injuries…)
+    html.querySelectorAll<HTMLElement>("[data-pool-item]").forEach((el) => {
+      el.addEventListener("click", () => {
+        const system = this.document.items.get(el.dataset.poolItem!)?.system;
+        const entry = system && isDicePoolSource(system) ? system.toPoolEntry() : null;
+        if (entry) void this._addToDicePool(entry.label, entry.die);
+      });
+    });
+
+    // A literal die shown on the sheet, e.g. the current Strain Penalty
+    html.querySelectorAll<HTMLElement>("[data-pool-die]").forEach((el) => {
+      el.addEventListener("click", () => {
+        void this._addToDicePool(el.dataset.poolLabel ?? "Bonus", el.dataset.poolDie!);
       });
     });
 
@@ -265,6 +283,19 @@ export abstract class OddActorSheetBase extends HandlebarsActorSheet {
           // eslint-disable-next-line sonarjs/deprecation -- fvtt-types stubs don't model v13 render(options) overload
           void item?.sheet?.render(true);
         }
+      });
+    });
+
+    // Inline add row
+    html.querySelectorAll<HTMLInputElement>(".inventory-add-input[data-item-type]").forEach((el) => {
+      el.addEventListener("keydown", (ev: Event) => {
+        const ke = ev as KeyboardEvent;
+        if (ke.key !== "Enter") return;
+        const name = el.value.trim();
+        if (!name) return;
+        // data-item-type is rendered from the item subtypes this sheet lists.
+        void this.document.createEmbeddedDocuments("Item", [{ name, type: el.dataset.itemType as Item.SubType }]);
+        el.value = "";
       });
     });
 
