@@ -2,7 +2,9 @@
  * ODD RPG — System Entry Point
  *
  * Adding a new Actor type:  create src/module/data/actor/<type>.ts (export default)
+ *                           and register a sheet for it below (each type has its own)
  * Adding a new Item type:   create src/module/data/item/<type>.ts  (export default)
+ *                           and list either in DataModelConfig (src/types/fvtt-config.d.ts)
  * Adding a new template:    drop a .hbs anywhere under templates/
  * Everything else is auto-discovered.
  */
@@ -12,9 +14,12 @@ import { OddActor } from "./module/documents/actor.js";
 import { OddItem } from "./module/documents/item.js";
 import { OddCombat } from "./module/documents/combat.js";
 import { OddActorSheet } from "./module/sheets/actor.js";
+import { OddEasyActorSheet } from "./module/sheets/easy-actor.js";
 import { OddItemSheet } from "./module/sheets/item.js";
 import { registerEnrichers } from "./module/enrichers.js";
 import { OddInitiativeTracker } from "./module/tracker/initiative-tracker.js";
+import { migrations } from "./module/migrations/index.js";
+import { registerSettings } from "./module/settings.js";
 
 const loadTemplates = foundry.applications.handlebars.loadTemplates;
 const DocumentSheetConfig = foundry.applications.apps.DocumentSheetConfig;
@@ -39,49 +44,51 @@ Hooks.once("init", () => {
 
   void loadTemplates(templatePaths);
   registerEnrichers();
+  registerSettings();
+  migrations.register();
 
   // ---- System configuration ----
-  // CONFIG.ODD is a system-specific extension not in fvtt-types; cast is unavoidable here.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-  (CONFIG as any).ODD = ODD;
+  CONFIG.ODD = ODD;
 
   // ---- Custom Document implementations ----
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-  (CONFIG as any).Actor.documentClass = OddActor;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-  (CONFIG as any).Item.documentClass = OddItem;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-  (CONFIG as any).Combat.documentClass = OddCombat;
+  CONFIG.Actor.documentClass = OddActor;
+  CONFIG.Item.documentClass = OddItem;
+  CONFIG.Combat.documentClass = OddCombat;
 
   // ---- Data Models ----
-  // model is unknown (glob return); cast to the record's value type to avoid bare `any`.
-  type ActorDataModel = (typeof CONFIG.Actor.dataModels)[string];
-  type ItemDataModel  = (typeof CONFIG.Item.dataModels)[string];
-  for (const [path, model] of Object.entries(actorModels)) {
-    CONFIG.Actor.dataModels[typeName(path)] = model as ActorDataModel;
-  }
-  for (const [path, model] of Object.entries(itemModels)) {
-    CONFIG.Item.dataModels[typeName(path)] = model as ItemDataModel;
-  }
+  // The typed shape of these records comes from DataModelConfig (src/types/fvtt-config.d.ts).
+  const byTypeName = (models: Record<string, unknown>) =>
+    Object.fromEntries(Object.entries(models).map(([path, model]) => [typeName(path), model]));
+  Object.assign(CONFIG.Actor.dataModels, byTypeName(actorModels));
+  Object.assign(CONFIG.Item.dataModels, byTypeName(itemModels));
 
   // ---- Trackable token attributes ----
-  CONFIG.Actor.trackableAttributes = {
+  // fvtt-types 14.366 beta types this as a single entry, but Foundry keys it by
+  // actor type (TokenDocument._getConfiguredTrackedAttributes(type); dnd5e does the same).
+  Object.assign(CONFIG.Actor.trackableAttributes, {
     character: {
       bar: ["xp", "statistics.magicPoints"],
       value: ["statistics.movementRate", "statistics.composureThreshold", "statistics.healingRate"],
     },
-  };
+  });
 
   // ---- Register sheets ----
+  // Core still registers its deprecated V1 sheets as defaults (until v16); removing them is the point.
+  // eslint-disable-next-line sonarjs/deprecation
   DocumentSheetConfig.unregisterSheet(Actor, "core", foundry.appv1.sheets.ActorSheet);
+  // eslint-disable-next-line sonarjs/deprecation
   DocumentSheetConfig.unregisterSheet(Item, "core", foundry.appv1.sheets.ItemSheet);
 
   DocumentSheetConfig.registerSheet(Actor, "odd-rpg", OddActorSheet, {
-    types: Object.keys(actorModels).map(typeName),
+    types: ["character"],
+    makeDefault: true,
+  });
+  DocumentSheetConfig.registerSheet(Actor, "odd-rpg", OddEasyActorSheet, {
+    types: ["easyCharacter"],
     makeDefault: true,
   });
   DocumentSheetConfig.registerSheet(Item, "odd-rpg", OddItemSheet, {
-    types: Object.keys(itemModels).map(typeName),
+    types: Object.keys(itemModels).map(typeName) as Item.SubType[],
     makeDefault: true,
   });
 });
@@ -92,13 +99,16 @@ Hooks.once("init", () => {
 
 Hooks.once("ready", () => {
   console.warn("ODD RPG | System ready");
+  if (game.user.isGM) {
+    migrations.run().catch((err: unknown) => { console.error("ODD RPG | World migration failed", err); });
+  }
 });
 
 /* -------------------------------------------------------------------------- */
 /*  Initiative Tracker — re-render on combat changes                         */
 /* -------------------------------------------------------------------------- */
 
-for (const hookName of ["createCombatant", "deleteCombatant", "updateCombatant", "createCombat", "deleteCombat"]) {
+for (const hookName of ["createCombatant", "deleteCombatant", "updateCombatant", "createCombat", "deleteCombat"] as const) {
   Hooks.on(hookName, () => {
     const tracker = OddInitiativeTracker.instance;
     if (tracker.rendered) void tracker.render();
@@ -111,11 +121,10 @@ for (const hookName of ["createCombatant", "deleteCombatant", "updateCombatant",
 // Keybindings must be registered in the init hook.
 // Default: Shift+I (configurable by the user in Foundry's Configure Controls dialog).
 Hooks.once("init", () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-  (game as any).keybindings.register("odd-rpg", "initiative-tracker", {
+  game.keybindings.register("odd-rpg", "initiative-tracker", {
     name: "ODD.Tracker.keybindName",
     hint: "ODD.Tracker.keybindHint",
-    editable: [{ key: "KeyI", modifiers: ["Shift"] }],
+    editable: [{ key: "KeyI", modifiers: [foundry.helpers.interaction.KeyboardManager.MODIFIER_KEYS.SHIFT] }],
     onDown: () => { void OddInitiativeTracker.instance.render({ force: true }); return true; },
   });
 });

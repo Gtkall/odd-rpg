@@ -1,0 +1,29 @@
+{{!-- ODDEasy injuries: named Wounds (a Penalty when they hinder a Test) and Crippling injuries --}}
+<div class="easy-panel easy-injuries-panel">
+  <div class="tf-section-header">
+    <h3 class="panel-header">{{localize "ODD.Easy.injuries"}}</h3>
+    {{#if isEditMode}}
+    <input type="text" class="inventory-add-input" data-item-type="injury"
+      placeholder="{{localize "ODD.Easy.addInjury"}}" />
+    {{/if}}
+  </div>
+  {{#each injuries}}
+  <div class="item easy-trait-row easy-injury-{{severity}}" data-item-id="{{id}}">
+    {{#if isWounded}}
+      <span class="easy-trait-name rollable" data-pool-item="{{id}}"
+            title="{{localize "ODD.Easy.addPenaltyHint"}}">{{name}}</span>
+      <span class="die-value-static is-penalty">−{{../woundPenalty}}</span>
+    {{else}}
+      <span class="easy-trait-name">{{name}}</span>
+      <span class="easy-injury-effect">{{localize "ODD.Easy.crippledEffect"}}</span>
+    {{/if}}
+    <span class="easy-injury-severity">{{localize severityLabel}}</span>
+    {{#if ../isEditMode}}
+    <div class="item-controls">
+      <button type="button" class="item-edit" title="Edit">✎</button>
+      <button type="button" class="item-delete" title="Delete">✕</button>
+    </div>
+    {{/if}}
+  </div>
+  {{/each}}
+</div>

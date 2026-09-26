@@ -26,5 +26,19 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
       - name: Build
         run: npm run build
+
+      # @vttforge/cli requires Node >= 26
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+
+      - name: Foundry audit
+        run: npm run foundry:audit

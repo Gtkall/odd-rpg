@@ -1,27 +1,13 @@
-import type { CharacterSystemData } from "../data/actor/character.js";
+import { creatableTypes } from "../settings.js";
 
 export class OddActor extends Actor {
-  get characterSystem(): CharacterSystemData {
-    return this.system as unknown as CharacterSystemData;
-  }
-
-  async applyDamage(amount: number): Promise<void> {
-    amount = Math.round(Math.max(1, amount));
-    const { health } = this.characterSystem;
-    await this.update({
-      "system.health.value": Math.max(0, health.value - amount),
-    } as any); // dotted-path updates — Foundry stub limitation
-
-    await ChatMessage.implementation.create({
-      content: `${this.name} took ${amount} damage!`,
-    } as any); // ChatMessage types incomplete in v13 stubs
-  }
-
-  async applyHealing(amount: number): Promise<void> {
-    amount = Math.round(Math.max(0, amount));
-    const { health } = this.characterSystem;
-    await this.update({
-      "system.health.value": Math.min(health.max, health.value + amount),
-    } as any); // dotted-path updates — Foundry stub limitation
+  /** Offer only the active ruleset's actor types in the "Create Actor" dialog. */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  static override createDialog(...args: any[]): Promise<Actor | null | undefined> {
+    const [data, createOptions, options] = args as [Record<string, unknown>?, Record<string, unknown>?, Record<string, unknown>?];
+    const rulesetTypes = creatableTypes("Actor");
+    const allowedTypes = (Actor.TYPES as string[]).filter(t => rulesetTypes.includes(t));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return super.createDialog(data, createOptions, { ...options, types: allowedTypes } as any);
   }
 }

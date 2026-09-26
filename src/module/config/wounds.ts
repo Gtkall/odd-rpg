@@ -104,3 +104,20 @@ export function resolveHitLocation(roll: number, isRanged = false): WoundLocatio
   }
   return "torso";
 }
+
+/* -------------------------------------------------------------------------- */
+/*  ODDEasy injuries                                                          */
+/* -------------------------------------------------------------------------- */
+
+export type InjurySeverity = "wounded" | "crippled";
+
+export const INJURY_SEVERITIES: Record<InjurySeverity, string> = {
+  wounded:  "ODD.Injury.Severities.wounded",
+  crippled: "ODD.Injury.Severities.crippled",
+};
+
+/** Penalty a Wound imposes on a Test it would hinder. */
+export const INJURY_WOUNDED_PENALTY = "d10";
+
+/** Wounds a character can carry; one more becomes a Crippling injury. */
+export const INJURY_MAX_WOUNDS = 2;

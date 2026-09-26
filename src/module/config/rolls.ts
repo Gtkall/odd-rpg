@@ -1,6 +1,9 @@
 export type RollSource =
   | { type: "attribute"; key: string }
-  | { type: "skill"; category: string; key: string };
+  /** A skill in ODD's categorized skill list. */
+  | { type: "skill"; category: string; key: string }
+  /** A skill in a flat skill list (ODDEasy). */
+  | { type: "skill"; key: string };
 
 export type RollResolution = "sum" | "keepHighest";
 
@@ -88,3 +91,28 @@ export const COMMON_ROLLS: readonly CommonRollDef[] = Object.freeze([
 export const STAMINA_ROLL = COMMON_ROLLS.find((r) => r.key === "stamina")!;
 export const INITIATIVE_ROLL = COMMON_ROLLS.find((r) => r.key === "initiative")!;
 export const DODGE_ROLL = COMMON_ROLLS.find((r) => r.key === "dodge")!;
+
+/** ODDEasy's predefined rolls (character sheet, p. 34). */
+export const EASY_COMMON_ROLLS: readonly CommonRollDef[] = Object.freeze([
+  {
+    key: "awareness",
+    label: "ODD.Rolls.awareness",
+    sources: [
+      { type: "attribute", key: "wits" },
+      { type: "skill", key: "mental" },
+    ],
+  },
+  {
+    key: "shock",
+    label: "ODD.Rolls.shock",
+    dedicated: true,
+    sources: [
+      { type: "attribute", key: "might" },
+      { type: "attribute", key: "spirit" },
+      { type: "skill", key: "physical" },
+    ],
+  },
+]);
+
+/** ODDEasy's Shock roll, shown in the strain panel. */
+export const EASY_SHOCK_ROLL = EASY_COMMON_ROLLS.find((r) => r.key === "shock")!;

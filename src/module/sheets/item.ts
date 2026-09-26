@@ -1,12 +1,12 @@
 import { WEAPON_TYPES, WEAPON_HANDS, WEAPON_DISTANCE, WEAPON_TAGS } from "../config/weapon.js";
 import { ARMOR_LOCATIONS } from "../config/armor.js";
 import { DICE_TYPES } from "../config/dice.js";
+import { ATTRIBUTE_DICE_TYPES } from "../config/attributes.js";
+import { INJURY_SEVERITIES } from "../config/wounds.js";
 import { TALENT_TYPES, TALENT_RANKS, TALENT_CATEGORIES } from "../config/talent.js";
 import { FLAW_SEVERITIES, FLAW_CATEGORIES } from "../config/flaw.js";
-import type { WeaponSystemData } from "../data/item/weapon.js";
-import type { ArmorSystemData } from "../data/item/armor.js";
-import type { TalentSystemData } from "../data/item/talent.js";
-import type { ItemSystemData } from "../data/item/item.js";
+import { isItemType } from "../utils/item-type.js";
+import { updateByPath } from "../utils/update.js";
 
 const { ItemSheetV2 } = foundry.applications.sheets;
 const { HandlebarsApplicationMixin } = foundry.applications.api;
@@ -39,30 +39,28 @@ export class OddItemSheet extends OddItemSheetBase {
   override async _prepareContext(options: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
     const context = await super._prepareContext(options);
     const item = this.document;
-    const system = item.system as unknown as WeaponSystemData;
 
-    const weaponContext = (item.type as string) === "weapon"
+    const weaponContext = isItemType(item, "weapon")
       ? {
           weaponTypes:    WEAPON_TYPES,
           weaponHands:    WEAPON_HANDS,
           weaponDistance: WEAPON_DISTANCE,
           weaponTags:     WEAPON_TAGS,
           diceTypes:      DICE_TYPES,
-          showOneHanded:  system.hands !== "2h",
-          showTwoHanded:  system.hands !== "1h",
-          showBoth:       system.hands === "versatile",
-          distanceLabel:  system.weaponType === "melee"
+          showOneHanded:  item.system.hands !== "2h",
+          showTwoHanded:  item.system.hands !== "1h",
+          showBoth:       item.system.hands === "versatile",
+          distanceLabel:  item.system.weaponType === "melee"
             ? "ODD.Weapon.Reach"
             : "ODD.Weapon.Range",
         }
       : {};
 
-    const armorSystem = item.system as unknown as ArmorSystemData;
-    const armorContext = (item.type as string) === "armor"
+    const armorContext = isItemType(item, "armor")
       ? (() => {
           const locationActive: Record<string, boolean> = {};
           for (const key of Object.keys(ARMOR_LOCATIONS)) {
-            locationActive[key] = armorSystem.location.includes(key);
+            locationActive[key] = item.system.location.includes(key);
           }
           return {
             armorLocations:    ARMOR_LOCATIONS,
@@ -73,24 +71,31 @@ export class OddItemSheet extends OddItemSheetBase {
       : {};
 
     const isEditMode = this.#isEditMode;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const rollData: Record<string, unknown> = (this.document as any).actor?.getRollData() ?? {};
+    const rollData: Record<string, unknown> = item.actor?.getRollData() ?? {};
     const enrichedDescription = isEditMode
       ? ""
       : await foundry.applications.ux.TextEditor.enrichHTML(
-          ((item.system as Record<string, unknown>).description as string) || "",
+          item.system.description || "",
           { rollData },
         );
 
-    const talentContext = (item.type as string) === "talent"
-      ? await this._prepareTalentContext(isEditMode, rollData)
+    const talentContext = isItemType(item, "talent")
+      ? await this._prepareTalentContext(item, isEditMode, rollData)
       : {};
 
-    const flawContext = (item.type as string) === "flaw"
+    const flawContext = isItemType(item, "flaw")
       ? {
           flawSeverities: FLAW_SEVERITIES,
           flawCategories: FLAW_CATEGORIES,
         }
+      : {};
+
+    const dieTraitContext = isItemType(item, "easyTalent") || isItemType(item, "easyFlaw")
+      ? { dieTypes: ATTRIBUTE_DICE_TYPES }
+      : {};
+
+    const injuryContext = isItemType(item, "injury")
+      ? { injurySeverities: INJURY_SEVERITIES }
       : {};
 
     return {
@@ -103,6 +108,8 @@ export class OddItemSheet extends OddItemSheetBase {
       ...armorContext,
       ...talentContext,
       ...flawContext,
+      ...dieTraitContext,
+      ...injuryContext,
     };
   }
 
@@ -119,37 +126,35 @@ export class OddItemSheet extends OddItemSheetBase {
     // Image click → FilePicker
     this.element.querySelector<HTMLImageElement>("img.item-img")
       ?.addEventListener("click", () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const fp = new (CONFIG as any).ux.FilePicker({
+        const fp = new foundry.applications.apps.FilePicker.implementation({
           type: "image",
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          current: (this.document as any).img as string,
+          current: this.document.img ?? undefined,
           callback: (path: string) => {
-            void (this.document as unknown as { update(d: Record<string, unknown>): Promise<unknown> })
-              .update({ img: path });
+            void this.document.update({ img: path });
           },
         });
         void fp.browse();
       });
 
-    if ((this.document.type as string) === "weapon") this._onRenderWeapon();
-    if ((this.document.type as string) === "armor")  this._onRenderArmor();
-    if ((this.document.type as string) === "talent") this._onRenderTalent();
-    if ((this.document.type as string) === "item")   this._onRenderItem();
+    const item = this.document;
+    if (isItemType(item, "weapon")) this._onRenderNotes(item);
+    if (isItemType(item, "armor"))  this._onRenderArmor(item);
+    if (isItemType(item, "talent")) this._onRenderTalent(item);
+    if (isItemType(item, "item"))   this._onRenderNotes(item);
   }
 
-  private async _prepareTalentContext(isEditMode: boolean, rollData: Record<string, unknown> = {}) {
-    const system = this.document.system as unknown as TalentSystemData;
+  private async _prepareTalentContext(
+    item: Item.OfType<"talent">, isEditMode: boolean, rollData: Record<string, unknown> = {},
+  ) {
+    const system = item.system;
     const isSide = system.talentType === "minorSide" || system.talentType === "majorSide";
 
     // Build existing tree names for datalist + auto-derive logic
-    const actor = (this.document as unknown as { actor: { items: { values(): Iterable<Item.Implementation> } } | null }).actor;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const collection: Iterable<Item.Implementation> = actor ? actor.items.values() : (game as any).items.values();
+    const collection: Iterable<Item.Implementation> = item.actor ? item.actor.items.values() : game.items.values();
     const existingTrees: string[] = [];
     for (const candidate of collection) {
-      if ((candidate.type as string) === "talent" && candidate.id !== this.document.id) {
-        const tree = (candidate.system as unknown as TalentSystemData).treeName;
+      if (isItemType(candidate, "talent") && candidate.id !== item.id) {
+        const tree = candidate.system.treeName;
         if (tree && !existingTrees.includes(tree)) existingTrees.push(tree);
       }
     }
@@ -175,10 +180,9 @@ export class OddItemSheet extends OddItemSheetBase {
     };
   }
 
-  private _onRenderTalent(): void {
+  private _onRenderTalent(item: Item.OfType<"talent">): void {
     const html   = this.element;
-    const doc    = this.document as unknown as { update(d: Record<string, unknown>): Promise<unknown> };
-    const system = this.document.system as unknown as TalentSystemData;
+    const system = item.system;
 
     // Tree combo — auto-derive parentId and suggest rank when an existing tree is selected
     const treeInput = html.querySelector<HTMLInputElement>(`input[name="system.treeName"]`);
@@ -189,19 +193,17 @@ export class OddItemSheet extends OddItemSheetBase {
 
         // For Side Talents, just update treeName; no rank/parent logic
         if (system.talentType !== "main") {
-          void doc.update({ "system.treeName": treeName, "system.parentId": "" });
+          void updateByPath(item, { "system.treeName": treeName, "system.parentId": "" });
           return;
         }
 
         // Find Main Talents in the same tree (excluding self)
-        const actor = (this.document as unknown as { actor: { items: { values(): Iterable<Item.Implementation> } } | null }).actor;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const collection: Iterable<Item.Implementation> = actor ? actor.items.values() : (game as any).items.values();
+        const collection: Iterable<Item.Implementation> = item.actor ? item.actor.items.values() : game.items.values();
         const rankOrder = ["I", "II", "III"];
         const inTree: { id: string; rankIdx: number }[] = [];
         for (const candidate of collection) {
-          if ((candidate.type as string) !== "talent" || candidate.id === this.document.id) continue;
-          const cs = candidate.system as unknown as TalentSystemData;
+          if (!isItemType(candidate, "talent") || candidate.id === item.id) continue;
+          const cs = candidate.system;
           if (cs.treeName === treeName && cs.talentType === "main") {
             inTree.push({ id: candidate.id!, rankIdx: rankOrder.indexOf(cs.rank) });
           }
@@ -212,7 +214,7 @@ export class OddItemSheet extends OddItemSheetBase {
         const nextRankIdx = Math.min(highestIdx + 1, 2);
         const parentId   = inTree.find(t => t.rankIdx === highestIdx)?.id ?? "";
 
-        void doc.update({
+        void updateByPath(item, {
           "system.treeName": treeName,
           "system.parentId": parentId,
           "system.rank":     rankOrder[nextRankIdx],
@@ -235,7 +237,7 @@ export class OddItemSheet extends OddItemSheetBase {
     html.querySelector<HTMLButtonElement>("[data-add-effect]")
       ?.addEventListener("click", () => {
         const effects = [...snapshotEffects(), { title: "", body: "" }];
-        void doc.update({ "system.effects": effects });
+        void updateByPath(item, { "system.effects": effects });
       });
 
     // Remove effect
@@ -244,39 +246,13 @@ export class OddItemSheet extends OddItemSheetBase {
         btn.addEventListener("click", () => {
           const idx = Number(btn.dataset.removeEffect);
           const effects = snapshotEffects().filter((_, i) => i !== idx);
-          void doc.update({ "system.effects": effects });
+          void updateByPath(item, { "system.effects": effects });
         });
       });
   }
 
-  private _onRenderItem(): void {
-    const html = this.element;
-    const doc = this.document as unknown as { update(d: Record<string, unknown>): Promise<unknown> };
-
-    html.querySelector<HTMLInputElement>(".tag-input")
-      ?.addEventListener("keydown", (ev: KeyboardEvent) => {
-        if (ev.key !== "Enter") return;
-        ev.preventDefault();
-        const input = ev.currentTarget as HTMLInputElement;
-        const tag = input.value.trim();
-        if (!tag) return;
-        input.value = "";
-        const notes = [...(this.document.system as unknown as ItemSystemData).notes, tag];
-        void doc.update({ "system.notes": notes });
-      });
-
-    html.querySelectorAll<HTMLButtonElement>("[data-remove-tag]")
-      .forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const tag = btn.dataset.removeTag!;
-          const notes = (this.document.system as unknown as ItemSystemData).notes
-            .filter((t) => t !== tag);
-          void doc.update({ "system.notes": notes });
-        });
-      });
-  }
-
-  private _onRenderWeapon(): void {
+  /** Tag (notes) editing, shared by every item type that carries notes. */
+  private _onRenderNotes(item: Item.OfType<"item" | "weapon" | "armor">): void {
     const html = this.element;
 
     html.querySelector<HTMLInputElement>(".tag-input")
@@ -287,33 +263,30 @@ export class OddItemSheet extends OddItemSheetBase {
         const tag = input.value.trim();
         if (!tag) return;
         input.value = "";
-        const notes = [...(this.document.system as unknown as WeaponSystemData).notes, tag];
-        void (this.document as unknown as { update(d: Record<string, unknown>): Promise<unknown> })
-          .update({ "system.notes": notes });
+        const notes = [...item.system.notes, tag];
+        void updateByPath(item, { "system.notes": notes });
       });
 
     html.querySelectorAll<HTMLButtonElement>("[data-remove-tag]")
       .forEach((btn) => {
         btn.addEventListener("click", () => {
           const tag = btn.dataset.removeTag!;
-          const notes = (this.document.system as unknown as WeaponSystemData).notes
+          const notes = item.system.notes
             .filter((t) => t !== tag);
-          void (this.document as unknown as { update(d: Record<string, unknown>): Promise<unknown> })
-            .update({ "system.notes": notes });
+          void updateByPath(item, { "system.notes": notes });
         });
       });
   }
 
-  private _onRenderArmor(): void {
+  private _onRenderArmor(item: Item.OfType<"armor">): void {
     const html = this.element;
-    const doc = this.document as unknown as { update(d: Record<string, unknown>): Promise<unknown> };
     const allKeys = Object.keys(ARMOR_LOCATIONS);
 
     html.querySelectorAll<HTMLButtonElement>("[data-location]")
       .forEach((btn) => {
         btn.addEventListener("click", () => {
           const loc = btn.dataset.location!;
-          const current = (this.document.system as unknown as ArmorSystemData).location;
+          const current = item.system.location;
           let location: string[];
           if (loc === "all") {
             location = current.length === allKeys.length ? [] : [...allKeys];
@@ -322,30 +295,10 @@ export class OddItemSheet extends OddItemSheetBase {
           } else {
             location = [...current, loc];
           }
-          void doc.update({ "system.location": location });
+          void updateByPath(item, { "system.location": location });
         });
       });
 
-    html.querySelector<HTMLInputElement>(".tag-input")
-      ?.addEventListener("keydown", (ev: KeyboardEvent) => {
-        if (ev.key !== "Enter") return;
-        ev.preventDefault();
-        const input = ev.currentTarget as HTMLInputElement;
-        const tag = input.value.trim();
-        if (!tag) return;
-        input.value = "";
-        const notes = [...(this.document.system as unknown as ArmorSystemData).notes, tag];
-        void doc.update({ "system.notes": notes });
-      });
-
-    html.querySelectorAll<HTMLButtonElement>("[data-remove-tag]")
-      .forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const tag = btn.dataset.removeTag!;
-          const notes = (this.document.system as unknown as ArmorSystemData).notes
-            .filter((t) => t !== tag);
-          void doc.update({ "system.notes": notes });
-        });
-      });
+    this._onRenderNotes(item);
   }
 }

@@ -18,8 +18,7 @@
 
 /** Called once during the `init` Foundry hook. */
 export function registerEnrichers(): void {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  (CONFIG as any).TextEditor.enrichers.push({
+  CONFIG.TextEditor.enrichers.push({
     // config group is optional (the space + content after the type keyword)
     pattern: /\[\[\/(?<type>oddPool|oddPenalty)(?<config> [^\]]+)?]](?:\{(?<label>[^}]+)\})?/gi,
     enricher: enrichOddPool,
@@ -34,7 +33,7 @@ export function registerEnrichers(): void {
 // eslint-disable-next-line @typescript-eslint/require-await
 async function enrichOddPool(
   match: RegExpMatchArray,
-  options: Record<string, unknown>,
+  options?: foundry.applications.ux.TextEditor.EnrichmentOptions,
 ): Promise<HTMLElement | null> {
   // Named groups are typed as string by TS but config/label are from optional groups.
   const groups = match.groups as Record<string, string | undefined>;
@@ -53,7 +52,8 @@ async function enrichOddPool(
 
   // Resolve @path references (e.g. @attributes.dex) via rollData.
   if (die.startsWith("@")) {
-    const rollData = (options.rollData as Record<string, unknown> | undefined) ?? {};
+    // The walk below checks each step is an object, so any rollData shape is safe.
+    const rollData: unknown = options?.rollData ?? {};
     const resolved = die
       .slice(1)
       .split(".")

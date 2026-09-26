@@ -1,14 +1,20 @@
-import { BaseItemDataModel } from "../_base.js";
+import { OddItemDataBase, defineItemBaseSchema } from "../abstract/item-base.js";
 
 const { NumberField } = foundry.data.fields;
 
+function defineSpellSchema() {
+  return {
+    ...defineItemBaseSchema(),
+    spellLevel: new NumberField({ required: true, integer: true, min: 0, initial: 1 }),
+  };
+}
+
+type SpellSchema = ReturnType<typeof defineSpellSchema>;
+
 /** Spell — a castable magical effect. */
-export class SpellDataModel extends BaseItemDataModel {
-  static override defineSchema() {
-    return {
-      ...super.defineSchema(),
-      spellLevel: new NumberField({ required: true, integer: true, min: 0, initial: 1 }),
-    };
+export class SpellDataModel extends OddItemDataBase<SpellSchema> {
+  static override defineSchema(): SpellSchema {
+    return defineSpellSchema();
   }
 }
 

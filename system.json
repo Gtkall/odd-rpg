@@ -4,8 +4,8 @@
   "description": "The ODD RPG game system for Foundry Virtual Tabletop.",
   "version": "0.9.0",
   "compatibility": {
-    "minimum": 13,
-    "verified": 13
+    "minimum": "14",
+    "verified": "14"
   },
   "authors": [
     {
@@ -17,7 +17,7 @@
     "odd-rpg.js"
   ],
   "styles": [
-    "styles/odd-rpg.css"
+    { "src": "styles/odd-rpg.css" }
   ],
   "languages": [
     {
@@ -32,9 +32,29 @@
         "htmlFields": [
           "biography"
         ]
+      },
+      "easyCharacter": {
+        "htmlFields": [
+          "biography"
+        ]
       }
     },
     "Item": {
+      "easyTalent": {
+        "htmlFields": [
+          "description"
+        ]
+      },
+      "easyFlaw": {
+        "htmlFields": [
+          "description"
+        ]
+      },
+      "injury": {
+        "htmlFields": [
+          "description"
+        ]
+      },
       "item": {
         "htmlFields": [
           "description"
@@ -63,7 +83,7 @@
       "talent": {
         "htmlFields": [
           "description",
-          "effects[].body"
+          "effects.*.body"
         ]
       },
       "flaw": {

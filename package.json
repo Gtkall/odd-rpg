@@ -9,6 +9,10 @@
     "clean": "rm -rf dist",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --typecheck.only",
+    "foundry:audit": "vttforge audit",
+    "foundry:migrate": "vttforge migrate",
     "prepare": "husky"
   },
   "devDependencies": {
@@ -17,21 +21,23 @@
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/exec": "^7.1.0",
     "@semantic-release/git": "^10.0.1",
+    "@vttforge/cli": "0.18.8",
     "conventional-changelog-conventionalcommits": "^9.3.0",
     "eslint": "^10.0.3",
     "eslint-plugin-sonarjs": "^4.0.2",
-    "fvtt-types": "github:League-of-Foundry-Developers/foundry-vtt-types#main",
+    "fvtt-types": "14.366.0-beta.20260925073408",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
     "semantic-release": "^25.0.3",
     "typescript": "^5.7.0",
     "typescript-eslint": "^8.57.1",
     "vite": "^6.0.0",
-    "vite-plugin-static-copy": "^2.2.0"
-  },
-  "lint-staged": {
-    "src/**/*.ts": "eslint"
+    "vite-plugin-static-copy": "^2.2.0",
+    "vitest": "5.0.2"
   },
   "author": "George Karettas",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@vttforge/core": "0.20.7"
+  }
 }

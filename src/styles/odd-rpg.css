@@ -3282,3 +3282,73 @@
 
 .odd-tracker-empty i { font-size: 2rem; }
 .odd-tracker-empty p { font-style: italic; font-size: 0.85rem; margin: 0; }
+
+/* -------------------------------------------------------------------------- */
+/*  ODDEasy character sheet                                                   */
+/* -------------------------------------------------------------------------- */
+
+.odd-rpg .easy-panel {
+    padding: 0.4rem 0.5rem 0.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--odd-color-border-subtle);
+    border-radius: 6px;
+}
+
+.odd-rpg .easy-skills-panel,
+.odd-rpg .easy-traits-panel {
+    flex: 1;
+}
+
+.odd-rpg .easy-trait-group + .easy-trait-group {
+    margin-top: 0.6rem;
+}
+
+.odd-rpg .easy-trait-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.15rem 0.2rem;
+}
+
+.odd-rpg .easy-trait-name {
+    flex: 1;
+    font-size: 0.85rem;
+}
+
+.odd-rpg .die-value-static.is-penalty {
+    color: #c87070;
+}
+
+.odd-rpg .easy-trait-description {
+    padding: 0 0.4rem 0.3rem 1rem;
+    font-size: 0.78rem;
+    color: #999;
+}
+
+.odd-rpg .easy-strain-penalty {
+    font-weight: 700;
+    font-size: 0.82rem;
+    color: #c87070;
+}
+
+.odd-rpg .easy-strain-full,
+.odd-rpg .easy-injury-effect {
+    font-size: 0.78rem;
+    color: #c87070;
+}
+
+.odd-rpg .easy-injury-severity {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #999;
+}
+
+.odd-rpg .easy-injury-crippled .easy-trait-name {
+    color: #c87070;
+}
+
+.odd-rpg .easy-notes-view {
+    min-height: 3rem;
+    font-size: 0.85rem;
+}
