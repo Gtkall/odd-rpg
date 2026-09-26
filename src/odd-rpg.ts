@@ -3,6 +3,7 @@
  *
  * Adding a new Actor type:  create src/module/data/actor/<type>.ts (export default)
  * Adding a new Item type:   create src/module/data/item/<type>.ts  (export default)
+ *                           and list either in DataModelConfig (src/types/fvtt-config.d.ts)
  * Adding a new template:    drop a .hbs anywhere under templates/
  * Everything else is auto-discovered.
  */
@@ -41,17 +42,12 @@ Hooks.once("init", () => {
   registerEnrichers();
 
   // ---- System configuration ----
-  // CONFIG.ODD is a system-specific extension not in fvtt-types; cast is unavoidable here.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-  (CONFIG as any).ODD = ODD;
+  CONFIG.ODD = ODD;
 
   // ---- Custom Document implementations ----
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-  (CONFIG as any).Actor.documentClass = OddActor;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-  (CONFIG as any).Item.documentClass = OddItem;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-  (CONFIG as any).Combat.documentClass = OddCombat;
+  CONFIG.Actor.documentClass = OddActor;
+  CONFIG.Item.documentClass = OddItem;
+  CONFIG.Combat.documentClass = OddCombat;
 
   // ---- Data Models ----
   // model is unknown (glob return); cast to the record's value type to avoid bare `any`.
@@ -112,11 +108,10 @@ for (const hookName of ["createCombatant", "deleteCombatant", "updateCombatant",
 // Keybindings must be registered in the init hook.
 // Default: Shift+I (configurable by the user in Foundry's Configure Controls dialog).
 Hooks.once("init", () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-  (game as any).keybindings.register("odd-rpg", "initiative-tracker", {
+  game.keybindings.register("odd-rpg", "initiative-tracker", {
     name: "ODD.Tracker.keybindName",
     hint: "ODD.Tracker.keybindHint",
-    editable: [{ key: "KeyI", modifiers: ["Shift"] }],
+    editable: [{ key: "KeyI", modifiers: [foundry.helpers.interaction.KeyboardManager.MODIFIER_KEYS.SHIFT] }],
     onDown: () => { void OddInitiativeTracker.instance.render({ force: true }); return true; },
   });
 });

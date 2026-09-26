@@ -76,27 +76,25 @@ export class OddInitiativeTracker extends HandlebarsApplicationMixin(Application
   // eslint-disable-next-line @typescript-eslint/require-await
   override async _prepareContext(options: any) {
     const context = await super._prepareContext(options);
-    /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment,
-       @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
-    const combat = (game as any).combat;
-    const rawCombatants: any[] = combat?.combatants?.contents ?? [];
+    const combat = game.combat;
+    const rawCombatants = combat?.combatants.contents ?? [];
 
-    const toCombatantData = (c: any): TrackerCombatant => ({
-      id: c.id,
+    const toCombatantData = (c: Combatant.Implementation): TrackerCombatant => ({
+      id: c.id!,
       name: c.name ?? "Unknown",
-      img: c.token?.texture?.src ?? c.actor?.img ?? "icons/svg/mystery-man.svg",
+      img: c.token?.texture.src ?? c.actor?.img ?? "icons/svg/mystery-man.svg",
     });
 
     const waitingCombatants: TrackerCombatant[] = rawCombatants
-      .filter((c: any) => c.getFlag("odd-rpg", "waiting") === true)
+      .filter((c) => c.getFlag("odd-rpg", "waiting") === true)
       .map(toCombatantData);
 
-    const activeCombatants: any[] = rawCombatants
-      .filter((c: any) => c.getFlag("odd-rpg", "waiting") !== true);
+    const activeCombatants = rawCombatants
+      .filter((c) => c.getFlag("odd-rpg", "waiting") !== true);
 
     const slots: TrackerSlot[] = SLOTS.map((value) => {
       const combatants: TrackerCombatant[] = activeCombatants
-        .filter((c: any) => c.initiative === value)
+        .filter((c) => c.initiative === value)
         .map(toCombatantData);
 
       let cssClass: string;
@@ -107,8 +105,6 @@ export class OddInitiativeTracker extends HandlebarsApplicationMixin(Application
 
       return { value, cssClass, combatants, penaltyLabel: OVEREXTENDED_PENALTY[value] ?? null };
     });
-    /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment,
-       @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
 
     return {...context, slots, waitingCombatants, hasCombat: combat !== null };
   }
@@ -217,81 +213,57 @@ export class OddInitiativeTracker extends HandlebarsApplicationMixin(Application
   // --------------------------------------------------------------------------
 
   private async _spendTempo(combatantId: string, delta: number): Promise<void> {
-    /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment,
-       @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
-    const combat = (game as any).combat;
+    const combat = game.combat;
     if (!combat) return;
-    const combatant = (combat.combatants as any[]).find((c: any) => c.id === combatantId);
+    const combatant = combat.combatants.find((c) => c.id === combatantId);
     if (!combatant) return;
-    const current = (combatant.initiative as number | null) ?? 0;
+    const current = combatant.initiative ?? 0;
     const next = Math.max(-5, current + delta);
     await combatant.update({ initiative: next });
-    /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment,
-       @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
   }
 
   private async _onNewRound(): Promise<void> {
-    /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call,
-       @typescript-eslint/no-unsafe-member-access */
-    await (ChatMessage as any).create({
-      content: `<strong>⚔ ${game.i18n!.localize("ODD.Tracker.newRound")}</strong><br>${game.i18n!.localize("ODD.Tracker.newRoundPrompt")}`,
-      speaker: { alias: game.i18n!.localize("ODD.Tracker.title") },
+    await ChatMessage.create({
+      content: `<strong>⚔ ${game.i18n.localize("ODD.Tracker.newRound")}</strong><br>${game.i18n.localize("ODD.Tracker.newRoundPrompt")}`,
+      speaker: { alias: game.i18n.localize("ODD.Tracker.title") },
     });
-    /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call,
-       @typescript-eslint/no-unsafe-member-access */
   }
 
   private _focusToken(combatantId: string): void {
-    /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment,
-       @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
-    const combat = (game as any).combat;
+    const combat = game.combat;
     if (!combat) return;
-    const combatant = (combat.combatants as any[]).find((c: any) => c.id === combatantId);
+    const combatant = combat.combatants.find((c) => c.id === combatantId);
     if (!combatant) return;
     const token = combatant.token;
     if (!token?.object) return;
     token.object.control({ releaseOthers: true });
-    void (canvas as any)?.animatePan({ x: token.x as number, y: token.y as number });
-    /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment,
-       @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
+    void canvas.animatePan({ x: token.x, y: token.y });
   }
 
   private async _dropOnSlot(combatantId: string, ii: number): Promise<void> {
-    /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment,
-       @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
-    const combat = (game as any).combat;
+    const combat = game.combat;
     if (!combat) return;
-    const combatant = (combat.combatants as any[]).find((c: any) => c.id === combatantId);
+    const combatant = combat.combatants.find((c) => c.id === combatantId);
     if (!combatant) return;
     await combatant.update({ initiative: ii });
     await combatant.unsetFlag("odd-rpg", "waiting");
-    /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment,
-       @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
   }
 
   private async _setWaiting(combatantId: string, waiting: boolean): Promise<void> {
-    /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment,
-       @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
-    const combat = (game as any).combat;
+    const combat = game.combat;
     if (!combat) return;
-    const combatant = (combat.combatants as any[]).find((c: any) => c.id === combatantId);
+    const combatant = combat.combatants.find((c) => c.id === combatantId);
     if (!combatant) return;
     if (waiting) {
       await combatant.setFlag("odd-rpg", "waiting", true);
     } else {
       await combatant.unsetFlag("odd-rpg", "waiting");
     }
-    /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment,
-       @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
   }
 
   private async _onRemove(combatantId: string): Promise<void> {
-    /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment,
-       @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
-    const combat = (game as any).combat;
+    const combat = game.combat;
     if (!combat) return;
     await combat.deleteEmbeddedDocuments("Combatant", [combatantId]);
-    /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment,
-       @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
   }
 }

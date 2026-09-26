@@ -1,27 +1,30 @@
-import type { CharacterSystemData } from "../data/actor/character.js";
+import type { CharacterDataModel } from "../data/actor/character.js";
+import { updateByPath } from "../utils/update.js";
 
 export class OddActor extends Actor {
-  get characterSystem(): CharacterSystemData {
-    return this.system as unknown as CharacterSystemData;
+  get characterSystem(): CharacterDataModel {
+    return this.system;
   }
 
   async applyDamage(amount: number): Promise<void> {
     amount = Math.round(Math.max(1, amount));
+    // @ts-expect-error `health` was removed from the character schema in fd0fe2f; this method has no callers.
     const { health } = this.characterSystem;
-    await this.update({
+    await updateByPath(this, {
       "system.health.value": Math.max(0, health.value - amount),
-    } as any); // dotted-path updates — Foundry stub limitation
+    });
 
     await ChatMessage.implementation.create({
       content: `${this.name} took ${amount} damage!`,
-    } as any); // ChatMessage types incomplete in v13 stubs
+    });
   }
 
   async applyHealing(amount: number): Promise<void> {
     amount = Math.round(Math.max(0, amount));
+    // @ts-expect-error `health` was removed from the character schema in fd0fe2f; this method has no callers.
     const { health } = this.characterSystem;
-    await this.update({
+    await updateByPath(this, {
       "system.health.value": Math.min(health.max, health.value + amount),
-    } as any); // dotted-path updates — Foundry stub limitation
+    });
   }
 }
