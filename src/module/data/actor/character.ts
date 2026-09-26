@@ -146,6 +146,8 @@ export class CharacterDataModel
     if (source.type === "attribute") {
       return { label: game.i18n.localize(ATTRIBUTES[source.key]), die: this.attributes[source.key] };
     }
+    // ODD's skills are all categorized, so a flat skill source names none of them.
+    if (!("category" in source)) return { label: source.key, die: "" };
     return {
       label: game.i18n.localize(SKILLS[source.category][source.key] ?? source.key),
       die: this.skills[source.category][source.key] ?? "",
