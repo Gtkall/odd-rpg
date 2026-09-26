@@ -90,7 +90,7 @@ VTTForge's value here is **version changes**, which come in two kinds. I inspect
 ### System versions (world data migrations)
 `@vttforge/core` as a runtime dependency, but we import **only `createMigrationRunner`**:
 - It stores a `schemaVersion` world setting and runs every migration newer than it, in order, as a GM on `ready`. It records progress after each step, so a failed migration can resume. `compatibleVersion` refuses to run on worlds that are too old.
-- The package is MIT and declares `sideEffects: false`, so Vite tree-shakes it down to the runner (about 50 lines plus its error class).
+- The package is MIT and declares `sideEffects: false`, so Vite drops everything except the runner and its error class. The error class pulls in VTTForge's full error registry (17 message strings), so the cost is about 12 KB unminified / 3.7 KB gzipped (measured in phase 0).
 - Per-document field renames still use Foundry's own `static migrateData`. The runner is for world-wide passes, e.g. rewriting embedded items when a type or schema changes.
 - semantic-release stays in charge of the release number. The runner's migration versions follow those release numbers.
 
@@ -112,7 +112,16 @@ Each phase is one PR into `develop`, and each verification step must pass before
 - Fix whatever typecheck breaks under the v14 types.
 - Add `audit` to CI and the release gate (non-zero exit on HIGH findings only).
 - Add `@vttforge/core` (exact pin) and set up `createMigrationRunner` with an empty migration list: `register()` in `init`, `run()` in `ready` for GMs. The infrastructure is then in place before any phase changes stored data.
-- **Verify:** `npm run typecheck`, `lint` and `build` pass; audit is clean; the build contains only the runner from `@vttforge/core` (check the unminified output); a new world gets `schemaVersion` set; smoke test in Foundry v14 (character sheet, rolls, tags, avatar, initiative tracker with Shift+I, combatant drag).
+- **Verify:** `npm run typecheck`, `lint` and `build` pass; audit has no HIGH findings; the build contains only the runner and its error registry from `@vttforge/core` (check the unminified output); the `odd-rpg.schemaVersion` world setting is registered (it is only written once the first migration exists); smoke test in Foundry v14 (character sheet, rolls, tags, avatar, initiative tracker with Shift+I, combatant drag).
+
+#### Phase 0 findings
+- `migrate` only proposed manifest changes. The `compatibility` change was applied; its `"type": "system"` addition was not, because the v14 manifest schema has no top-level `type` and dnd5e doesn't use one.
+- Audit false positives, left as they are: `VTTF-AUDIT-005` (the base `TypeDataModel` already defines `prepareBaseData`, and the rule matches source text) and `VTTF-AUDIT-004` on `talent` (the rule reduces the nested `effects.*.body` path to `body`, so it can't match any correct nested path).
+- Real fixes from the audit: the talent `htmlFields` entry `effects[].body` became `effects.*.body`, the wildcard form dnd5e uses (`advancement.*.hint`); `styles` moved to the v13+ object form.
+- fvtt-types beta bug: `CONFIG.Actor.trackableAttributes` is typed as a single entry, but Foundry keys it by actor type. Worked around with `Object.assign` (no cast).
+- `sonarjs/argument-type` is off. It crashes on the v14 `Math` augmentation, and `tsc --strict` already checks argument types.
+- CI switches to Node 26 for the audit step only (`@vttforge/cli` requires Node >= 26). Install, lint, typecheck and build stay on Node 22.
+- The repo has no Docker config. The only local Foundry container belongs to another project, so moving the Docker image to v14 is left to whoever runs the smoke test.
 
 ### Checkpoint: VTTForge base-class spike (after phase 0, before phase 1)
 Decides the root of the class hierarchy: our own `OddDataModel` / `OddActorSheetBase`, or VTTForge's `BaseTypeDataModel` / `BaseItemSheet` / `BaseActorSheet`.
