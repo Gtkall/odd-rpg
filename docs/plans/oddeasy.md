@@ -11,7 +11,7 @@ Add ODDEasy, the rules-lite version of ODD, to the odd-rpg system: a second char
 | 3 | **Separate item types** for Easy talents and flaws (`easyTalent`, `easyFlaw`), sharing abstract bases with `talent` and `flaw` | Die fields added to the ODD types |
 | 4 | **Injuries are items** (`injury`) | An array field on the actor |
 | 5 | **Move to Foundry v14** before any ODDEasy work | Staying on v13 |
-| 6 | **VTTForge for version changes**: the CLI's `migrate` and `audit` for Foundry major upgrades, plus `createMigrationRunner` from `@vttforge/core` for world data migrations. No VTTForge data model or sheet bases | Adopting its whole runtime (`registerSystem`, `BaseTypeDataModel`, sheet bases); not using it at all |
+| 6 | **VTTForge for version changes**: the CLI's `migrate` and `audit` for Foundry major upgrades, plus `createMigrationRunner` from `@vttforge/core` for world data migrations. No VTTForge data model or sheet bases (confirmed by the spike: [notes/vttforge-spike.md](../research/notes/vttforge-spike.md)) | Adopting its whole runtime (`registerSystem`, `BaseTypeDataModel`, sheet bases); not using it at all |
 | 7 | **No ODD → ODDEasy conversion for now.** It is feasible later as a one-way copy (see *Deferred*) | Live ODD/Easy toggle on one actor. Rejected because edits can't be written back to the ODD fields: 4 attributes can't turn back into 8 |
 
 ## ODDEasy rules that affect the model
@@ -133,6 +133,7 @@ Decides the root of the class hierarchy: our own `OddDataModel` / `OddActorSheet
   - how much bundle size it adds (check the unminified output).
 - **Adopt VTTForge bases** in phase 1 only if the port needs **no new casts** at the fvtt-types boundary and typecheck passes. Otherwise, **drop the spike**; phase 1 uses our own bases and VTTForge stays limited to the CLI and migration runner.
 - **Output:** a short results note in `docs/research/notes/vttforge-spike.md` and an update to decision 6 above. The spike branch is not merged.
+- **Outcome (2026-09-26): dropped.** fvtt-types resolves a VTTForge-typed `flaw` model to `never` (5 errors), fixable only with `as unknown as` at each consumer; `registerSheet` rejects a `BaseItemSheet` subclass. Phase 1 uses our own bases. Details: [notes/vttforge-spike.md](../research/notes/vttforge-spike.md).
 
 ### 1. Abstract layer under the existing ODD code, with no behavior change
 - Add `OddDataModel`, `OddCharacterDataBase`, `OddItemDataBase`, `TalentDataBase` and `FlawDataBase`, and re-parent the existing models.
