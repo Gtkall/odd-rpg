@@ -19,6 +19,7 @@ import { OddItemSheet } from "./module/sheets/item.js";
 import { registerEnrichers } from "./module/enrichers.js";
 import { OddInitiativeTracker } from "./module/tracker/initiative-tracker.js";
 import { migrations } from "./module/migrations/index.js";
+import { registerSettings } from "./module/settings.js";
 
 const loadTemplates = foundry.applications.handlebars.loadTemplates;
 const DocumentSheetConfig = foundry.applications.apps.DocumentSheetConfig;
@@ -43,6 +44,7 @@ Hooks.once("init", () => {
 
   void loadTemplates(templatePaths);
   registerEnrichers();
+  registerSettings();
   migrations.register();
 
   // ---- System configuration ----

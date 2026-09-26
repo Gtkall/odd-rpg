@@ -211,6 +211,16 @@
       },
       "becameCrippled": "A third Wound becomes Crippling: {name}."
     },
+    "Settings": {
+      "ruleset": {
+        "name": "Ruleset",
+        "hint": "Which game this world plays. It decides the actor and item types offered when creating new ones; existing characters of either ruleset stay usable."
+      },
+      "Rulesets": {
+        "odd": "ODD RPG",
+        "easy": "ODDEasy"
+      }
+    },
     "Easy": {
       "notes": "Notes",
       "talents": "Talents",
