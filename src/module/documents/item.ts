@@ -1,5 +1,3 @@
-import type { BaseItemSystemData } from "../data/_base.js";
-
 // Item types hidden from the "Create Item" dialog.
 // "feature" is removed from the ODD system entirely.
 // "spell" and "item" are commented out here — planned for future implementation.
@@ -9,7 +7,7 @@ const HIDDEN_TYPES = new Set([
   // "item",
 ]);
 
-export class OddItem extends Item {
+export class OddItem<SubType extends Item.SubType = Item.SubType> extends Item<SubType> {
   /** Filter the types shown in Foundry's "Create Item" dialog. */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   static override createDialog(...args: any[]): Promise<Item | null | undefined> {
@@ -18,8 +16,8 @@ export class OddItem extends Item {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
     return super.createDialog(data, createOptions, { ...options, types: allowedTypes } as any);
   }
-  get itemSystem(): BaseItemSystemData {
-    return this.system as unknown as BaseItemSystemData;
+  get itemSystem() {
+    return this.system;
   }
 
   async toChat(): Promise<void> {
@@ -29,6 +27,6 @@ export class OddItem extends Item {
         <p>${this.itemSystem.description}</p>
       </div>
     `;
-    await ChatMessage.implementation.create({ content } as any); // ChatMessage types incomplete in v13 stubs
+    await ChatMessage.implementation.create({ content });
   }
 }

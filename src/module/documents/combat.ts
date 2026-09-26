@@ -8,7 +8,7 @@ export class OddCombat extends Combat {
   /** Redirect GMs to roll from the character sheet. */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/require-await
   override async rollInitiative(..._args: any[]): Promise<this> {
-    ui.notifications?.info(game.i18n!.localize("ODD.Tracker.rollFromSheet"));
+    ui.notifications.info(game.i18n.localize("ODD.Tracker.rollFromSheet"));
     return this;
   }
 

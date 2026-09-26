@@ -12,13 +12,15 @@ import {
   HIT_LOCATIONS, HIT_LOCATION_ORDER, WOUND_BASE_STATES, WOUND_SUB_STATUSES,
   PAIN_PENALTY_DICE, resolveHitLocation,
 } from "../config/wounds.js";
-import type { WeaponSystemData, WeaponHandConfig } from "../data/item/weapon.js";
-import type { ArmorSystemData } from "../data/item/armor.js";
+import type { WoundLocationKey } from "../config/wounds.js";
+import type { WeaponHandConfig } from "../data/item/weapon.js";
 import {
   STRAIN_VALUES, STRAIN_DEFAULT_SLOT_COUNT,
   STRAIN_MAX_FORTITUDE_SLOTS, STRAIN_FATIGUE_PENALTIES,
 } from "../config/strain.js";
-import type { CharacterSystemData } from "../data/actor/character.js";
+import type { CharacterDataModel } from "../data/actor/character.js";
+import { isItemType } from "../utils/item-type.js";
+import { updateByPath } from "../utils/update.js";
 
 const { ActorSheetV2 } = foundry.applications.sheets;
 
@@ -48,10 +50,6 @@ const { HandlebarsApplicationMixin } = foundry.applications.api;
 // HandlebarsApplicationMixin returns an opaque type; cast once here so class
 // declarations stay readable and type inference flows correctly throughout.
 const OddActorSheetBase = HandlebarsApplicationMixin(ActorSheetV2) as typeof ActorSheetV2;
-
-// fvtt-types doesn't fully model these APIs; typed once here to avoid repetition
-interface ActorWithRollData { getRollData(): Record<string, unknown> }
-interface RollWithReplaceFormulaData { replaceFormulaData(f: string, d: object, o?: { missing?: string }): string }
 
 export class OddActorSheet extends OddActorSheetBase {
   /** Whether the sheet is currently in edit mode. */
@@ -164,7 +162,7 @@ export class OddActorSheet extends OddActorSheetBase {
           src.type === "attribute"
             ? ATTRIBUTES[src.key]
             : (SKILLS[src.category][src.key] ?? src.key);
-        return { die, label: game.i18n!.localize(labelKey) };
+        return { die, label: game.i18n.localize(labelKey) };
       });
       const dice = sources.filter((s) => s.die).map((s) => s.die);
       const formula = roll.rollResolution === "keepHighest"
@@ -190,7 +188,7 @@ export class OddActorSheet extends OddActorSheetBase {
       label: r.name,
       formula: [
         ...r.dice.map((d) => d.die),
-        ...(r.flat !== 0 ? [`${r.flat > 0 ? "+" : ""}${r.flat}`] : []),
+        ...((r.flat ?? 0) !== 0 ? [`${(r.flat ?? 0) > 0 ? "+" : ""}${r.flat}`] : []),
       ].join("+"),
       sourceLabels: r.dice.map((d) => `${d.label} (${d.die})`).join(", "),
       modifier: rollModifiers[r.id] ?? "",
@@ -198,7 +196,8 @@ export class OddActorSheet extends OddActorSheetBase {
     }));
 
     const { strain } = system;
-    const lockedFortSlots = STRAIN_MAX_FORTITUDE_SLOTS - strain.fortitudeSlots;
+    // NumberField is nullable; subtraction already treated null as 0.
+    const lockedFortSlots = STRAIN_MAX_FORTITUDE_SLOTS - (strain.fortitudeSlots ?? 0);
     const strainSlots = Array.from(
       { length: STRAIN_MAX_FORTITUDE_SLOTS + STRAIN_DEFAULT_SLOT_COUNT },
       (_, i) => {
@@ -257,10 +256,10 @@ export class OddActorSheet extends OddActorSheetBase {
       talentGroups: await this._buildTalentGroups(),
       flawRows: await this._buildFlawRows(),
       talentCategoryOptions: Object.entries(TALENT_CATEGORIES)
-        .map(([value, labelKey]) => ({ value, label: game.i18n!.localize(labelKey) }))
+        .map(([value, labelKey]) => ({ value, label: game.i18n.localize(labelKey) }))
         .sort((a, b) => a.label.localeCompare(b.label)),
       flawCategoryOptions: Object.entries(FLAW_CATEGORIES)
-        .map(([value, labelKey]) => ({ value, label: game.i18n!.localize(labelKey) }))
+        .map(([value, labelKey]) => ({ value, label: game.i18n.localize(labelKey) }))
         .sort((a, b) => a.label.localeCompare(b.label)),
       weaponDistance: WEAPON_DISTANCE,
       tabs: this._getTabs(),
@@ -284,8 +283,8 @@ export class OddActorSheet extends OddActorSheetBase {
     return context;
   }
 
-  private get characterSystem(): CharacterSystemData {
-    return this.document.system as unknown as CharacterSystemData;
+  private get characterSystem(): CharacterDataModel {
+    return this.document.system;
   }
 
   _dicePool: { id: string; label: string; die: string }[] = [];
@@ -346,7 +345,7 @@ export class OddActorSheet extends OddActorSheetBase {
         const key = (ev.currentTarget as HTMLElement).dataset.rollAttribute!;
         const die = this.characterSystem.attributes[key];
         if (die) {
-          const label = game.i18n!.localize(ATTRIBUTES[key]);
+          const label = game.i18n.localize(ATTRIBUTES[key]);
           void this._addToDicePool(label, die);
         }
       });
@@ -359,7 +358,7 @@ export class OddActorSheet extends OddActorSheetBase {
         const skill = target.dataset.rollSkill!;
         const die = this.characterSystem.skills[category][skill];
         if (die) {
-          const label = game.i18n!.localize(SKILLS[category][skill]);
+          const label = game.i18n.localize(SKILLS[category][skill]);
           void this._addToDicePool(label, die);
         }
       });
@@ -380,8 +379,7 @@ export class OddActorSheet extends OddActorSheetBase {
         const updated = this.characterSystem.customSkills.map((s) =>
           s.id === id ? { ...s, die: select.value } : s,
         );
-        void (this.document as unknown as { update(d: Record<string, unknown>): Promise<unknown> })
-          .update({ "system.customSkills": updated });
+        void updateByPath(this.document, { "system.customSkills": updated });
       });
     });
 
@@ -396,8 +394,7 @@ export class OddActorSheet extends OddActorSheetBase {
       el.addEventListener("click", (ev: Event) => {
         const id = (ev.currentTarget as HTMLElement).dataset.customSkillId!;
         const updated = this.characterSystem.customSkills.filter((s) => s.id !== id);
-        void (this.document as unknown as { update(d: Record<string, unknown>): Promise<unknown> })
-          .update({ "system.customSkills": updated });
+        void updateByPath(this.document, { "system.customSkills": updated });
       });
     });
 
@@ -427,8 +424,7 @@ export class OddActorSheet extends OddActorSheetBase {
       const category = categorySelect?.value ?? "combat";
       const entry = { id: crypto.randomUUID(), name, category, die: "" };
       const updated = [...this.characterSystem.customSkills, entry];
-      void (this.document as unknown as { update(d: Record<string, unknown>): Promise<unknown> })
-        .update({ "system.customSkills": updated });
+      void updateByPath(this.document, { "system.customSkills": updated });
     });
 
     html.querySelectorAll(".roll-action-roll[data-common-roll]").forEach((el) => {
@@ -454,8 +450,7 @@ export class OddActorSheet extends OddActorSheetBase {
         const checkbox = ev.currentTarget as HTMLInputElement;
         if (!checkbox.checked) {
           const key = checkbox.dataset.rollKey!;
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- fvtt-types stubs don't model system.* dot-paths
-          void this.document.update({ [`system.rollModifiers.${key}`]: "" } as any);
+          void updateByPath(this.document, { [`system.rollModifiers.${key}`]: "" });
         }
       });
     });
@@ -468,35 +463,32 @@ export class OddActorSheet extends OddActorSheetBase {
     // SVG body region click → cycle base state
     html.querySelectorAll<SVGElement>(".body-region[data-location]").forEach((el) => {
       el.addEventListener("click", () => {
-        const loc = el.dataset.location!;
+        // data-location is rendered from HIT_LOCATION_ORDER.
+        const loc = el.dataset.location as WoundLocationKey;
         const order = ["uninjured", "wounded", "crippled"] as const;
         const current = this.characterSystem.wounds[loc].state as typeof order[number];
         const next = order[(order.indexOf(current) + 1) % order.length];
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        void this.document.update({ [`system.wounds.${loc}.state`]: next } as any);
+        void updateByPath(this.document, { [`system.wounds.${loc}.state`]: next });
       });
     });
 
     // Pain penalty die select
     html.querySelector<HTMLSelectElement>(".pain-penalty-die-select")?.addEventListener("change", (ev) => {
       const select = ev.currentTarget as HTMLSelectElement;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      void this.document.update({ "system.painPenaltyDie": select.value } as any);
+      void updateByPath(this.document, { "system.painPenaltyDie": select.value });
     });
 
     // Wound state dropdown change
     html.querySelectorAll<HTMLSelectElement>(".wound-state-select[data-location]").forEach((el) => {
       el.addEventListener("change", () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        void this.document.update({ [`system.wounds.${el.dataset.location!}.state`]: el.value } as any);
+        void updateByPath(this.document, { [`system.wounds.${el.dataset.location!}.state`]: el.value });
       });
     });
 
     // Wound sub-status dropdown change
     html.querySelectorAll<HTMLSelectElement>(".wound-substatus-select[data-location]").forEach((el) => {
       el.addEventListener("change", () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        void this.document.update({ [`system.wounds.${el.dataset.location!}.subStatus`]: el.value } as any);
+        void updateByPath(this.document, { [`system.wounds.${el.dataset.location!}.subStatus`]: el.value });
       });
     });
 
@@ -505,17 +497,14 @@ export class OddActorSheet extends OddActorSheetBase {
     // Avatar click → FilePicker
     html.querySelector<HTMLImageElement>("img.profile-img")
       ?.addEventListener("click", () => {
-        /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
-        const fp = new (CONFIG as any).ux.FilePicker({
+        const fp = new foundry.applications.apps.FilePicker.implementation({
           type: "image",
-          current: (this.document as any).img as string,
+          current: this.document.img ?? undefined,
           callback: (path: string) => {
-            void (this.document as unknown as { update(d: Record<string, unknown>): Promise<unknown> })
-              .update({ img: path });
+            void this.document.update({ img: path });
           },
         });
-        fp.browse();
-        /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
+        void fp.browse();
       });
 
     html.querySelectorAll("[data-fort-slot-toggle]").forEach((el) => {
@@ -525,8 +514,7 @@ export class OddActorSheet extends OddActorSheetBase {
         const current = this.characterSystem.strain.fortitudeManualSlots;
         const updated = [...current];
         updated[i] = !updated[i];
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- fvtt-types stubs don't model system.* dot-paths
-        void this.document.update({ "system.strain.fortitudeManualSlots": updated } as any);
+        void updateByPath(this.document, { "system.strain.fortitudeManualSlots": updated });
       });
     });
 
@@ -577,10 +565,8 @@ export class OddActorSheet extends OddActorSheetBase {
           const dieToRoll = storedDie.startsWith("-") ? storedDie.slice(1) : storedDie;
           void (async () => {
             const r = await new Roll(dieToRoll).evaluate();
-            /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
-            await (ChatMessage as any).create({
-              speaker: (ChatMessage as any).getSpeaker({ actor: this.document }),
-            /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
+            await ChatMessage.create({
+              speaker: ChatMessage.getSpeaker({ actor: this.document }),
               flavor: label,
               rolls: [r],
             });
@@ -644,8 +630,7 @@ export class OddActorSheet extends OddActorSheetBase {
     html.querySelectorAll<HTMLInputElement>(".item-equipped[data-item-id]").forEach((el) => {
       el.addEventListener("change", () => {
         const item = this.document.items.get(el.dataset.itemId!);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        void (item as any)?.update({ "system.equipped": el.checked });
+        if (item) void updateByPath(item, { "system.equipped": el.checked });
       });
     });
 
@@ -668,8 +653,8 @@ export class OddActorSheet extends OddActorSheetBase {
         if (ke.key !== "Enter") return;
         const name = el.value.trim();
         if (!name) return;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        void this.document.createEmbeddedDocuments("Item", [{ name, type: el.dataset.itemType }] as any[]);
+        // data-item-type is rendered from the item subtypes this sheet lists.
+        void this.document.createEmbeddedDocuments("Item", [{ name, type: el.dataset.itemType as Item.SubType }]);
         el.value = "";
       });
     });
@@ -775,23 +760,22 @@ export class OddActorSheet extends OddActorSheetBase {
       flat: this._dicePoolFlat,
     };
     const current = this.characterSystem.savedRolls;
-    await (this.document as unknown as { update(d: Record<string, unknown>): Promise<unknown> })
-      .update({ "system.savedRolls": [...current, entry] });
+    await updateByPath(this.document, { "system.savedRolls": [...current, entry] });
     this._saveRollName = "";
   }
 
   private async _deleteSavedRoll(id: string): Promise<void> {
     const updated = this.characterSystem.savedRolls.filter((r) => r.id !== id);
-    await (this.document as unknown as { update(d: Record<string, unknown>): Promise<unknown> })
-      .update({ "system.savedRolls": updated });
+    await updateByPath(this.document, { "system.savedRolls": updated });
   }
 
   private _resolveSavedRoll(key: string): { entries: { label: string; die: string }[]; bonus: string | undefined; resolution: RollResolution } | undefined {
     const saved = this.characterSystem.savedRolls.find((r) => r.id === key);
     if (!saved) return undefined;
     const entries = saved.dice.filter((d) => d.die);
-    const flatSign = saved.flat > 0 ? "+" : "";
-    const flatBonus = saved.flat !== 0 ? `${flatSign}${saved.flat}` : undefined;
+    const flat = saved.flat ?? 0;
+    const flatSign = flat > 0 ? "+" : "";
+    const flatBonus = flat !== 0 ? `${flatSign}${flat}` : undefined;
     const modBonus = (this.characterSystem.rollModifiers[key] ?? "").trim() || undefined;
     const bonus = modBonus ?? flatBonus;
     return { entries, bonus, resolution: "sum" };
@@ -803,7 +787,7 @@ export class OddActorSheet extends OddActorSheetBase {
     const system = this.characterSystem;
     const entries = def.sources
       .map((src) => ({
-        label: game.i18n!.localize(
+        label: game.i18n.localize(
           src.type === "attribute" ? ATTRIBUTES[src.key] : SKILLS[src.category][src.key],
         ),
         die: src.type === "attribute"
@@ -839,16 +823,16 @@ export class OddActorSheet extends OddActorSheetBase {
     let sign = 1;
     for (const term of new Roll(resolvedBonus).terms) {
       if (term instanceof foundry.dice.terms.OperatorTerm) {
-        const { operator } = term as unknown as { operator: string };
+        const { operator } = term;
         sign = operator === "-" ? -1 : 1;
       } else if (term instanceof foundry.dice.terms.DiceTerm) {
-        const { number, faces } = term as unknown as { number: number | undefined; faces: number };
+        const { number, faces } = term;
         const count = number ?? 1;
         const prefix = sign < 0 ? "-" : "";
         for (let i = 0; i < count; i++) await this._addToDicePool("Bonus", `${prefix}d${faces}`);
         sign = 1;
       } else if (term instanceof foundry.dice.terms.NumericTerm) {
-        const { number } = term as unknown as { number: number };
+        const { number } = term;
         this._dicePoolFlat += sign * number;
         await this._updateDicePoolTray();
         sign = 1;
@@ -857,9 +841,9 @@ export class OddActorSheet extends OddActorSheetBase {
   }
 
   private _resolveBonusFormula(bonus: string): string {
-    const rollData = (this.document as unknown as ActorWithRollData).getRollData();
+    const rollData = this.document.getRollData();
     const cleaned = bonus.replace(/^\+/, "").trim();
-    return (Roll as unknown as RollWithReplaceFormulaData).replaceFormulaData(cleaned, rollData, { missing: "0" });
+    return Roll.replaceFormulaData(cleaned, rollData, { missing: "0" });
   }
 
   private async _executeRoll(
@@ -917,8 +901,8 @@ export class OddActorSheet extends OddActorSheetBase {
       { total: finalTotal, breakdown, isKeepHighest: resolution === "keepHighest" },
     );
 
-    await (ChatMessage as any).create({ // eslint-disable-line @typescript-eslint/no-explicit-any
-      speaker: (ChatMessage as any).getSpeaker({ actor: this.document }), // eslint-disable-line @typescript-eslint/no-explicit-any
+    await ChatMessage.create({
+      speaker: ChatMessage.getSpeaker({ actor: this.document }),
       content,
       rolls: [roll],
     });
@@ -936,7 +920,7 @@ export class OddActorSheet extends OddActorSheetBase {
   /** Last hit location resolved from a d20 roll — client-side transient. */
   _lastHitLocation: string | null = null;
 
-  private _buildWoundLocations(system: CharacterSystemData) {
+  private _buildWoundLocations(system: CharacterDataModel) {
     return HIT_LOCATION_ORDER.map((key) => {
       const def = HIT_LOCATIONS[key];
       const loc = system.wounds[key];
@@ -967,13 +951,11 @@ export class OddActorSheet extends OddActorSheetBase {
       {
         total,
         locationKey: key,
-        locationLabel: game.i18n!.localize(def.label),
+        locationLabel: game.i18n.localize(def.label),
       },
     );
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (ChatMessage as any).create({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      speaker: (ChatMessage as any).getSpeaker({ actor: this.document }),
+    await ChatMessage.create({
+      speaker: ChatMessage.getSpeaker({ actor: this.document }),
       content,
       rolls: [roll],
     });
@@ -1006,25 +988,24 @@ export class OddActorSheet extends OddActorSheetBase {
   }
 
   private _buildWeaponRows(
-    system: CharacterSystemData,
+    system: CharacterDataModel,
     rollModifiers: Record<string, string>,
   ) {
     const buildAttack = (
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      item: any,
+      item: Item.OfType<"weapon">,
       hand: WeaponHandConfig,
       suffix: string,
-      type: "melee" | "ranged",
+      type: string,
     ) => {
       const attrKey = type === "ranged" ? "dex" : "agi";
       const skillKey = type === "ranged" ? "archery" : "melee";
       const sources = [
-        { label: game.i18n!.localize(ATTRIBUTES[attrKey]), die: system.attributes[attrKey] ?? "" },
-        { label: game.i18n!.localize(SKILLS.combat[skillKey] ?? ""), die: system.skills.combat[skillKey] ?? "" },
-        { label: game.i18n!.localize("ODD.Weapon.Accuracy"), die: hand.accuracy },
+        { label: game.i18n.localize(ATTRIBUTES[attrKey]), die: system.attributes[attrKey] ?? "" },
+        { label: game.i18n.localize(SKILLS.combat[skillKey] ?? ""), die: system.skills.combat[skillKey] ?? "" },
+        { label: game.i18n.localize("ODD.Weapon.Accuracy"), die: hand.accuracy },
       ].filter((s) => s.die);
       const keySuffix = suffix ? `-${suffix}` : "";
-      const key = `weapon-attack-${item.id as string}${keySuffix}`;
+      const key = `weapon-attack-${item.id}${keySuffix}`;
       return {
         key,
         formula: sources.map((s) => s.die).join("+"),
@@ -1034,18 +1015,14 @@ export class OddActorSheet extends OddActorSheetBase {
       };
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return ([...this.document.items] as any[])
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .filter((i: any) => (i.type as string) === "weapon")
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-      .sort((a: any, b: any) => (a.sort as number) - (b.sort as number))
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .flatMap((item: any) => {
-        const sys = item.system as WeaponSystemData;
+    return [...this.document.items]
+      .filter((i) => isItemType(i, "weapon"))
+      .sort((a, b) => a.sort - b.sort)
+      .flatMap((item) => {
+        const sys = item.system;
         const base = {
-          id: item.id as string,
-          name: item.name as string,
+          id: item.id,
+          name: item.name,
           equipped: sys.equipped,
           notes: sys.notes.join(", "),
         };
@@ -1053,7 +1030,7 @@ export class OddActorSheet extends OddActorSheetBase {
           const dmg = `${h.damage.diceCount}${h.damage.dieType}`;
           return {
             tempos: h.tempos,
-            distance: game.i18n!.localize(WEAPON_DISTANCE[h.distance] ?? h.distance),
+            distance: game.i18n.localize(WEAPON_DISTANCE[h.distance] ?? h.distance),
             accuracy: h.accuracy,
             damage: h.damage.isBonus ? `+${dmg}` : dmg,
           };
@@ -1072,21 +1049,17 @@ export class OddActorSheet extends OddActorSheetBase {
   }
 
   private _buildArmorRows() {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return ([...this.document.items] as any[])
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .filter((i: any) => (i.type as string) === "armor")
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-      .sort((a: any, b: any) => (a.sort as number) - (b.sort as number))
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .map((item: any) => {
-        const sys = item.system as ArmorSystemData;
+    return [...this.document.items]
+      .filter((i) => isItemType(i, "armor"))
+      .sort((a, b) => a.sort - b.sort)
+      .map((item) => {
+        const sys = item.system;
         return {
-          id: item.id as string,
-          name: item.name as string,
+          id: item.id,
+          name: item.name,
           bulk: sys.bulk,
           protection: sys.protection,
-          location: sys.location.map((k) => game.i18n!.localize(ARMOR_LOCATIONS[k] ?? k)).join(", "),
+          location: sys.location.map((k) => game.i18n.localize(ARMOR_LOCATIONS[k] ?? k)).join(", "),
           notes: sys.notes.join(", "),
           equipped: sys.equipped,
         };
@@ -1095,56 +1068,44 @@ export class OddActorSheet extends OddActorSheetBase {
 
   private async _buildTalentGroups() {
     const RANK_ORDER = ["I", "II", "III"];
-    const rollData = (this.document as unknown as ActorWithRollData).getRollData();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const talents = ([...this.document.items] as any[]).filter((i: any) => (i.type as string) === "talent");
+    const rollData = this.document.getRollData();
+    const talents = [...this.document.items].filter((i) => isItemType(i, "talent"));
 
     const groups = new Map<string, Record<string, unknown>[]>();
     for (const item of talents) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      const tree: string = (item.system.treeName as string) || "";
+      const tree: string = item.system.treeName || "";
       if (!groups.has(tree)) groups.set(tree, []);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      // The stored value comes from the field's config-derived choices.
       const talentType = item.system.talentType as keyof typeof TALENT_TYPES;
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      const category = item.system.category as keyof typeof TALENT_CATEGORIES;
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      const rawEffects = (item.system.effects as { title: string; body: string }[] | undefined) ?? [];
+      const category = item.system.category;
+      const rawEffects = item.system.effects;
       const enrichedEffects = await Promise.all(
         rawEffects.map(async (e) => ({
           title: e.title,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-          body: await (foundry.applications.ux as any).TextEditor.enrichHTML(e.body || "", { rollData }) as string,
+          body: await foundry.applications.ux.TextEditor.enrichHTML(e.body || "", { rollData }),
         })),
       );
       groups.get(tree)!.push({
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        id:                   item.id as string,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        name:                 item.name as string,
+        id:                   item.id,
+        name:                 item.name,
         talentType,
-        talentTypeLabel:      game.i18n!.localize(TALENT_TYPES[talentType]),
+        talentTypeLabel:      game.i18n.localize(TALENT_TYPES[talentType]),
         category,
-        categoryLabel:        game.i18n!.localize(TALENT_CATEGORIES[category] ?? category),
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        rank:                 item.system.rank as string,
+        categoryLabel:        game.i18n.localize(TALENT_CATEGORIES[category] ?? category),
+        rank:                 item.system.rank,
         isSide:               ["minorSide", "majorSide"].includes(talentType),
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        xpCost:               item.system.xpCost as number,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        prerequisites:        (item.system.prerequisites as string) || "",
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        enrichedDescription:  await (foundry.applications.ux as any).TextEditor.enrichHTML(
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          (item.system.description as string) || "", { rollData },
-        ) as string,
+        xpCost:               item.system.xpCost,
+        prerequisites:        item.system.prerequisites || "",
+        enrichedDescription:  await foundry.applications.ux.TextEditor.enrichHTML(
+          item.system.description || "", { rollData },
+        ),
         enrichedEffects,
       });
     }
 
     return [...groups.entries()]
       .map(([treeName, items]) => ({
-        treeName: treeName || game.i18n!.localize("ODD.Talent.ungrouped"),
+        treeName: treeName || game.i18n.localize("ODD.Talent.ungrouped"),
         items: items.toSorted((a, b) => {
           if (a.isSide !== b.isSide) return (a.isSide as boolean) ? 1 : -1;
           return RANK_ORDER.indexOf(a.rank as string) - RANK_ORDER.indexOf(b.rank as string);
@@ -1154,58 +1115,41 @@ export class OddActorSheet extends OddActorSheetBase {
   }
 
   private async _buildFlawRows() {
-    const rollData = (this.document as unknown as ActorWithRollData).getRollData();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return Promise.all(([...this.document.items] as any[])
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .filter((i: any) => (i.type as string) === "flaw")
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .map(async (item: any) => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        const category = item.system.category as keyof typeof FLAW_CATEGORIES;
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const rollData = this.document.getRollData();
+    return Promise.all([...this.document.items]
+      .filter((i) => isItemType(i, "flaw"))
+      .map(async (item) => {
+        const category = item.system.category;
+        // The stored value comes from the field's config-derived choices.
         const severity = item.system.severity as keyof typeof FLAW_SEVERITIES;
         return {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          id:                  item.id as string,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          name:                item.name as string,
+          id:                  item.id,
+          name:                item.name,
           severity,
           category,
-          categoryLabel:       game.i18n!.localize(FLAW_CATEGORIES[category] ?? category),
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          xpValue:             item.system.xpValue as number,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          symbol:              item.system.symbol as string,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-          enrichedDescription: await (foundry.applications.ux as any).TextEditor.enrichHTML(
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            (item.system.description as string) || "", { rollData },
-          ) as string,
+          categoryLabel:       game.i18n.localize(FLAW_CATEGORIES[category] ?? category),
+          xpValue:             item.system.xpValue,
+          symbol:              item.system.symbol,
+          enrichedDescription: await foundry.applications.ux.TextEditor.enrichHTML(
+            item.system.description || "", { rollData },
+          ),
         };
       }),
     );
   }
 
   private async _sortItem(id: string, type: string, direction: number): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const items = ([...this.document.items] as any[])
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .filter((i: any) => (i.type as string) === type)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-      .sort((a: any, b: any) => (a.sort as number) - (b.sort as number));
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const idx = items.findIndex((i: any) => (i.id as string) === id);
+    const items = [...this.document.items]
+      .filter((i) => i.type === type)
+      .sort((a, b) => a.sort - b.sort);
+    const idx = items.findIndex((i) => i.id === id);
     const swapIdx = idx + direction;
     if (idx < 0 || swapIdx < 0 || swapIdx >= items.length) return;
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
     const updates = [
-      { _id: items[idx].id as string,     sort: items[swapIdx].sort as number },
-      { _id: items[swapIdx].id as string, sort: items[idx].sort as number },
+      { _id: items[idx].id,     sort: items[swapIdx].sort },
+      { _id: items[swapIdx].id, sort: items[idx].sort },
     ];
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (this.document as any).updateEmbeddedDocuments("Item", updates);
+    await this.document.updateEmbeddedDocuments("Item", updates);
   }
 
   private _resolveWeaponAttack(el: HTMLElement): { entries: { label: string; die: string }[]; bonus: string | undefined } {
@@ -1231,17 +1175,15 @@ export class OddActorSheet extends OddActorSheetBase {
   }
 
   private async _setInitiativeInCombat(value: number): Promise<void> {
-    /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
-    const combat = (game as any).combat;
+    const combat = game.combat;
     if (!combat) return;
-    const tokens: { id: string }[] = (this.document as any).getActiveTokens();
+    const tokens = this.document.getActiveTokens();
     if (tokens.length === 0) return; // no placed token — cannot create/find combatant
     const token = tokens[0];
-    const existing = (combat.combatants as any[]).find(
-      (c: any) => c.tokenId === token.id,
+    const existing = combat.combatants.find(
+      (c) => c.tokenId === token.id,
     );
     const combatant = existing ?? (await combat.createEmbeddedDocuments("Combatant", [{ actorId: this.document.id, tokenId: token.id }]))[0];
     await combatant.update({ initiative: value });
-    /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
   }
 }
