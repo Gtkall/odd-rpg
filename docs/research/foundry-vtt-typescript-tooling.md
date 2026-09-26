@@ -17,6 +17,7 @@ The candidates that do exist split into three groups.
 | Option | What you get | Foundry | Maturity | Verdict for odd-rpg |
 |---|---|---|---|---|
 | VTTForge | registerSystem, typed schema base, sheet bases, audit/migrate | v14+ | 0.x, 1 maintainer | Borrow ideas; run `audit` once; don't adopt the runtime |
+| ISDL | DSL that generates a whole system (Vue 3 + Vuetify sheets) | v12–v14 | 0.x, 1 maintainer, 42 installs | Avoid; it replaces the codebase instead of extending it ([notes/isdl.md](notes/isdl.md)) |
 | TRL (Svelte 4) | Reactive app shells, component library | v13 | Stale, no Svelte 5 | Avoid |
 | fvtt-vue / Solid adapter | ApplicationV2 mixin for another UI library | unstated / new | Tiny | Avoid |
 | In-repo Svelte 5 mixin (PF2e pattern) | Reactive UI where needed | any | You own it | Only if a UI outgrows Handlebars |
