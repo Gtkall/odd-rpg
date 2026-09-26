@@ -157,6 +157,13 @@ Decides the root of the class hierarchy: our own `OddDataModel` / `OddActorSheet
 - Type-level tests for the new models.
 - **Verify:** typecheck and tests pass; an Easy actor and each Easy item can be created with the correct defaults; dropping an ODD talent on an Easy character is rejected.
 
+#### Phase 2 notes
+- `OddDataModel` is still not needed. Each character type defines its whole `strain` field (ODD: 10 slots with fortitude, bleeding and armor; Easy: 7 slots of F/E/B), so there's no nested schema to merge. Add it when two types extend one nested field.
+- Instead of `TalentDataBase` / `FlawDataBase` (ODD and Easy talents share only `description`), the real shared abstraction is **`DieTraitDataBase`**: an item that is a named die. It implements `DicePoolSource`, and `easyTalent` / `easyFlaw` differ only in `isPenalty` (a flaw's die goes into the pool as `-dX`, as the enricher's Penalty already does). `toPoolEntry()` returns a `PoolEntry`, never `null`, since nothing needs `null` yet.
+- `RollSource` gains a flat skill variant (`{ type: "skill", key }`). ODD's resolver returns no die for it; the sheet's skill click builds one when the element has no `data-roll-category`.
+- Item-type acceptance is `OddCharacterDataBase.acceptsItemType()` (lists in `config/item-types.ts`), enforced once in `OddItemDataBase._preCreate`.
+- `OddActorSheet` is registered for `character` only. Until phase 3, an `easyCharacter` has no sheet, and Easy items use the item sheet's generic name-and-description form. Their forms (die, severity) move to phase 3.
+
 ### 3. `OddEasyActorSheet`
 - Single page following the PDF's character sheet: header and XP; attributes; skills; talents and flaws with dice; strain slots (F/E/B) with the penalty; injuries; Awareness and Shock rolls; notes.
 - Reuse the partials (attribute table, roll entry, strain) through the base sheet; add Easy-specific templates only where the layout differs.

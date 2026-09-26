@@ -7,7 +7,7 @@
  * every character type can reuse it.
  */
 
-import type { CommonRollDef, RollResolution } from "../config/rolls.js";
+import type { CommonRollDef, RollResolution, RollSource } from "../config/rolls.js";
 import type { PoolEntry, RollingActor } from "../data/abstract/character-base.js";
 import { updateByPath } from "../utils/update.js";
 
@@ -197,9 +197,10 @@ export abstract class OddActorSheetBase extends HandlebarsActorSheet {
     html.querySelectorAll("[data-roll-skill]").forEach((el) => {
       el.addEventListener("click", (ev: Event) => {
         const target = ev.currentTarget as HTMLElement;
-        const category = target.dataset.rollCategory!;
+        const category = target.dataset.rollCategory;
         const key = target.dataset.rollSkill!;
-        const { label, die } = this.rollingSystem.resolveRollSource({ type: "skill", category, key });
+        const source: RollSource = category ? { type: "skill", category, key } : { type: "skill", key };
+        const { label, die } = this.rollingSystem.resolveRollSource(source);
         if (die) void this._addToDicePool(label, die);
       });
     });

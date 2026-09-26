@@ -16,3 +16,11 @@ export const STRAIN_FATIGUE_PENALTIES: Record<number, string> = Object.freeze({
   5: "d10",
   6: "d12",
 });
+
+/** ODDEasy strain slots: Fatigue, Exhaustion, or armor Bulk. */
+export const EASY_STRAIN_VALUES: Record<string, string> = Object.freeze({
+  "":  "ODD.Strain.none",
+  "F": "ODD.Strain.fatigue",
+  "E": "ODD.Strain.exhaustion",
+  "B": "ODD.Strain.bulk",
+});

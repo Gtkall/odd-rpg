@@ -2,6 +2,7 @@
  * ODD RPG — System Entry Point
  *
  * Adding a new Actor type:  create src/module/data/actor/<type>.ts (export default)
+ *                           and register a sheet for it below (each type has its own)
  * Adding a new Item type:   create src/module/data/item/<type>.ts  (export default)
  *                           and list either in DataModelConfig (src/types/fvtt-config.d.ts)
  * Adding a new template:    drop a .hbs anywhere under templates/
@@ -76,8 +77,7 @@ Hooks.once("init", () => {
   DocumentSheetConfig.unregisterSheet(Item, "core", foundry.appv1.sheets.ItemSheet);
 
   DocumentSheetConfig.registerSheet(Actor, "odd-rpg", OddActorSheet, {
-    // Type names come from auto-discovered file names, so the compiler only sees string[].
-    types: Object.keys(actorModels).map(typeName) as Actor.SubType[],
+    types: ["character"],
     makeDefault: true,
   });
   DocumentSheetConfig.registerSheet(Item, "odd-rpg", OddItemSheet, {

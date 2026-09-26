@@ -32,9 +32,29 @@
         "htmlFields": [
           "biography"
         ]
+      },
+      "easyCharacter": {
+        "htmlFields": [
+          "biography"
+        ]
       }
     },
     "Item": {
+      "easyTalent": {
+        "htmlFields": [
+          "description"
+        ]
+      },
+      "easyFlaw": {
+        "htmlFields": [
+          "description"
+        ]
+      },
+      "injury": {
+        "htmlFields": [
+          "description"
+        ]
+      },
       "item": {
         "htmlFields": [
           "description"

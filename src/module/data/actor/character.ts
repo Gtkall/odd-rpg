@@ -21,6 +21,7 @@ import {
 } from "../../config/wounds.js";
 import type { WoundLocationKey } from "../../config/wounds.js";
 import { COMMON_ROLLS, type CommonRollDef, type RollSource } from "../../config/rolls.js";
+import { ODD_ITEM_TYPES } from "../../config/item-types.js";
 import {
   OddCharacterDataBase, defineCharacterBaseSchema,
   type CharacterBaseKeyedData, type PoolEntry, type RollingActor,
@@ -142,10 +143,16 @@ export class CharacterDataModel
     return COMMON_ROLLS;
   }
 
+  acceptsItemType(type: string): boolean {
+    return ODD_ITEM_TYPES.includes(type);
+  }
+
   resolveRollSource(source: RollSource): PoolEntry {
     if (source.type === "attribute") {
       return { label: game.i18n.localize(ATTRIBUTES[source.key]), die: this.attributes[source.key] };
     }
+    // ODD's skills are all categorized, so a flat skill source names none of them.
+    if (!("category" in source)) return { label: source.key, die: "" };
     return {
       label: game.i18n.localize(SKILLS[source.category][source.key] ?? source.key),
       die: this.skills[source.category][source.key] ?? "",

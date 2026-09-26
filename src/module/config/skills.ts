@@ -53,3 +53,15 @@ export const SKILL_LAYOUT: readonly (readonly [string, string, string])[] = Obje
   ["combat", "knowledge", "mental"],
   ["physical", "social", "special"],
 ]);
+
+/**
+ * ODDEasy's five broad skills. They are ODD's skill categories, so they reuse
+ * the category labels. A character may have no die in a skill (untrained).
+ */
+export const EASY_SKILLS: Record<string, string> = Object.freeze({
+  combat:    "ODD.SkillCategories.combat",
+  knowledge: "ODD.SkillCategories.knowledge",
+  mental:    "ODD.SkillCategories.mental",
+  physical:  "ODD.SkillCategories.physical",
+  social:    "ODD.SkillCategories.social",
+});
