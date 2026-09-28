@@ -20,7 +20,7 @@ export class OddEasyActorSheet extends OddActorSheetBase {
   static override readonly DEFAULT_OPTIONS = {
     classes: ["odd-rpg", "sheet", "actor", "easy-character"],
     position: {
-      width: Math.round(Math.min(window.innerWidth * 0.5, 820)),
+      width: Math.round(Math.min(window.innerWidth * 0.6, 985)),
       height: Math.round(Math.min(window.innerHeight * 0.85, 1000)),
     },
   };
