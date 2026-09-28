@@ -414,6 +414,16 @@
     border-color: #ff4444;
 }
 
+/* Over the dice pool cap: shown, but not rolled */
+.odd-rpg .pool-chip.dropped {
+    opacity: 0.45;
+    border-style: dashed;
+}
+
+.odd-rpg .pool-chip.dropped .chip-die {
+    text-decoration: line-through;
+}
+
 .odd-rpg .pool-flat {
     display: inline-flex;
     align-items: center;
@@ -434,6 +444,7 @@
 
 .odd-rpg .dice-pool-add-row {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 0.3rem;
 }
@@ -525,6 +536,10 @@
     color: var(--odd-color-primary);
     cursor: pointer;
     transition: border-color 0.15s, color 0.15s;
+}
+
+.odd-rpg .dice-pool-add-die.penalty {
+    color: var(--odd-color-muted, #888);
 }
 
 .odd-rpg .dice-pool-add-die:hover {
@@ -646,7 +661,7 @@
     white-space: nowrap;
 }
 
-/* Discarded (non-kept) dice for keepHighest */
+/* Discarded dice: not kept by keepHighest, or over the dice pool cap */
 .odd-roll-result .roll-die-entry.discarded .die-chip {
     border-color: #999;
     color: #999;

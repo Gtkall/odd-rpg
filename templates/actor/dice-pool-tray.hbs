@@ -2,7 +2,7 @@
   <div class="dice-pool-chips">
     {{#if dicePool.length}}
       {{#each dicePool}}
-        <span class="pool-chip" data-id="{{id}}" title="Click to remove">
+        <span class="pool-chip{{#if dropped}} dropped{{/if}}" data-id="{{id}}" title="{{#if dropped}}Over the dice pool cap: not rolled. {{/if}}Click to remove">
           <span class="chip-label">{{label}}</span>
           <span class="chip-die">{{die}}</span>
         </span>
@@ -24,6 +24,9 @@
     <span class="dice-pool-add-label">Add:</span>
     {{#each bonusDice}}
       <button type="button" class="dice-pool-add-die" data-die="{{this}}">{{this}}</button>
+    {{/each}}
+    {{#each penaltyDice}}
+      <button type="button" class="dice-pool-add-die penalty" data-die="{{this}}">{{this}}</button>
     {{/each}}
   </div>
   <div class="dice-pool-history-nav">

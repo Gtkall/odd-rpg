@@ -6,3 +6,6 @@ export const DICE_TYPES: Record<string, string> = Object.freeze({
   d10: "ODD.Dice.d10",
   d12: "ODD.Dice.d12",
 });
+
+/** The most Bonus dice a Standard Test rolls; the rest of the pool is dropped. */
+export const DICE_POOL_CAP = 5;

@@ -10,6 +10,7 @@
 import type { CommonRollDef, RollResolution, RollSource } from "../config/rolls.js";
 import type { PoolEntry, RollingActor } from "../data/abstract/character-base.js";
 import { isDicePoolSource } from "../data/abstract/dice-pool-source.js";
+import { droppedPoolIndices } from "../utils/dice-pool.js";
 import { updateByPath } from "../utils/update.js";
 
 const { ActorSheetV2 } = foundry.applications.sheets;
@@ -351,12 +352,14 @@ export abstract class OddActorSheetBase extends HandlebarsActorSheet {
     const tray = this.element.querySelector(".dice-pool-tray");
     if (!tray) return;
 
+    const dropped = droppedPoolIndices(this._dicePool.map((e) => e.die));
     tray.innerHTML = await foundry.applications.handlebars.renderTemplate(
       "systems/odd-rpg/templates/actor/dice-pool-tray.hbs",
       {
-        dicePool: this._dicePool,
+        dicePool: this._dicePool.map((e, i) => ({ ...e, dropped: dropped.has(i) })),
         dicePoolFlat: this._dicePoolFlat,
         bonusDice: ["d4", "d6", "d8", "d10", "d12"],
+        penaltyDice: ["-d4", "-d6", "-d8", "-d10", "-d12"],
         historyCanGoUp: this._rollHistoryIndex < this._rollHistory.length - 1,
         historyCanGoDown: this._rollHistoryIndex >= 0,
         saveRollName: this._saveRollName,
@@ -374,7 +377,7 @@ export abstract class OddActorSheetBase extends HandlebarsActorSheet {
     tray.querySelectorAll(".dice-pool-add-die").forEach((btn) => {
       btn.addEventListener("click", () => {
         const die = (btn as HTMLElement).dataset.die;
-        if (die) void this._addToDicePool("Bonus", die);
+        if (die) void this._addToDicePool(die.startsWith("-") ? "Penalty" : "Bonus", die);
       });
     });
     tray.querySelector(".history-up")?.addEventListener("click", () => { this._navigateHistory("up"); });
@@ -517,7 +520,8 @@ export abstract class OddActorSheetBase extends HandlebarsActorSheet {
   ): Promise<number | undefined> {
     if (entries.length === 0) return undefined;
 
-    const diceParts = entries.map((e) => e.die);
+    const dropped = this._droppedDice(entries, resolution);
+    const diceParts = entries.filter((_, i) => !dropped.has(i)).map((e) => e.die);
     const roll = new Roll(diceParts.join("+"));
     await roll.evaluate();
 
@@ -547,7 +551,7 @@ export abstract class OddActorSheetBase extends HandlebarsActorSheet {
         const resolved = this._resolveBonusFormula(bonus);
         const bonusRoll = await new Roll(resolved).evaluate();
         finalTotal = roll.total! + bonusRoll.total;
-        breakdown = this._buildSumBreakdown(entries, roll);
+        breakdown = this._buildSumBreakdown(entries, roll, dropped);
         // Bonus dice from the bonus roll
         for (const term of bonusRoll.dice) {
           const dieLabel = `d${term.faces}`;
@@ -556,7 +560,7 @@ export abstract class OddActorSheetBase extends HandlebarsActorSheet {
         }
       } else {
         finalTotal = roll.total ?? 0;
-        breakdown = this._buildSumBreakdown(entries, roll);
+        breakdown = this._buildSumBreakdown(entries, roll, dropped);
       }
     }
 
@@ -574,10 +578,19 @@ export abstract class OddActorSheetBase extends HandlebarsActorSheet {
     return finalTotal;
   }
 
+  /** Pool dice over the cap. Initiative keeps its highest die, so only a Standard Test is capped. */
+  private _droppedDice(entries: PoolEntry[], resolution: RollResolution): Set<number> {
+    return resolution === "sum" ? droppedPoolIndices(entries.map((e) => e.die)) : new Set<number>();
+  }
+
   private _buildSumBreakdown(
     entries: PoolEntry[],
     roll: Roll,
-  ): { label: string; die: string; result: number | string }[] {
-    return entries.map(({ label, die }, i) => ({ label, die, result: roll.dice[i]?.total ?? "?" }));
+    dropped: Set<number>,
+  ): { label: string; die: string; result: number | string; discarded?: boolean }[] {
+    let rolled = 0;
+    return entries.map(({ label, die }, i) => dropped.has(i)
+      ? { label, die, result: "—", discarded: true }
+      : { label, die, result: roll.dice[rolled++]?.total ?? "?" });
   }
 }
