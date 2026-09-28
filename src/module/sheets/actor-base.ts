@@ -10,7 +10,7 @@
 import type { CommonRollDef, RollResolution, RollSource } from "../config/rolls.js";
 import type { PoolEntry, RollingActor } from "../data/abstract/character-base.js";
 import { isDicePoolSource } from "../data/abstract/dice-pool-source.js";
-import { droppedPoolIndices } from "../utils/dice-pool.js";
+import { dieFaces, droppedPoolIndices, nextDieStep } from "../utils/dice-pool.js";
 import { updateByPath } from "../utils/update.js";
 
 const { ActorSheetV2 } = foundry.applications.sheets;
@@ -27,6 +27,7 @@ interface BreakdownEntry {
   result: number | string;
   discarded?: boolean;
   hitch?: boolean;
+  fate?: boolean;
 }
 
 interface ResolvedRoll {
@@ -573,6 +574,9 @@ export abstract class OddActorSheetBase extends HandlebarsActorSheet {
       }
     }
 
+    const fateRolls = await this._rollHandOfFate(breakdown, resolution);
+    finalTotal += fateRolls.reduce((sum, r) => sum + (r.total ?? 0), 0);
+
     const content = await foundry.applications.handlebars.renderTemplate(
       "systems/odd-rpg/templates/chat/dice-pool-roll.hbs",
       { total: finalTotal, breakdown, isKeepHighest: resolution === "keepHighest", ...this._markHitches(breakdown, resolution) },
@@ -581,7 +585,7 @@ export abstract class OddActorSheetBase extends HandlebarsActorSheet {
     await ChatMessage.create({
       speaker: this._speaker(),
       content,
-      rolls: [roll],
+      rolls: [roll, ...fateRolls],
     });
 
     return finalTotal;
@@ -590,6 +594,30 @@ export abstract class OddActorSheetBase extends HandlebarsActorSheet {
   /** Pool dice over the cap. Initiative keeps its highest die, so only a Standard Test is capped. */
   private _droppedDice(entries: PoolEntry[], resolution: RollResolution): Set<number> {
     return resolution === "sum" ? droppedPoolIndices(entries.map((e) => e.die)) : new Set<number>();
+  }
+
+  /**
+   * Hand of Fate: when every rolled Bonus die shows its maximum, roll an extra
+   * die one step above the largest, and keep going while each extra die rolls
+   * its maximum too (d12s at the top). This can go past the dice pool cap.
+   * Adds the extra dice to the breakdown and returns their rolls.
+   */
+  private async _rollHandOfFate(breakdown: BreakdownEntry[], resolution: RollResolution): Promise<Roll[]> {
+    const bonusDice = breakdown.filter((d) => !d.discarded && !d.die.startsWith("-"));
+    if (resolution !== "sum" || !bonusDice.length) return [];
+    if (!bonusDice.every((d) => d.result === dieFaces(d.die))) return [];
+
+    let die = `d${Math.max(...bonusDice.map((d) => dieFaces(d.die)))}`;
+    const rolls: Roll[] = [];
+    let maxed = true;
+    while (maxed) {
+      die = nextDieStep(die);
+      const fateRoll = await new Roll(die).evaluate();
+      rolls.push(fateRoll);
+      breakdown.push({ label: game.i18n.localize("ODD.Roll.handOfFate"), die, result: fateRoll.total, fate: true });
+      maxed = fateRoll.total === dieFaces(die);
+    }
+    return rolls;
   }
 
   /**

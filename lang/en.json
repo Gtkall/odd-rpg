@@ -154,6 +154,7 @@
       "shock": "Shock"
     },
     "Roll": {
+      "handOfFate": "Hand of Fate",
       "hitch": "1 Hitch",
       "hitches": "{count} Hitches",
       "snakeEyes": "Snake Eyes! All 1s: a Botch"
