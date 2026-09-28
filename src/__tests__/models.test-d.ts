@@ -14,6 +14,7 @@ import type CharacterDataModel from "../module/data/actor/character.js";
 import type EasyCharacterDataModel from "../module/data/actor/easyCharacter.js";
 import type ArmorDataModel from "../module/data/item/armor.js";
 import type EasyArmorDataModel from "../module/data/item/easyArmor.js";
+import type EasyWeaponDataModel from "../module/data/item/easyWeapon.js";
 import type EasyFlawDataModel from "../module/data/item/easyFlaw.js";
 import type EasyTalentDataModel from "../module/data/item/easyTalent.js";
 import type FlawDataModel from "../module/data/item/flaw.js";
@@ -91,6 +92,7 @@ describe("items", () => {
     expectTypeOf<Item.SystemOfType<"armor">>().toEqualTypeOf<ArmorDataModel>();
     expectTypeOf<Item.SystemOfType<"easyArmor">>().toEqualTypeOf<EasyArmorDataModel>();
     expectTypeOf<Item.SystemOfType<"easyFlaw">>().toEqualTypeOf<EasyFlawDataModel>();
+    expectTypeOf<Item.SystemOfType<"easyWeapon">>().toEqualTypeOf<EasyWeaponDataModel>();
     expectTypeOf<Item.SystemOfType<"easyTalent">>().toEqualTypeOf<EasyTalentDataModel>();
     expectTypeOf<Item.SystemOfType<"injury">>().toEqualTypeOf<InjuryDataModel>();
     expectTypeOf<Item.SystemOfType<"flaw">>().toEqualTypeOf<FlawDataModel>();
@@ -103,6 +105,7 @@ describe("items", () => {
     expectTypeOf<Item.SystemOfType<"armor">["description"]>().toEqualTypeOf<string>();
     expectTypeOf<Item.SystemOfType<"easyArmor">["description"]>().toEqualTypeOf<string>();
     expectTypeOf<Item.SystemOfType<"easyFlaw">["description"]>().toEqualTypeOf<string>();
+    expectTypeOf<Item.SystemOfType<"easyWeapon">["description"]>().toEqualTypeOf<string>();
     expectTypeOf<Item.SystemOfType<"easyTalent">["description"]>().toEqualTypeOf<string>();
     expectTypeOf<Item.SystemOfType<"injury">["description"]>().toEqualTypeOf<string>();
     expectTypeOf<Item.SystemOfType<"feature">["description"]>().toEqualTypeOf<string>();
@@ -129,6 +132,14 @@ describe("items", () => {
     expectTypeOf<Item.SystemOfType<"easyArmor">["bulk"]>().toEqualTypeOf<number>();
     expectTypeOf<Item.SystemOfType<"easyArmor">["protection"]>().toEqualTypeOf<number>();
     expectTypeOf<Item.SystemOfType<"easyArmor">["equipped"]>().toEqualTypeOf<boolean>();
+  });
+
+  it("types an ODDEasy weapon's Power and its parts", () => {
+    expectTypeOf<Item.SystemOfType<"easyWeapon">["power"]>().toEqualTypeOf<number>();
+    expectTypeOf<Item.SystemOfType<"easyWeapon">["muscle"]>().toEqualTypeOf<boolean>();
+    expectTypeOf<Item.SystemOfType<"easyWeapon">["twoHanded"]>().toEqualTypeOf<boolean>();
+    expectTypeOf<Item.SystemOfType<"easyWeapon">["traits"]>().toEqualTypeOf<string>();
+    expectTypeOf<EasyWeaponDataModel["hitPower"]>().toEqualTypeOf<number>();
   });
 
   it("types derived data", () => {

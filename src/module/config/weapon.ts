@@ -21,3 +21,6 @@ export const WEAPON_TEMPO_MIN = 1;
 export const WEAPON_TEMPO_MAX = 10;
 
 export const WEAPON_TAGS: readonly string[] = Object.freeze([]);
+
+/** Extra Power a muscle-powered ODDEasy weapon gains when used two-handed (on top of Might). */
+export const EASY_TWO_HANDED_POWER = 5;

@@ -12,6 +12,8 @@
   {{> "systems/odd-rpg/templates/item/partials/die-trait-form.hbs"}}
 {{else if (eq item.type "easyArmor")}}
   {{> "systems/odd-rpg/templates/item/partials/easy-armor-form.hbs"}}
+{{else if (eq item.type "easyWeapon")}}
+  {{> "systems/odd-rpg/templates/item/partials/easy-weapon-form.hbs"}}
 {{else if (eq item.type "injury")}}
   {{> "systems/odd-rpg/templates/item/partials/injury-form.hbs"}}
 {{else}}

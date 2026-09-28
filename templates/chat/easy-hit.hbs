@@ -1,0 +1,45 @@
+{{!-- ODDEasy Hit: exploding d20 + Power, read against the Damage Ladder --}}
+<div class="odd-roll-result easy-hit">
+  <div class="roll-label">{{localize "ODD.Easy.hit"}}: {{weapon}}</div>
+
+  <div class="roll-dice-row">
+    {{#each dice}}
+      {{#unless @first}}<span class="roll-operator">+</span>{{/unless}}
+      <div class="roll-die-entry{{#if exploded}} fate{{/if}}">
+        <div class="die-chip">{{result}}</div>
+        <div class="die-meta"><span class="die-type">d20</span></div>
+      </div>
+    {{/each}}
+    {{#each powerParts}}
+      <span class="roll-operator">+</span>
+      <div class="roll-die-entry">
+        <div class="die-chip">{{value}}</div>
+        <div class="die-meta"><span class="die-source">{{localize label}}</span></div>
+      </div>
+    {{/each}}
+  </div>
+
+  <div class="roll-divider"></div>
+  <div class="roll-label">{{localize "ODD.Easy.damage"}}</div>
+  <div class="roll-total">{{damage}}</div>
+
+  <table class="easy-damage-ladder">
+    <thead>
+      <tr>
+        <th>{{localize "ODD.Easy.damage"}}</th>
+        <th>{{localize "ODD.Easy.result"}}</th>
+        <th>{{localize "ODD.Easy.shockDT"}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each ladder}}
+      <tr{{#if active}} class="active"{{/if}}>
+        <td>{{range}}</td>
+        <td>{{localize result}}</td>
+        <td>{{#if shockDT}}{{shockDT}}{{else}}—{{/if}}</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  <div class="easy-hit-note">{{localize "ODD.Easy.beforeProtection"}}</div>
+</div>
