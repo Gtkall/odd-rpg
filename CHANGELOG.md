@@ -1,3 +1,9 @@
+## [0.12.0](https://github.com/Gtkall/odd-rpg/compare/v0.11.0...v0.12.0) (2026-09-28)
+
+### Features
+
+* restyle sheets with the ODDEasy palette and meet WCAG contrast ([b17c576](https://github.com/Gtkall/odd-rpg/commit/b17c576935230767cccdfcee1467d5bc536bf0b8))
+
 ## [0.11.0](https://github.com/Gtkall/odd-rpg/compare/v0.10.0...v0.11.0) (2026-09-28)
 
 ### Features
