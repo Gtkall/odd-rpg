@@ -14,6 +14,7 @@ import type { OddCombat } from "../module/documents/combat.js";
 import type CharacterDataModel from "../module/data/actor/character.js";
 import type EasyCharacterDataModel from "../module/data/actor/easyCharacter.js";
 import type ArmorDataModel from "../module/data/item/armor.js";
+import type EasyArmorDataModel from "../module/data/item/easyArmor.js";
 import type EasyFlawDataModel from "../module/data/item/easyFlaw.js";
 import type EasyTalentDataModel from "../module/data/item/easyTalent.js";
 import type FeatureDataModel from "../module/data/item/feature.js";
@@ -71,6 +72,7 @@ declare module "fvtt-types/configuration" {
     };
     Item: {
       armor: typeof ArmorDataModel;
+      easyArmor: typeof EasyArmorDataModel;
       easyFlaw: typeof EasyFlawDataModel;
       easyTalent: typeof EasyTalentDataModel;
       feature: typeof FeatureDataModel;

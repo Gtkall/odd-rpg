@@ -8,5 +8,5 @@ export const ODD_ITEM_TYPES: readonly string[] = Object.freeze([
 ]);
 
 export const EASY_ITEM_TYPES: readonly string[] = Object.freeze([
-  "easyFlaw", "easyTalent", "injury", "item",
+  "easyArmor", "easyFlaw", "easyTalent", "injury", "item",
 ]);

@@ -12,6 +12,7 @@
       "armor":   "Armor",
       "talent":  "Talent",
       "flaw":    "Flaw",
+      "easyArmor":  "ODDEasy Armor",
       "easyTalent": "ODDEasy Talent",
       "easyFlaw":   "ODDEasy Flaw",
       "injury":     "Injury"
@@ -235,6 +236,10 @@
       "addTalent": "Add talent…",
       "addFlaw": "Add flaw…",
       "addInjury": "Add injury…",
+      "armor": "Armor",
+      "addArmor": "Add armor…",
+      "worn": "Worn",
+      "bulkSlotHint": "Filled by worn armor's Bulk; take the armor off to clear it",
       "die": "Die",
       "severity": "Severity",
       "strainPenalty": "Strain Penalty",
