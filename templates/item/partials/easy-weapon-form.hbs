@@ -1,0 +1,43 @@
+{{!-- ODDEasy weapon: Power, whether Might adds to it, and traits --}}
+<div class="odd-rpg flaw-form">
+
+  <header class="flaw-header">
+    <img class="item-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" width="48" height="48" />
+    <input class="item-name" name="name" type="text" value="{{item.name}}" placeholder="{{localize "TYPES.Item.easyWeapon"}}"
+      {{#unless isEditMode}}disabled{{/unless}} />
+    <button type="button" class="item-edit-toggle" data-edit-toggle
+      title="{{#if isEditMode}}Finish editing{{else}}Edit item{{/if}}">
+      {{#if isEditMode}}<i class="fas fa-check"></i>{{else}}<i class="fas fa-pen"></i>{{/if}}
+    </button>
+  </header>
+
+  <fieldset class="item-fields flaw-fields" {{#unless isEditMode}}disabled{{/unless}}>
+    <div class="flaw-row">
+      <div class="flaw-row-label">{{localize "ODD.Easy.power"}}</div>
+      <input type="number" name="system.power" value="{{system.power}}" step="1" />
+    </div>
+    <div class="flaw-row">
+      <div class="flaw-row-label">{{localize "ODD.Easy.muscle"}}</div>
+      <input type="checkbox" name="system.muscle" {{checked system.muscle}}
+        title="{{localize "ODD.Easy.muscleHint"}}" />
+    </div>
+    <div class="flaw-row">
+      <div class="flaw-row-label">{{localize "ODD.Easy.twoHanded"}}</div>
+      <input type="checkbox" name="system.twoHanded" {{checked system.twoHanded}}
+        title="{{localize "ODD.Easy.twoHandedHint"}}" />
+    </div>
+    <div class="flaw-row">
+      <div class="flaw-row-label">{{localize "ODD.Easy.traits"}}</div>
+      <input type="text" name="system.traits" value="{{system.traits}}" placeholder="{{localize "ODD.Easy.traitsPlaceholder"}}" />
+    </div>
+  </fieldset>
+
+  <div class="item-description">
+    {{#if isEditMode}}
+      <prose-mirror name="system.description" value="{{system.description}}" compact></prose-mirror>
+    {{else}}
+      <div class="item-description-view">{{{enrichedDescription}}}</div>
+    {{/if}}
+  </div>
+
+</div>

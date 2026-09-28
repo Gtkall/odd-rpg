@@ -57,6 +57,11 @@
           "description"
         ]
       },
+      "easyWeapon": {
+        "htmlFields": [
+          "description"
+        ]
+      },
       "injury": {
         "htmlFields": [
           "description"

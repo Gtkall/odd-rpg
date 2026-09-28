@@ -717,6 +717,38 @@
     padding: 0.15rem 0.4rem;
 }
 
+/* ── ODDEasy Hit: the Damage Ladder, with the rung the Damage reaches highlighted ── */
+.odd-roll-result .easy-damage-ladder {
+    width: 100%;
+    margin: 0.3rem 0 0.2rem;
+    border-collapse: collapse;
+    font-size: 0.75rem;
+    color: #555;
+}
+
+.odd-roll-result .easy-damage-ladder th {
+    font-weight: 700;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.odd-roll-result .easy-damage-ladder td,
+.odd-roll-result .easy-damage-ladder th {
+    padding: 0.1rem 0.3rem;
+    text-align: center;
+}
+
+.odd-roll-result .easy-damage-ladder tr.active td {
+    background: #c0392b;
+    color: #fff;
+    font-weight: 700;
+}
+
+.odd-roll-result .easy-hit-note {
+    font-size: 0.68rem;
+    font-style: italic;
+    color: #888;
+}
+
 /* ── Hit Location Roll chat message ── */
 .hit-location-result .hit-location-chat-layout {
     display: flex;
@@ -3385,6 +3417,17 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: #999;
+}
+
+.odd-rpg .easy-weapons-panel,
+.odd-rpg .easy-armor-panel {
+    flex: 1;
+}
+
+.odd-rpg .easy-weapon-traits {
+    font-size: 0.72rem;
+    color: #999;
+    font-style: italic;
 }
 
 .odd-rpg .easy-armor-stat {
