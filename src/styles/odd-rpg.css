@@ -680,6 +680,13 @@
     color: #fff;
 }
 
+/* Hand of Fate: an extra die after every Bonus die rolled its maximum */
+.odd-roll-result .roll-die-entry.fate .die-chip {
+    border-color: #b8860b;
+    color: #b8860b;
+    background: #fff8e1;
+}
+
 /* ── Total ── */
 .odd-roll-result .roll-divider {
     height: 1px;
