@@ -674,6 +674,12 @@
     color: #999;
 }
 
+/* Hitch: a 1 on a Bonus die */
+.odd-roll-result .roll-die-entry.hitch .die-chip {
+    background: #c0392b;
+    color: #fff;
+}
+
 /* ── Total ── */
 .odd-roll-result .roll-divider {
     height: 1px;
@@ -687,6 +693,21 @@
     line-height: 1;
     padding: 0.1rem 0 0.3rem;
     color: #c0392b;
+}
+
+.odd-roll-result .roll-hitches {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #c0392b;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.odd-roll-result .roll-hitches.snake-eyes {
+    background: #c0392b;
+    color: #fff;
+    border-radius: 3px;
+    padding: 0.15rem 0.4rem;
 }
 
 /* ── Hit Location Roll chat message ── */

@@ -20,6 +20,15 @@ const { HandlebarsApplicationMixin } = foundry.applications.api;
 // declarations stay readable and type inference flows correctly throughout.
 const HandlebarsActorSheet = HandlebarsApplicationMixin(ActorSheetV2) as typeof ActorSheetV2;
 
+/** One die on a roll's chat card. */
+interface BreakdownEntry {
+  label: string;
+  die: string;
+  result: number | string;
+  discarded?: boolean;
+  hitch?: boolean;
+}
+
 interface ResolvedRoll {
   entries: PoolEntry[];
   bonus: string | undefined;
@@ -526,7 +535,7 @@ export abstract class OddActorSheetBase extends HandlebarsActorSheet {
     await roll.evaluate();
 
     let finalTotal: number;
-    let breakdown: { label: string; die: string; result: number | string; discarded?: boolean }[];
+    let breakdown: BreakdownEntry[];
 
     if (resolution === "keepHighest") {
       // Determine max die; mark the rest discarded
@@ -566,7 +575,7 @@ export abstract class OddActorSheetBase extends HandlebarsActorSheet {
 
     const content = await foundry.applications.handlebars.renderTemplate(
       "systems/odd-rpg/templates/chat/dice-pool-roll.hbs",
-      { total: finalTotal, breakdown, isKeepHighest: resolution === "keepHighest" },
+      { total: finalTotal, breakdown, isKeepHighest: resolution === "keepHighest", ...this._markHitches(breakdown, resolution) },
     );
 
     await ChatMessage.create({
@@ -583,11 +592,27 @@ export abstract class OddActorSheetBase extends HandlebarsActorSheet {
     return resolution === "sum" ? droppedPoolIndices(entries.map((e) => e.die)) : new Set<number>();
   }
 
+  /**
+   * Marks every Hitch (a 1 on a rolled Bonus die) and reports the count, and
+   * Snake Eyes when every Bonus die is a 1. A Penalty die's 1 is no Hitch; it
+   * works for the roller. Initiative has no Hitches.
+   */
+  private _markHitches(
+    breakdown: BreakdownEntry[],
+    resolution: RollResolution,
+  ): { hitches: number; snakeEyes: boolean } {
+    if (resolution !== "sum") return { hitches: 0, snakeEyes: false };
+    const bonusDice = breakdown.filter((d) => !d.discarded && !d.die.startsWith("-"));
+    for (const d of bonusDice) d.hitch = d.result === 1;
+    const hitches = bonusDice.filter((d) => d.hitch).length;
+    return { hitches, snakeEyes: hitches > 0 && hitches === bonusDice.length };
+  }
+
   private _buildSumBreakdown(
     entries: PoolEntry[],
     roll: Roll,
     dropped: Set<number>,
-  ): { label: string; die: string; result: number | string; discarded?: boolean }[] {
+  ): BreakdownEntry[] {
     let rolled = 0;
     return entries.map(({ label, die }, i) => dropped.has(i)
       ? { label, die, result: "—", discarded: true }

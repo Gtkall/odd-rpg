@@ -153,6 +153,11 @@
       "initiative": "Initiative",
       "shock": "Shock"
     },
+    "Roll": {
+      "hitch": "1 Hitch",
+      "hitches": "{count} Hitches",
+      "snakeEyes": "Snake Eyes! All 1s: a Botch"
+    },
     "Sheet": {
       "Tabs": {
         "character": "Character",
