@@ -23,7 +23,7 @@ export class OddItemSheet extends OddItemSheetBase {
   static override readonly DEFAULT_OPTIONS = {
     classes: ["odd-rpg", "sheet", "item"],
     position: {
-      width:  Math.round(Math.min(window.innerWidth  * 0.385, 645)),
+      width:  Math.round(Math.min(window.innerWidth  * 0.46, 775)),
       height: Math.round(Math.min(window.innerHeight * 0.595, 755)),
     },
     form: { submitOnChange: true },
