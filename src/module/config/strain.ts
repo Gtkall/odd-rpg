@@ -17,10 +17,12 @@ export const STRAIN_FATIGUE_PENALTIES: Record<number, string> = Object.freeze({
   6: "d12",
 });
 
-/** ODDEasy strain slots: Fatigue, Exhaustion, or armor Bulk. */
+/** ODDEasy strain slots set by hand: Fatigue or Exhaustion. Worn armor fills Bulk slots. */
 export const EASY_STRAIN_VALUES: Record<string, string> = Object.freeze({
   "":  "ODD.Strain.none",
   "F": "ODD.Strain.fatigue",
   "E": "ODD.Strain.exhaustion",
-  "B": "ODD.Strain.bulk",
 });
+
+/** An ODDEasy Strain Slot filled by worn armor's Bulk. */
+export const EASY_BULK_SLOT = "B";

@@ -10,6 +10,7 @@
 import type { CommonRollDef, RollResolution, RollSource } from "../config/rolls.js";
 import type { PoolEntry, RollingActor } from "../data/abstract/character-base.js";
 import { isDicePoolSource } from "../data/abstract/dice-pool-source.js";
+import { dieFaces, droppedPoolIndices, nextDieStep } from "../utils/dice-pool.js";
 import { updateByPath } from "../utils/update.js";
 
 const { ActorSheetV2 } = foundry.applications.sheets;
@@ -18,6 +19,16 @@ const { HandlebarsApplicationMixin } = foundry.applications.api;
 // HandlebarsApplicationMixin returns an opaque type; cast once here so class
 // declarations stay readable and type inference flows correctly throughout.
 const HandlebarsActorSheet = HandlebarsApplicationMixin(ActorSheetV2) as typeof ActorSheetV2;
+
+/** One die on a roll's chat card. */
+interface BreakdownEntry {
+  label: string;
+  die: string;
+  result: number | string;
+  discarded?: boolean;
+  hitch?: boolean;
+  fate?: boolean;
+}
 
 interface ResolvedRoll {
   entries: PoolEntry[];
@@ -351,12 +362,14 @@ export abstract class OddActorSheetBase extends HandlebarsActorSheet {
     const tray = this.element.querySelector(".dice-pool-tray");
     if (!tray) return;
 
+    const dropped = droppedPoolIndices(this._dicePool.map((e) => e.die));
     tray.innerHTML = await foundry.applications.handlebars.renderTemplate(
       "systems/odd-rpg/templates/actor/dice-pool-tray.hbs",
       {
-        dicePool: this._dicePool,
+        dicePool: this._dicePool.map((e, i) => ({ ...e, dropped: dropped.has(i) })),
         dicePoolFlat: this._dicePoolFlat,
         bonusDice: ["d4", "d6", "d8", "d10", "d12"],
+        penaltyDice: ["-d4", "-d6", "-d8", "-d10", "-d12"],
         historyCanGoUp: this._rollHistoryIndex < this._rollHistory.length - 1,
         historyCanGoDown: this._rollHistoryIndex >= 0,
         saveRollName: this._saveRollName,
@@ -374,7 +387,7 @@ export abstract class OddActorSheetBase extends HandlebarsActorSheet {
     tray.querySelectorAll(".dice-pool-add-die").forEach((btn) => {
       btn.addEventListener("click", () => {
         const die = (btn as HTMLElement).dataset.die;
-        if (die) void this._addToDicePool("Bonus", die);
+        if (die) void this._addToDicePool(die.startsWith("-") ? "Penalty" : "Bonus", die);
       });
     });
     tray.querySelector(".history-up")?.addEventListener("click", () => { this._navigateHistory("up"); });
@@ -517,12 +530,13 @@ export abstract class OddActorSheetBase extends HandlebarsActorSheet {
   ): Promise<number | undefined> {
     if (entries.length === 0) return undefined;
 
-    const diceParts = entries.map((e) => e.die);
+    const dropped = this._droppedDice(entries, resolution);
+    const diceParts = entries.filter((_, i) => !dropped.has(i)).map((e) => e.die);
     const roll = new Roll(diceParts.join("+"));
     await roll.evaluate();
 
     let finalTotal: number;
-    let breakdown: { label: string; die: string; result: number | string; discarded?: boolean }[];
+    let breakdown: BreakdownEntry[];
 
     if (resolution === "keepHighest") {
       // Determine max die; mark the rest discarded
@@ -547,7 +561,7 @@ export abstract class OddActorSheetBase extends HandlebarsActorSheet {
         const resolved = this._resolveBonusFormula(bonus);
         const bonusRoll = await new Roll(resolved).evaluate();
         finalTotal = roll.total! + bonusRoll.total;
-        breakdown = this._buildSumBreakdown(entries, roll);
+        breakdown = this._buildSumBreakdown(entries, roll, dropped);
         // Bonus dice from the bonus roll
         for (const term of bonusRoll.dice) {
           const dieLabel = `d${term.faces}`;
@@ -556,28 +570,80 @@ export abstract class OddActorSheetBase extends HandlebarsActorSheet {
         }
       } else {
         finalTotal = roll.total ?? 0;
-        breakdown = this._buildSumBreakdown(entries, roll);
+        breakdown = this._buildSumBreakdown(entries, roll, dropped);
       }
     }
 
+    const fateRolls = await this._rollHandOfFate(breakdown, resolution);
+    finalTotal += fateRolls.reduce((sum, r) => sum + (r.total ?? 0), 0);
+
     const content = await foundry.applications.handlebars.renderTemplate(
       "systems/odd-rpg/templates/chat/dice-pool-roll.hbs",
-      { total: finalTotal, breakdown, isKeepHighest: resolution === "keepHighest" },
+      { total: finalTotal, breakdown, isKeepHighest: resolution === "keepHighest", ...this._markHitches(breakdown, resolution) },
     );
 
     await ChatMessage.create({
       speaker: this._speaker(),
       content,
-      rolls: [roll],
+      rolls: [roll, ...fateRolls],
     });
 
     return finalTotal;
   }
 
+  /** Pool dice over the cap. Initiative keeps its highest die, so only a Standard Test is capped. */
+  private _droppedDice(entries: PoolEntry[], resolution: RollResolution): Set<number> {
+    return resolution === "sum" ? droppedPoolIndices(entries.map((e) => e.die)) : new Set<number>();
+  }
+
+  /**
+   * Hand of Fate: when every rolled Bonus die shows its maximum, roll an extra
+   * die one step above the largest, and keep going while each extra die rolls
+   * its maximum too (d12s at the top). This can go past the dice pool cap.
+   * Adds the extra dice to the breakdown and returns their rolls.
+   */
+  private async _rollHandOfFate(breakdown: BreakdownEntry[], resolution: RollResolution): Promise<Roll[]> {
+    const bonusDice = breakdown.filter((d) => !d.discarded && !d.die.startsWith("-"));
+    if (resolution !== "sum" || !bonusDice.length) return [];
+    if (!bonusDice.every((d) => d.result === dieFaces(d.die))) return [];
+
+    let die = `d${Math.max(...bonusDice.map((d) => dieFaces(d.die)))}`;
+    const rolls: Roll[] = [];
+    let maxed = true;
+    while (maxed) {
+      die = nextDieStep(die);
+      const fateRoll = await new Roll(die).evaluate();
+      rolls.push(fateRoll);
+      breakdown.push({ label: game.i18n.localize("ODD.Roll.handOfFate"), die, result: fateRoll.total, fate: true });
+      maxed = fateRoll.total === dieFaces(die);
+    }
+    return rolls;
+  }
+
+  /**
+   * Marks every Hitch (a 1 on a rolled Bonus die) and reports the count, and
+   * Snake Eyes when every Bonus die is a 1. A Penalty die's 1 is no Hitch; it
+   * works for the roller. Initiative has no Hitches.
+   */
+  private _markHitches(
+    breakdown: BreakdownEntry[],
+    resolution: RollResolution,
+  ): { hitches: number; snakeEyes: boolean } {
+    if (resolution !== "sum") return { hitches: 0, snakeEyes: false };
+    const bonusDice = breakdown.filter((d) => !d.discarded && !d.die.startsWith("-"));
+    for (const d of bonusDice) d.hitch = d.result === 1;
+    const hitches = bonusDice.filter((d) => d.hitch).length;
+    return { hitches, snakeEyes: hitches > 0 && hitches === bonusDice.length };
+  }
+
   private _buildSumBreakdown(
     entries: PoolEntry[],
     roll: Roll,
-  ): { label: string; die: string; result: number | string }[] {
-    return entries.map(({ label, die }, i) => ({ label, die, result: roll.dice[i]?.total ?? "?" }));
+    dropped: Set<number>,
+  ): BreakdownEntry[] {
+    let rolled = 0;
+    return entries.map(({ label, die }, i) => dropped.has(i)
+      ? { label, die, result: "—", discarded: true }
+      : { label, die, result: roll.dice[rolled++]?.total ?? "?" });
   }
 }

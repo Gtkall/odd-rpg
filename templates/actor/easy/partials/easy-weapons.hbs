@@ -1,0 +1,24 @@
+{{!-- ODDEasy weapons: click one to roll a Hit (d20 + Power) --}}
+<div class="easy-panel easy-weapons-panel">
+  <div class="tf-section-header">
+    <h3 class="panel-header">{{localize "ODD.Easy.weapons"}}</h3>
+    {{#if isEditMode}}
+    <input type="text" class="inventory-add-input" data-item-type="easyWeapon"
+      placeholder="{{localize "ODD.Easy.addWeapon"}}" />
+    {{/if}}
+  </div>
+  {{#each weapons}}
+  <div class="item easy-trait-row" data-item-id="{{id}}">
+    <span class="easy-trait-name rollable" data-weapon-hit="{{id}}"
+          title="{{localize "ODD.Easy.rollHitHint"}}">{{name}}</span>
+    {{#if traits}}<span class="easy-weapon-traits">{{traits}}</span>{{/if}}
+    <span class="easy-armor-stat">{{localize "ODD.Easy.power"}} +{{hitPower}}</span>
+    {{#if ../isEditMode}}
+    <div class="item-controls">
+      <button type="button" class="item-edit" title="Edit">✎</button>
+      <button type="button" class="item-delete" title="Delete">✕</button>
+    </div>
+    {{/if}}
+  </div>
+  {{/each}}
+</div>

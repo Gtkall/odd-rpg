@@ -121,3 +121,28 @@ export const INJURY_WOUNDED_PENALTY = "d10";
 
 /** Wounds a character can carry; one more becomes a Crippling injury. */
 export const INJURY_MAX_WOUNDS = 2;
+
+/* -------------------------------------------------------------------------- */
+/*  ODDEasy Hits & the Damage Ladder                                          */
+/* -------------------------------------------------------------------------- */
+
+/** A Hit rolls a d20 that explodes: each 20 adds 20 and rolls again. Then add the attack's Power. */
+export const EASY_HIT_DIE = "1d20x";
+
+/** One rung of the Damage Ladder: a Hit dealing at least `min` Damage. */
+export interface DamageLadderRung {
+  min: number;
+  result: string;
+  /** DT of the Shock Roll that follows, or null when there is none. */
+  shockDT: number | null;
+}
+
+/** ODDEasy's Damage Ladder (p. 10), highest rung first. Damage below the lowest rung does nothing. */
+export const EASY_DAMAGE_LADDER: readonly DamageLadderRung[] = Object.freeze([
+  { min: 50, result: "ODD.Easy.Ladder.dead",          shockDT: null },
+  { min: 40, result: "ODD.Easy.Ladder.crippledDying", shockDT: 25 },
+  { min: 30, result: "ODD.Easy.Ladder.crippled",      shockDT: 20 },
+  { min: 20, result: "ODD.Easy.Ladder.wounded",       shockDT: 15 },
+  { min: 10, result: "ODD.Easy.Ladder.exhaustion",    shockDT: 10 },
+  { min: 1,  result: "ODD.Easy.Ladder.fatigue",       shockDT: 5 },
+]);

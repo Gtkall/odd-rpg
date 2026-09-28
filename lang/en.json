@@ -12,7 +12,9 @@
       "armor":   "Armor",
       "talent":  "Talent",
       "flaw":    "Flaw",
+      "easyArmor":  "ODDEasy Armor",
       "easyTalent": "ODDEasy Talent",
+      "easyWeapon": "ODDEasy Weapon",
       "easyFlaw":   "ODDEasy Flaw",
       "injury":     "Injury"
     }
@@ -153,6 +155,12 @@
       "initiative": "Initiative",
       "shock": "Shock"
     },
+    "Roll": {
+      "handOfFate": "Hand of Fate",
+      "hitch": "1 Hitch",
+      "hitches": "{count} Hitches",
+      "snakeEyes": "Snake Eyes! All 1s: a Botch"
+    },
     "Sheet": {
       "Tabs": {
         "character": "Character",
@@ -229,6 +237,33 @@
       "addTalent": "Add talent…",
       "addFlaw": "Add flaw…",
       "addInjury": "Add injury…",
+      "armor": "Armor",
+      "addArmor": "Add armor…",
+      "worn": "Worn",
+      "bulkSlotHint": "Filled by worn armor's Bulk; take the armor off to clear it",
+      "weapons": "Weapons",
+      "addWeapon": "Add weapon…",
+      "rollHitHint": "Click to roll a Hit: d20 + Power",
+      "power": "Power",
+      "muscle": "Muscle-powered",
+      "muscleHint": "Might's value (the number after the d) adds to Power",
+      "twoHanded": "Two-handed",
+      "twoHandedHint": "A muscle-powered weapon used in both hands adds 5 more Power",
+      "traits": "Traits",
+      "traitsPlaceholder": "e.g. Armor-piercing, Flaming",
+      "hit": "Hit",
+      "damage": "Damage",
+      "result": "Result",
+      "shockDT": "Shock DT",
+      "beforeProtection": "Before armor: the target subtracts their Protection, then reads the ladder",
+      "Ladder": {
+        "dead": "Dead",
+        "crippledDying": "Crippled and Dying",
+        "crippled": "Crippled",
+        "wounded": "Wounded",
+        "exhaustion": "Suffer 1 Exhaustion",
+        "fatigue": "Suffer 1 Fatigue"
+      },
       "die": "Die",
       "severity": "Severity",
       "strainPenalty": "Strain Penalty",

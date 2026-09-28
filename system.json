@@ -47,7 +47,17 @@
           "description"
         ]
       },
+      "easyArmor": {
+        "htmlFields": [
+          "description"
+        ]
+      },
       "easyFlaw": {
+        "htmlFields": [
+          "description"
+        ]
+      },
+      "easyWeapon": {
         "htmlFields": [
           "description"
         ]

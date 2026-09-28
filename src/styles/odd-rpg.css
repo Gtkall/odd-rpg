@@ -414,6 +414,16 @@
     border-color: #ff4444;
 }
 
+/* Over the dice pool cap: shown, but not rolled */
+.odd-rpg .pool-chip.dropped {
+    opacity: 0.45;
+    border-style: dashed;
+}
+
+.odd-rpg .pool-chip.dropped .chip-die {
+    text-decoration: line-through;
+}
+
 .odd-rpg .pool-flat {
     display: inline-flex;
     align-items: center;
@@ -434,6 +444,7 @@
 
 .odd-rpg .dice-pool-add-row {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 0.3rem;
 }
@@ -525,6 +536,10 @@
     color: var(--odd-color-primary);
     cursor: pointer;
     transition: border-color 0.15s, color 0.15s;
+}
+
+.odd-rpg .dice-pool-add-die.penalty {
+    color: var(--odd-color-muted, #888);
 }
 
 .odd-rpg .dice-pool-add-die:hover {
@@ -646,7 +661,7 @@
     white-space: nowrap;
 }
 
-/* Discarded (non-kept) dice for keepHighest */
+/* Discarded dice: not kept by keepHighest, or over the dice pool cap */
 .odd-roll-result .roll-die-entry.discarded .die-chip {
     border-color: #999;
     color: #999;
@@ -657,6 +672,19 @@
 .odd-roll-result .roll-die-entry.discarded .die-type,
 .odd-roll-result .roll-die-entry.discarded .die-source {
     color: #999;
+}
+
+/* Hitch: a 1 on a Bonus die */
+.odd-roll-result .roll-die-entry.hitch .die-chip {
+    background: #c0392b;
+    color: #fff;
+}
+
+/* Hand of Fate: an extra die after every Bonus die rolled its maximum */
+.odd-roll-result .roll-die-entry.fate .die-chip {
+    border-color: #b8860b;
+    color: #b8860b;
+    background: #fff8e1;
 }
 
 /* ── Total ── */
@@ -672,6 +700,53 @@
     line-height: 1;
     padding: 0.1rem 0 0.3rem;
     color: #c0392b;
+}
+
+.odd-roll-result .roll-hitches {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #c0392b;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.odd-roll-result .roll-hitches.snake-eyes {
+    background: #c0392b;
+    color: #fff;
+    border-radius: 3px;
+    padding: 0.15rem 0.4rem;
+}
+
+/* ── ODDEasy Hit: the Damage Ladder, with the rung the Damage reaches highlighted ── */
+.odd-roll-result .easy-damage-ladder {
+    width: 100%;
+    margin: 0.3rem 0 0.2rem;
+    border-collapse: collapse;
+    font-size: 0.75rem;
+    color: #555;
+}
+
+.odd-roll-result .easy-damage-ladder th {
+    font-weight: 700;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.odd-roll-result .easy-damage-ladder td,
+.odd-roll-result .easy-damage-ladder th {
+    padding: 0.1rem 0.3rem;
+    text-align: center;
+}
+
+.odd-roll-result .easy-damage-ladder tr.active td {
+    background: #c0392b;
+    color: #fff;
+    font-weight: 700;
+}
+
+.odd-roll-result .easy-hit-note {
+    font-size: 0.68rem;
+    font-style: italic;
+    color: #888;
 }
 
 /* ── Hit Location Roll chat message ── */
@@ -3342,6 +3417,35 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: #999;
+}
+
+.odd-rpg .easy-weapons-panel,
+.odd-rpg .easy-armor-panel {
+    flex: 1;
+}
+
+.odd-rpg .easy-weapon-traits {
+    font-size: 0.72rem;
+    color: #999;
+    font-style: italic;
+}
+
+.odd-rpg .easy-armor-stat {
+    font-size: 0.78rem;
+    color: #aaa;
+}
+
+/* A Strain Slot filled by worn armor's Bulk: fixed, same size as a slot select */
+.odd-rpg .strain-slot.is-bulk .slot-bulk {
+    width: 100%;
+    font-size: 0.875rem;
+    padding: 0.3rem 0.15rem;
+    text-align: center;
+    background: #333;
+    color: #aaa;
+    border: 1px solid #555;
+    border-radius: 3px;
+    cursor: default;
 }
 
 .odd-rpg .easy-injury-crippled .easy-trait-name {
