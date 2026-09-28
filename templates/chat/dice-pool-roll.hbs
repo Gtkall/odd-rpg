@@ -4,8 +4,9 @@
 
   <div class="roll-dice-row">
     {{#each breakdown}}
-      {{#unless @first}}
-        {{#unless ../isKeepHighest}}<span class="roll-operator">+</span>{{/unless}}
+      {{#unless ../isKeepHighest}}
+        {{#if this.penalty}}<span class="roll-operator">−</span>
+        {{else unless @first}}<span class="roll-operator">+</span>{{/if}}
       {{/unless}}
       <div class="roll-die-entry{{#if this.discarded}} discarded{{/if}}{{#if this.hitch}} hitch{{/if}}{{#if this.fate}} fate{{/if}}">
         <div class="die-chip">{{this.result}}</div>

@@ -28,6 +28,8 @@ interface BreakdownEntry {
   discarded?: boolean;
   hitch?: boolean;
   fate?: boolean;
+  /** Subtracted from the total, so the card shows "−" before it. */
+  penalty?: boolean;
 }
 
 interface ResolvedRoll {
@@ -643,7 +645,7 @@ export abstract class OddActorSheetBase extends HandlebarsActorSheet {
   ): BreakdownEntry[] {
     let rolled = 0;
     return entries.map(({ label, die }, i) => dropped.has(i)
-      ? { label, die, result: "—", discarded: true }
-      : { label, die, result: roll.dice[rolled++]?.total ?? "?" });
+      ? { label, die, result: "—", discarded: true, penalty: die.startsWith("-") }
+      : { label, die, result: roll.dice[rolled++]?.total ?? "?", penalty: die.startsWith("-") });
   }
 }
