@@ -1,0 +1,25 @@
+{{!-- ODDEasy armor: Protection reduces a Hit's Damage; worn armor's Bulk fills Strain Slots --}}
+<div class="easy-panel easy-armor-panel">
+  <div class="tf-section-header">
+    <h3 class="panel-header">{{localize "ODD.Easy.armor"}}</h3>
+    {{#if isEditMode}}
+    <input type="text" class="inventory-add-input" data-item-type="easyArmor"
+      placeholder="{{localize "ODD.Easy.addArmor"}}" />
+    {{/if}}
+  </div>
+  {{#each armor}}
+  <div class="item easy-trait-row" data-item-id="{{id}}">
+    <input type="checkbox" class="item-equipped" data-item-id="{{id}}" {{checked equipped}}
+      title="{{localize "ODD.Easy.worn"}}" />
+    <span class="easy-trait-name">{{name}}</span>
+    <span class="easy-armor-stat">{{localize "ODD.Armor.Bulk"}} {{bulk}}</span>
+    <span class="easy-armor-stat">{{localize "ODD.Armor.Protection"}} {{protection}}</span>
+    {{#if ../isEditMode}}
+    <div class="item-controls">
+      <button type="button" class="item-edit" title="Edit">✎</button>
+      <button type="button" class="item-delete" title="Delete">✕</button>
+    </div>
+    {{/if}}
+  </div>
+  {{/each}}
+</div>

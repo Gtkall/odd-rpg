@@ -1,0 +1,37 @@
+{{!-- ODDEasy armor: Bulk, Protection and whether it is worn --}}
+<div class="odd-rpg flaw-form">
+
+  <header class="flaw-header">
+    <img class="item-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" width="48" height="48" />
+    <input class="item-name" name="name" type="text" value="{{item.name}}" placeholder="{{localize "TYPES.Item.easyArmor"}}"
+      {{#unless isEditMode}}disabled{{/unless}} />
+    <button type="button" class="item-edit-toggle" data-edit-toggle
+      title="{{#if isEditMode}}Finish editing{{else}}Edit item{{/if}}">
+      {{#if isEditMode}}<i class="fas fa-check"></i>{{else}}<i class="fas fa-pen"></i>{{/if}}
+    </button>
+  </header>
+
+  <fieldset class="item-fields flaw-fields" {{#unless isEditMode}}disabled{{/unless}}>
+    <div class="flaw-row">
+      <div class="flaw-row-label">{{localize "ODD.Armor.Bulk"}}</div>
+      <input type="number" name="system.bulk" value="{{system.bulk}}" min="0" step="1" />
+    </div>
+    <div class="flaw-row">
+      <div class="flaw-row-label">{{localize "ODD.Armor.Protection"}}</div>
+      <input type="number" name="system.protection" value="{{system.protection}}" min="0" step="1" />
+    </div>
+    <div class="flaw-row">
+      <div class="flaw-row-label">{{localize "ODD.Easy.worn"}}</div>
+      <input type="checkbox" name="system.equipped" {{checked system.equipped}} />
+    </div>
+  </fieldset>
+
+  <div class="item-description">
+    {{#if isEditMode}}
+      <prose-mirror name="system.description" value="{{system.description}}" compact></prose-mirror>
+    {{else}}
+      <div class="item-description-view">{{{enrichedDescription}}}</div>
+    {{/if}}
+  </div>
+
+</div>

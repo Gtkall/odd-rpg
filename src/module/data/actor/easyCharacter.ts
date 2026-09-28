@@ -5,16 +5,19 @@
  * - Base info (from OddCharacterDataBase): player name, XP, biography, saved rolls
  * - Attributes: Might, Finesse, Wits, Spirit
  * - Skills: Combat, Knowledge, Mental, Physical, Social (untrained = no die)
- * - Strain: 7 slots of Fatigue, Exhaustion or armor Bulk
- * Talents, Flaws and Injuries are items.
+ * - Strain: 7 slots of Fatigue or Exhaustion; worn armor's Bulk fills the leftmost ones
+ * Talents, Flaws, Injuries and armor are items.
  */
 
 import { ATTRIBUTE_DICE_TYPES, DEFAULT_DIE, EASY_ATTRIBUTES } from "../../config/attributes.js";
 import { EASY_SKILLS } from "../../config/skills.js";
 import { DICE_TYPES } from "../../config/dice.js";
-import { EASY_STRAIN_VALUES, STRAIN_DEFAULT_SLOT_COUNT, STRAIN_FATIGUE_PENALTIES } from "../../config/strain.js";
+import {
+  EASY_BULK_SLOT, EASY_STRAIN_VALUES, STRAIN_DEFAULT_SLOT_COUNT, STRAIN_FATIGUE_PENALTIES,
+} from "../../config/strain.js";
 import { EASY_COMMON_ROLLS, type CommonRollDef, type RollSource } from "../../config/rolls.js";
 import { EASY_ITEM_TYPES } from "../../config/item-types.js";
+import { isItemType } from "../../utils/item-type.js";
 import {
   OddCharacterDataBase, defineCharacterBaseSchema,
   type CharacterBaseKeyedData, type PoolEntry, type RollingActor,
@@ -66,19 +69,51 @@ export class EasyCharacterDataModel
     return defineEasyCharacterSchema();
   }
 
+  /**
+   * Strain Slots were once set to Bulk by hand; worn armor fills them now, so
+   * a stored "B" is cleared rather than counted twice.
+   */
+  static override migrateData(source: object): object {
+    const strain = (source as { strain?: { slots?: unknown } }).strain;
+    if (Array.isArray(strain?.slots)) {
+      strain.slots = (strain.slots as unknown[]).map((value) => (value === EASY_BULK_SLOT ? "" : value));
+    }
+    return super.migrateData(source);
+  }
+
   get commonRolls(): readonly CommonRollDef[] {
     return EASY_COMMON_ROLLS;
   }
 
+  /** How many Strain Slots worn armor fills with Bulk, at most every slot. */
+  get bulkSlots(): number {
+    let bulk = 0;
+    for (const item of this.parent.items) {
+      if (isItemType(item, "easyArmor") && item.system.equipped) bulk += item.system.bulk;
+    }
+    return Math.min(bulk, this.strain.slots.length);
+  }
+
+  /**
+   * Every Strain Slot as it counts: Bulk in the leftmost slots, then the stored
+   * slots. Stored slots pushed past the end are hidden, not lost; they return
+   * when the armor comes off.
+   */
+  get strainSlotValues(): string[] {
+    const bulk = this.bulkSlots;
+    const stored = this.strain.slots.slice(0, this.strain.slots.length - bulk);
+    return [...Array<string>(bulk).fill(EASY_BULK_SLOT), ...stored];
+  }
+
   /** Strain Penalty die for the filled slots: none below three, d4 at three up to d12 when full. */
   get strainPenalty(): string | null {
-    const filled = this.strain.slots.filter(Boolean).length;
+    const filled = this.strainSlotValues.filter(Boolean).length;
     return STRAIN_FATIGUE_PENALTIES[filled - 1] ?? null;
   }
 
   /** With no empty slot left, the next Fatigue or Exhaustion leaves the character Incapacitated. */
   get isStrainFull(): boolean {
-    return this.strain.slots.every(Boolean);
+    return this.strainSlotValues.every(Boolean);
   }
 
   acceptsItemType(type: string): boolean {
