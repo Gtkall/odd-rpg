@@ -1,3 +1,13 @@
+## [0.11.0](https://github.com/Gtkall/odd-rpg/compare/v0.10.0...v0.11.0) (2026-09-28)
+
+### Features
+
+* add ODDEasy armor whose worn Bulk fills Strain Slots ([52a2004](https://github.com/Gtkall/odd-rpg/commit/52a2004269c264a6967a373e64aa5c5b458a5d9c))
+* add ODDEasy weapons that roll a Hit against the Damage Ladder ([5481624](https://github.com/Gtkall/odd-rpg/commit/5481624414528c2df281c058376378286ca4e866))
+* cap dice pools at the five largest dice ([074672d](https://github.com/Gtkall/odd-rpg/commit/074672dc967ca77ce18a2bcc5595676a086eaff7))
+* flag Hitches and Snake Eyes on dice pool rolls ([7c38c7b](https://github.com/Gtkall/odd-rpg/commit/7c38c7ba86d8c855a1638ace8489880e11a971e3))
+* roll Hand of Fate dice when every Bonus die rolls its maximum ([5f3b18c](https://github.com/Gtkall/odd-rpg/commit/5f3b18caccb4f6d89ec776fbace9441cb738dee9))
+
 ## [0.10.0](https://github.com/Gtkall/odd-rpg/compare/v0.9.0...v0.10.0) (2026-09-26)
 
 ### Features
