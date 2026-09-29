@@ -13,15 +13,18 @@ import { ATTRIBUTE_DICE_TYPES, DEFAULT_DIE, EASY_ATTRIBUTES } from "../../config
 import { EASY_SKILLS } from "../../config/skills.js";
 import { DICE_TYPES } from "../../config/dice.js";
 import {
-  EASY_BULK_SLOT, EASY_STRAIN_VALUES, STRAIN_DEFAULT_SLOT_COUNT, STRAIN_FATIGUE_PENALTIES,
+  EASY_BULK_SLOT, EASY_EXHAUSTION_SLOT, EASY_FATIGUE_SLOT, EASY_STRAIN_VALUES,
+  STRAIN_DEFAULT_SLOT_COUNT, STRAIN_FATIGUE_PENALTIES, type EasyStrainKind,
 } from "../../config/strain.js";
 import { EASY_COMMON_ROLLS, type CommonRollDef, type RollSource } from "../../config/rolls.js";
 import { EASY_ITEM_TYPES } from "../../config/item-types.js";
 import { isItemType } from "../../utils/item-type.js";
+import { updateByPath } from "../../utils/update.js";
 import {
   OddCharacterDataBase, defineCharacterBaseSchema,
   type CharacterBaseKeyedData, type PoolEntry, type RollingActor,
 } from "../abstract/character-base.js";
+import type { StrainSufferer } from "../abstract/strain-sufferer.js";
 
 const { ArrayField, SchemaField, StringField } = foundry.data.fields;
 
@@ -64,7 +67,7 @@ type EasyCharacterKeyedData = CharacterBaseKeyedData & {
 
 export class EasyCharacterDataModel
   extends OddCharacterDataBase<EasyCharacterSchema, EasyCharacterKeyedData>
-  implements RollingActor {
+  implements RollingActor, StrainSufferer {
   static override defineSchema(): EasyCharacterSchema {
     return defineEasyCharacterSchema();
   }
@@ -114,6 +117,28 @@ export class EasyCharacterDataModel
   /** With no empty slot left, the next Fatigue or Exhaustion leaves the character Incapacitated. */
   get isStrainFull(): boolean {
     return this.strainSlotValues.every(Boolean);
+  }
+
+  /**
+   * Fatigue fills the leftmost empty slot. Exhaustion turns the leftmost F
+   * into an E, then marks the leftmost empty slot F (or fills it with E when
+   * there is no F). Slots hidden under Bulk don't count. With no empty slot
+   * the character is Incapacitated instead, so nothing changes.
+   */
+  async sufferStrain(kind: EasyStrainKind): Promise<boolean> {
+    const slots = [...this.strain.slots];
+    const visible = slots.slice(0, slots.length - this.bulkSlots);
+    const empty = visible.findIndex((value) => !value);
+    if (empty === -1) return false;
+    const fatigue = visible.indexOf(EASY_FATIGUE_SLOT);
+    if (kind === EASY_EXHAUSTION_SLOT && fatigue !== -1) {
+      slots[fatigue] = EASY_EXHAUSTION_SLOT;
+      slots[empty] = EASY_FATIGUE_SLOT;
+    } else {
+      slots[empty] = kind;
+    }
+    await updateByPath(this.parent, { "system.strain.slots": slots });
+    return true;
   }
 
   acceptsItemType(type: string): boolean {

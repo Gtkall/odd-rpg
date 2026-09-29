@@ -770,6 +770,21 @@ body.theme-light .odd-rpg,
     color: var(--odd-chat-on-superb);
 }
 
+/* Push Yourself: any rolled Bonus die can be rerolled, once per Test */
+.odd-roll-result .roll-die-entry.pushable {
+    cursor: pointer;
+}
+
+.odd-roll-result .roll-die-entry.pushable:hover .die-chip {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+
+.odd-roll-result .roll-die-entry.pushed .die-chip {
+    outline: 2px dashed currentColor;
+    outline-offset: 2px;
+}
+
 /* ── Total ── */
 .odd-roll-result .roll-divider {
     height: 1px;
@@ -797,6 +812,12 @@ body.theme-light .odd-rpg,
     color: var(--odd-chat-on-bad);
     border-radius: 3px;
     padding: 0.15rem 0.4rem;
+}
+
+.odd-roll-result .roll-push {
+    font-size: 0.9rem;
+    color: var(--odd-chat-muted);
+    margin-top: 0.2rem;
 }
 
 /* ── ODDEasy Hit: the Damage Ladder, with the rung the Damage reaches highlighted ── */

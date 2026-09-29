@@ -159,7 +159,11 @@
       "handOfFate": "Hand of Fate",
       "hitch": "1 Hitch",
       "hitches": "{count} Hitches",
-      "snakeEyes": "Snake Eyes! All 1s: a Botch"
+      "snakeEyes": "Snake Eyes! All 1s: a Botch",
+      "pushHint": "Push Yourself: reroll this die and keep the best. Click to suffer 1 Fatigue; Shift-click to suffer 1 Exhaustion (long-term activities, the GM's call)",
+      "pushedFatigue": "Pushed: rerolled a {die}, {from} → {to}. Suffered 1 Fatigue",
+      "pushedExhaustion": "Pushed: rerolled a {die}, {from} → {to}. Suffered 1 Exhaustion",
+      "pushStrainFull": "No empty Strain Slot: pushing would leave you Incapacitated"
     },
     "Sheet": {
       "Tabs": {
