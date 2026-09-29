@@ -17,6 +17,7 @@ import { OddActorSheet } from "./module/sheets/actor.js";
 import { OddEasyActorSheet } from "./module/sheets/easy-actor.js";
 import { OddItemSheet } from "./module/sheets/item.js";
 import { registerEnrichers } from "./module/enrichers.js";
+import { onRenderDicePoolCard } from "./module/chat/dice-pool-card.js";
 import { OddInitiativeTracker } from "./module/tracker/initiative-tracker.js";
 import { migrations } from "./module/migrations/index.js";
 import { registerSettings } from "./module/settings.js";
@@ -103,6 +104,12 @@ Hooks.once("ready", () => {
     migrations.run().catch((err: unknown) => { console.error("ODD RPG | World migration failed", err); });
   }
 });
+
+/* -------------------------------------------------------------------------- */
+/*  Chat — Push Yourself from a dice pool roll's card                         */
+/* -------------------------------------------------------------------------- */
+
+Hooks.on("renderChatMessageHTML", onRenderDicePoolCard);
 
 /* -------------------------------------------------------------------------- */
 /*  Initiative Tracker — re-render on combat changes                         */
