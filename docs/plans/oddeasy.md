@@ -196,7 +196,7 @@ Decides the root of the class hierarchy: our own `OddDataModel` / `OddActorSheet
   - Lossy: hit-location wounds → named injuries (bleeding and bandaged status are lost).
 - `easyWeapon` (Power) and Easy armor use. The PDF treats gear as mostly narrative.
 - The Odds advancement roller.
-- Trackers for Extended and Challenge tests (progress bars, goals, timers).
+- ~~Trackers for Extended and Challenge tests (progress bars, goals, timers).~~ Built as `OddChallengeTracker` (`tracker/challenge-tracker.ts`), a floating window like the initiative tracker (Shift+G, or the Token controls button). Its state is the `odd-rpg.challenge` world setting, so only the GM edits it and every client re-renders on change. A Primary Goal is a Progress Bar with three Failure pips (a lone Extended Test is one such Goal); a Secondary Goal is marked succeeded or failed. A Goal turns green on success (full bar) and red on failure (third Failure); both follow from what the GM marks, never from a roll. Not built: per-Goal Timers, and marking Progress from a roll's chat card.
 - NPCs (the PDF describes them as dice pools, not attributes).
 
 ## Open questions

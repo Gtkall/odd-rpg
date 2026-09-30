@@ -3466,6 +3466,316 @@ body.theme-light .odd-rpg,
 .odd-tracker-empty i { font-size: 2rem; }
 .odd-tracker-empty p { font-style: italic; font-size: 1.02rem; margin: 0; }
 
+/* ============================================================================
+   ODD Challenge Tracker (Extended Test Progress Bars, Challenge Test Goals)
+   ============================================================================ */
+
+/* The window can be dragged narrow: rows wrap instead of squeezing, so the
+   Progress Bar and the text keep their size. */
+.odd-challenge-tracker {
+    min-width: 15rem;
+}
+
+.odd-challenge-tracker .window-content {
+    padding: 0;
+    background: var(--odd-color-bg);
+}
+
+.odd-challenge-inner {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    font-family: var(--odd-font-primary);
+    color: var(--odd-color-primary);
+}
+
+.odd-challenge-tracker button {
+    width: auto;
+    flex: none;
+}
+
+/* Players see the GM's marks read-only, at full contrast. */
+.odd-challenge-tracker button:disabled {
+    opacity: 1;
+    cursor: default;
+}
+
+/* Player view: a Goal reads as a title with a line of facts under it */
+.odd-challenge-info {
+    font-size: 0.95rem;
+    color: var(--odd-color-muted);
+    cursor: help;
+}
+
+.odd-challenge-info:focus-visible {
+    outline: 2px solid var(--odd-color-accent);
+    outline-offset: 2px;
+    border-radius: 50%;
+}
+
+.odd-goal-summary {
+    flex: 1;
+    min-width: 0;
+}
+
+.odd-goal-summary-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.2rem 0.5rem;
+}
+
+.odd-goal-title {
+    flex: 1 1 9rem;
+    margin: 0;
+    border: none;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--odd-color-primary);
+}
+
+.odd-goal-subtitle {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.1rem 1rem;
+    margin: 0.1rem 0 0;
+    font-size: 0.95rem;
+    color: var(--odd-color-muted);
+}
+
+/* A fact that wraps keeps its text clear of the icon */
+.odd-goal-fact {
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
+}
+
+.odd-goal-fact-danger {
+    color: var(--odd-color-danger);
+}
+
+/* Says the outcome in words, so the card's colour is never the only cue */
+.odd-goal-status {
+    flex: 0 0 auto;
+    padding: 0.05rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    white-space: nowrap;
+    color: var(--odd-color-bg);
+}
+
+.odd-goal-status--success { background: var(--odd-color-success); }
+.odd-goal-status--failure { background: var(--odd-color-danger); }
+
+.odd-challenge-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.75rem;
+    padding: 0.4rem 0.6rem;
+    border-bottom: 1px solid var(--odd-color-border);
+    flex-shrink: 0;
+}
+
+/* Players have no controls here, so their Turn sits on the right */
+.odd-challenge-toolbar--player {
+    justify-content: flex-end;
+}
+
+/* The GM's way out of the preview stays on the left */
+.odd-challenge-toolbar--player .odd-challenge-preview {
+    margin-right: auto;
+}
+
+.odd-challenge-hourglass {
+    font-size: 1.35rem;
+    color: var(--odd-color-accent);
+}
+
+.odd-challenge-turn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 1.08rem;
+    white-space: nowrap;
+}
+
+.odd-challenge-turn--last .odd-challenge-turn-label {
+    color: var(--odd-color-danger);
+    font-weight: 600;
+}
+
+.odd-challenge-timer {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--odd-color-muted);
+    white-space: nowrap;
+}
+
+.odd-challenge-timer input {
+    width: 3rem;
+    text-align: center;
+}
+
+.odd-challenge-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem 0.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+}
+
+.odd-challenge-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.5rem;
+    border-bottom: 1px solid var(--odd-color-accent-border);
+    padding-bottom: 0.25rem;
+    margin-bottom: 0.4rem;
+}
+
+.odd-challenge-heading h3 {
+    margin: 0;
+    border: none;
+    font-size: 1.08rem;
+    color: var(--odd-color-accent);
+}
+
+.odd-challenge-empty {
+    margin: 0;
+    font-style: italic;
+    color: var(--odd-color-faint);
+}
+
+.odd-goal {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 0.4rem;
+    margin-bottom: 0.4rem;
+    background: var(--odd-color-panel);
+    border: 1px solid var(--odd-color-border);
+    border-left-width: 4px;
+    border-radius: 4px;
+}
+
+/* A Goal the table has settled: green for succeeded, red for failed. */
+.odd-goal--success {
+    border-color: var(--odd-color-success);
+    background: color-mix(in srgb, var(--odd-color-success) 12%, transparent);
+}
+
+.odd-goal--failure {
+    border-color: var(--odd-color-danger);
+    background: color-mix(in srgb, var(--odd-color-danger) 12%, transparent);
+}
+
+.odd-goal-outcome {
+    display: flex;
+    gap: 0.2rem;
+}
+
+.odd-challenge-tracker .odd-outcome-btn {
+    width: 1.7rem;
+    height: 1.7rem;
+    min-height: 0;
+    padding: 0;
+    border: 2px solid var(--odd-color-control);
+    background: var(--odd-color-surface-sunken);
+    color: var(--odd-color-control);
+}
+
+.odd-challenge-tracker .odd-outcome-btn--success.is-active {
+    border-color: var(--odd-color-success);
+    background: var(--odd-color-success);
+    color: var(--odd-color-bg);
+}
+
+.odd-challenge-tracker .odd-outcome-btn--failure.is-active {
+    border-color: var(--odd-color-danger);
+    background: var(--odd-color-danger);
+    color: var(--odd-color-bg);
+}
+
+.odd-goal-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.odd-goal-row .odd-goal-name { flex: 1 1 10rem; min-width: 0; }
+.odd-goal-row .odd-goal-dt   { flex: 0 0 4.5rem; text-align: center; }
+.odd-goal-row select         { flex: 0 0 auto; width: auto; }
+
+/* Progress Bar, as the rulebook draws it (p. 10): a narrow pill with a heavy
+   outline, divided into Segments by thin dashed lines */
+.odd-progress {
+    display: flex;
+    /* Wide enough to read; the Failures drop to their own line before it shrinks further */
+    flex: 1 1 12rem;
+    min-width: 10rem;
+    max-width: 32rem;
+    height: 1.75rem;
+    border: 3px solid var(--odd-color-primary);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.odd-challenge-tracker .odd-progress-segment {
+    flex: 1;
+    height: 100%;
+    min-height: 0;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: var(--odd-color-surface-sunken);
+    transition: background 0.15s;
+}
+
+.odd-challenge-tracker .odd-progress-segment + .odd-progress-segment {
+    border-left: 1px dashed var(--odd-color-primary);
+}
+
+.odd-challenge-tracker .odd-progress-segment.is-filled {
+    background: var(--odd-color-accent);
+}
+
+/* The ink divider has no contrast on the fill, so between two filled Segments
+   it takes the window's background colour */
+.odd-challenge-tracker .odd-progress-segment.is-filled + .odd-progress-segment.is-filled {
+    border-left-color: var(--odd-color-bg);
+}
+
+.odd-failures {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: var(--odd-color-muted);
+}
+
+.odd-challenge-tracker .odd-failure-pip {
+    width: 1.1rem;
+    height: 1.1rem;
+    min-height: 0;
+    padding: 0;
+    border: 2px solid var(--odd-color-control);
+    border-radius: 50%;
+    background: var(--odd-color-surface-sunken);
+}
+
+.odd-challenge-tracker .odd-failure-pip.is-filled {
+    background: var(--odd-color-danger);
+    border-color: var(--odd-color-danger);
+}
+
 /* -------------------------------------------------------------------------- */
 /*  ODDEasy character sheet                                                   */
 /* -------------------------------------------------------------------------- */

@@ -6,9 +6,14 @@
 
 import { describe, expectTypeOf, it } from "vitest";
 import type { RulesetKey } from "../module/config/rulesets.js";
+import type { ChallengeState } from "../module/tracker/challenge-tracker.js";
 
 describe("settings", () => {
   it("types the ruleset setting as a RulesetKey", () => {
     expectTypeOf<ReturnType<typeof game.settings.get<"odd-rpg", "ruleset">>>().toEqualTypeOf<RulesetKey>();
+  });
+
+  it("types the challenge setting as a ChallengeState", () => {
+    expectTypeOf<ReturnType<typeof game.settings.get<"odd-rpg", "challenge">>>().toEqualTypeOf<ChallengeState>();
   });
 });
