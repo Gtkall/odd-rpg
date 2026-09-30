@@ -1,3 +1,10 @@
+## [0.13.0](https://github.com/Gtkall/odd-rpg/compare/v0.12.0...v0.13.0) (2026-09-30)
+
+### Features
+
+* challenge tracker for extended and challenge tests ([8c63402](https://github.com/Gtkall/odd-rpg/commit/8c63402221311a72547fc5c6a4012abd67d56cfe))
+* push yourself from the dice pool chat card ([6730fef](https://github.com/Gtkall/odd-rpg/commit/6730feff37c44f834489ad907b3084087cc1441d))
+
 ## [0.12.0](https://github.com/Gtkall/odd-rpg/compare/v0.11.0...v0.12.0) (2026-09-28)
 
 ### Features
