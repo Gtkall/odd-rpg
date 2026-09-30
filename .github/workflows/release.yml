@@ -68,3 +68,18 @@ jobs:
         run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+
+  # The release commit lands on main only. Fast-forward develop to it so the
+  # next feature branch starts from the released version.
+  sync-develop:
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.RELEASE_TOKEN }}
+
+      - name: Fast-forward develop to main
+        run: git push origin HEAD:develop
