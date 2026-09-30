@@ -1,0 +1,166 @@
+{{!-- ODD Challenge Tracker: Extended Test Progress Bars and Challenge Test Goals --}}
+{{#*inline "goalStatus"}}
+  {{#if succeeded}}
+    <span class="odd-goal-status odd-goal-status--success"><i class="fa-solid fa-check"></i> {{localize "ODD.Challenge.succeeded"}}</span>
+  {{/if}}
+  {{#if failed}}
+    <span class="odd-goal-status odd-goal-status--failure"><i class="fa-solid fa-xmark"></i> {{localize "ODD.Challenge.failed"}}</span>
+  {{/if}}
+{{/inline}}
+
+{{!-- What a player reads in place of the GM's controls --}}
+{{#*inline "goalSummary"}}
+  <div class="odd-goal-summary">
+    <div class="odd-goal-summary-head">
+      <h4 class="odd-goal-title">{{#if name}}{{name}}{{else}}{{localize "ODD.Challenge.unnamedGoal"}}{{/if}}</h4>
+      {{> goalStatus}}
+    </div>
+    {{#if details.length}}
+      <p class="odd-goal-subtitle">
+        {{#each details}}
+          <span class="odd-goal-fact"><i class="{{this.icon}}" aria-hidden="true"></i> {{this.text}}</span>
+        {{/each}}
+      </p>
+    {{/if}}
+  </div>
+{{/inline}}
+
+<div class="odd-challenge-inner">
+
+  {{!-- Toolbar: Turn counter, Timer, reset --}}
+  <div class="odd-challenge-toolbar {{#if locked}}odd-challenge-toolbar--player{{/if}}">
+    {{#if preview}}
+      <button type="button" class="odd-challenge-preview" data-action="togglePreview">
+        <i class="fa-solid fa-pen"></i>
+        {{localize "ODD.Challenge.previewOff"}}
+      </button>
+    {{/if}}
+    <div class="odd-challenge-turn {{#if lastTurn}}odd-challenge-turn--last{{/if}}">
+      {{#if locked}}{{#if timer}}<i class="odd-challenge-hourglass fa-solid fa-hourglass-half" aria-hidden="true"></i>{{/if}}{{/if}}
+      {{#if isGM}}
+        <button type="button" data-action="changeTurn" data-delta="-1" aria-label="{{localize 'ODD.Challenge.previousTurn'}}" data-tooltip="{{localize 'ODD.Challenge.previousTurn'}}">
+          <i class="fa-solid fa-minus"></i>
+        </button>
+      {{/if}}
+      <span class="odd-challenge-turn-label">
+        {{localize "ODD.Challenge.turn"}} <strong>{{turn}}</strong>{{#if timer}} / {{timer}}{{/if}}
+      </span>
+      {{#if locked}}{{#if timer}}<span class="odd-challenge-info" tabindex="0" role="img" aria-label="{{localize 'ODD.Challenge.timerExplain' timer=timer}}" data-tooltip="{{localize 'ODD.Challenge.timerExplain' timer=timer}}"><i class="fa-solid fa-circle-info" aria-hidden="true"></i></span>{{/if}}{{/if}}
+      {{#if isGM}}
+        <button type="button" data-action="changeTurn" data-delta="1" aria-label="{{localize 'ODD.Challenge.nextTurn'}}" data-tooltip="{{localize 'ODD.Challenge.nextTurn'}}">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      {{/if}}
+    </div>
+    {{#if isGM}}
+      <label class="odd-challenge-timer" data-tooltip="{{localize 'ODD.Challenge.timerHint'}}">
+        <i class="fa-solid fa-hourglass-half" aria-hidden="true"></i>
+        {{localize "ODD.Challenge.timer"}}
+        <input type="number" min="0" step="1" data-field="timer" value="{{timer}}">
+      </label>
+      <button type="button" class="odd-challenge-preview" data-action="togglePreview" data-tooltip="{{localize 'ODD.Challenge.previewHint'}}">
+        <i class="fa-solid fa-eye"></i>
+        {{localize "ODD.Challenge.previewOn"}}
+      </button>
+      <button type="button" class="odd-challenge-reset" data-action="reset">
+        <i class="fa-solid fa-trash"></i>
+        {{localize "ODD.Challenge.reset"}}
+      </button>
+    {{/if}}
+  </div>
+
+  <div class="odd-challenge-body">
+
+    {{!-- Primary Goals: Extended Tests --}}
+    <section class="odd-challenge-section">
+      <header class="odd-challenge-heading">
+        <h3>{{localize "ODD.Challenge.primaryGoals"}} <span class="odd-challenge-info" tabindex="0" role="img" aria-label="{{localize 'ODD.Challenge.primaryHint'}}" data-tooltip="{{localize 'ODD.Challenge.primaryHint'}}"><i class="fa-solid fa-circle-info" aria-hidden="true"></i></span></h3>
+        {{#if isGM}}
+          <button type="button" data-action="addGoal" data-primary="true">
+            <i class="fa-solid fa-plus"></i>
+            {{localize "ODD.Challenge.addGoal"}}
+          </button>
+        {{/if}}
+      </header>
+      {{#each primaryGoals}}
+        <div class="odd-goal {{#if this.succeeded}}odd-goal--success{{/if}} {{#if this.failed}}odd-goal--failure{{/if}}" data-goal-id="{{this.id}}">
+          <div class="odd-goal-row">
+            {{#if @root.isGM}}
+              <input type="text" class="odd-goal-name" data-field="name" value="{{this.name}}" placeholder="{{localize 'ODD.Challenge.goalName'}}" aria-label="{{localize 'ODD.Challenge.goalName'}}">
+              <input type="text" class="odd-goal-dt" data-field="dt" value="{{this.dt}}" placeholder="{{localize 'ODD.Challenge.dt'}}" aria-label="{{localize 'ODD.Challenge.dtHint'}}" data-tooltip="{{localize 'ODD.Challenge.dtHint'}}">
+              <select data-field="segments" aria-label="{{localize 'ODD.Challenge.length'}}" data-tooltip="{{localize 'ODD.Challenge.length'}}">
+                {{selectOptions @root.lengthOptions selected=this.segments}}
+              </select>
+              <select data-field="danger" aria-label="{{localize 'ODD.Challenge.danger'}}" data-tooltip="{{localize 'ODD.Challenge.dangerHint'}}">
+                {{selectOptions @root.dangerOptions selected=this.danger blank=(localize "ODD.Challenge.noDanger")}}
+              </select>
+              <button type="button" class="odd-goal-remove" data-action="removeGoal" aria-label="{{localize 'ODD.Challenge.removeGoal'}}" data-tooltip="{{localize 'ODD.Challenge.removeGoal'}}">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            {{else}}
+              {{> goalSummary}}
+            {{/if}}
+          </div>
+          <div class="odd-goal-row">
+            <div class="odd-progress" role="group" aria-label="{{localize 'ODD.Challenge.progress'}}">
+              {{#each this.segmentCells}}
+                <button type="button" class="odd-progress-segment {{#if this.filled}}is-filled{{/if}}" data-action="setProgress" data-value="{{this.value}}" aria-pressed="{{this.filled}}" aria-label="{{localize 'ODD.Challenge.segment'}} {{this.value}}" {{disabled @root.locked}}></button>
+              {{/each}}
+            </div>
+            <div class="odd-failures" role="group" aria-label="{{localize 'ODD.Challenge.failures'}}" data-tooltip="{{localize 'ODD.Challenge.failuresHint'}}">
+              <span class="odd-failures-label">{{localize "ODD.Challenge.failures"}}</span>
+              {{#each this.failurePips}}
+                <button type="button" class="odd-failure-pip {{#if this.filled}}is-filled{{/if}}" data-action="setFailures" data-value="{{this.value}}" aria-pressed="{{this.filled}}" aria-label="{{localize 'ODD.Challenge.failures'}} {{this.value}}" {{disabled @root.locked}}></button>
+              {{/each}}
+            </div>
+            {{#if @root.isGM}}{{> goalStatus}}{{/if}}
+          </div>
+        </div>
+      {{else}}
+        <p class="odd-challenge-empty">{{localize "ODD.Challenge.noPrimaryGoals"}}</p>
+      {{/each}}
+    </section>
+
+    {{!-- Secondary Goals: Standard or Opposed Tests --}}
+    <section class="odd-challenge-section">
+      <header class="odd-challenge-heading">
+        <h3>{{localize "ODD.Challenge.secondaryGoals"}} <span class="odd-challenge-info" tabindex="0" role="img" aria-label="{{localize 'ODD.Challenge.secondaryHint'}}" data-tooltip="{{localize 'ODD.Challenge.secondaryHint'}}"><i class="fa-solid fa-circle-info" aria-hidden="true"></i></span></h3>
+        {{#if isGM}}
+          <button type="button" data-action="addGoal" data-primary="false">
+            <i class="fa-solid fa-plus"></i>
+            {{localize "ODD.Challenge.addGoal"}}
+          </button>
+        {{/if}}
+      </header>
+      {{#each secondaryGoals}}
+        <div class="odd-goal {{#if this.succeeded}}odd-goal--success{{/if}} {{#if this.failed}}odd-goal--failure{{/if}}" data-goal-id="{{this.id}}">
+          <div class="odd-goal-row">
+            {{#if @root.isGM}}
+              <div class="odd-goal-outcome" role="group" aria-label="{{localize 'ODD.Challenge.outcome'}}">
+                <button type="button" class="odd-outcome-btn odd-outcome-btn--success {{#if this.succeeded}}is-active{{/if}}" data-action="setOutcome" data-outcome="success" aria-pressed="{{this.succeeded}}" aria-label="{{localize 'ODD.Challenge.succeeded'}}" data-tooltip="{{localize 'ODD.Challenge.succeeded'}}">
+                  <i class="fa-solid fa-check"></i>
+                </button>
+                <button type="button" class="odd-outcome-btn odd-outcome-btn--failure {{#if this.failed}}is-active{{/if}}" data-action="setOutcome" data-outcome="failure" aria-pressed="{{this.failed}}" aria-label="{{localize 'ODD.Challenge.failed'}}" data-tooltip="{{localize 'ODD.Challenge.failed'}}">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+              <input type="text" class="odd-goal-name" data-field="name" value="{{this.name}}" placeholder="{{localize 'ODD.Challenge.goalName'}}" aria-label="{{localize 'ODD.Challenge.goalName'}}">
+              <input type="text" class="odd-goal-dt" data-field="dt" value="{{this.dt}}" placeholder="{{localize 'ODD.Challenge.dt'}}" aria-label="{{localize 'ODD.Challenge.dtHint'}}" data-tooltip="{{localize 'ODD.Challenge.dtHint'}}">
+              <select data-field="danger" aria-label="{{localize 'ODD.Challenge.danger'}}" data-tooltip="{{localize 'ODD.Challenge.dangerHint'}}">
+                {{selectOptions @root.dangerOptions selected=this.danger blank=(localize "ODD.Challenge.noDanger")}}
+              </select>
+              <button type="button" class="odd-goal-remove" data-action="removeGoal" aria-label="{{localize 'ODD.Challenge.removeGoal'}}" data-tooltip="{{localize 'ODD.Challenge.removeGoal'}}">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            {{else}}
+              {{> goalSummary}}
+            {{/if}}
+          </div>
+        </div>
+      {{else}}
+        <p class="odd-challenge-empty">{{localize "ODD.Challenge.noSecondaryGoals"}}</p>
+      {{/each}}
+    </section>
+
+  </div>
+</div>

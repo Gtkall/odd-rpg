@@ -12,6 +12,7 @@ import type { OddActor } from "../module/documents/actor.js";
 import type { OddItem } from "../module/documents/item.js";
 import type { OddCombat } from "../module/documents/combat.js";
 import type { DicePoolCard } from "../module/chat/dice-pool-card.js";
+import type { ChallengeState } from "../module/tracker/challenge-tracker.js";
 import type CharacterDataModel from "../module/data/actor/character.js";
 import type EasyCharacterDataModel from "../module/data/actor/easyCharacter.js";
 import type ArmorDataModel from "../module/data/item/armor.js";
@@ -58,6 +59,8 @@ declare module "fvtt-types/configuration" {
   interface SettingConfig {
     /** The ruleset whose document types the "Create" dialogs offer. */
     "odd-rpg.ruleset": RulesetKey;
+    /** The challenge tracker's Turn, Timer and Goals, shared by every client. */
+    "odd-rpg.challenge": ChallengeState;
   }
 
   interface FlagConfig {

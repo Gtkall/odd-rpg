@@ -19,6 +19,7 @@ import { OddItemSheet } from "./module/sheets/item.js";
 import { registerEnrichers } from "./module/enrichers.js";
 import { onRenderDicePoolCard } from "./module/chat/dice-pool-card.js";
 import { OddInitiativeTracker } from "./module/tracker/initiative-tracker.js";
+import { OddChallengeTracker } from "./module/tracker/challenge-tracker.js";
 import { migrations } from "./module/migrations/index.js";
 import { registerSettings } from "./module/settings.js";
 
@@ -123,7 +124,7 @@ for (const hookName of ["createCombatant", "deleteCombatant", "updateCombatant",
 }
 
 /* -------------------------------------------------------------------------- */
-/*  Keybinding — open the initiative tracker (registered during init)        */
+/*  Keybindings — open the trackers (registered during init)                 */
 /* -------------------------------------------------------------------------- */
 // Keybindings must be registered in the init hook.
 // Default: Shift+I (configurable by the user in Foundry's Configure Controls dialog).
@@ -133,6 +134,13 @@ Hooks.once("init", () => {
     hint: "ODD.Tracker.keybindHint",
     editable: [{ key: "KeyI", modifiers: [foundry.helpers.interaction.KeyboardManager.MODIFIER_KEYS.SHIFT] }],
     onDown: () => { void OddInitiativeTracker.instance.render({ force: true }); return true; },
+  });
+  // Default: Shift+G.
+  game.keybindings.register("odd-rpg", "challenge-tracker", {
+    name: "ODD.Challenge.keybindName",
+    hint: "ODD.Challenge.keybindHint",
+    editable: [{ key: "KeyG", modifiers: [foundry.helpers.interaction.KeyboardManager.MODIFIER_KEYS.SHIFT] }],
+    onDown: () => { void OddChallengeTracker.instance.render({ force: true }); return true; },
   });
 });
 
@@ -153,5 +161,14 @@ Hooks.on("getSceneControlButtons", (controls: any) => {
     order: 9,
     button: true,
     onChange: () => { void OddInitiativeTracker.instance.render({ force: true }); },
+  };
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  tokens.tools["odd-challenge-tracker"] = {
+    name: "odd-challenge-tracker",
+    title: "ODD.Challenge.title",
+    icon: "fa-solid fa-bars-progress",
+    order: 10,
+    button: true,
+    onChange: () => { void OddChallengeTracker.instance.render({ force: true }); },
   };
 });
