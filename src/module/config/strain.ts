@@ -26,3 +26,8 @@ export const EASY_STRAIN_VALUES: Record<string, string> = Object.freeze({
 
 /** An ODDEasy Strain Slot filled by worn armor's Bulk. */
 export const EASY_BULK_SLOT = "B";
+
+/** What a Strain Slot holds after suffering 1 Fatigue or 1 Exhaustion. */
+export const EASY_FATIGUE_SLOT = "F";
+export const EASY_EXHAUSTION_SLOT = "E";
+export type EasyStrainKind = typeof EASY_FATIGUE_SLOT | typeof EASY_EXHAUSTION_SLOT;

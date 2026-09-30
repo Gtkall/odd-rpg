@@ -11,6 +11,8 @@ import type { RulesetKey } from "../module/config/rulesets.js";
 import type { OddActor } from "../module/documents/actor.js";
 import type { OddItem } from "../module/documents/item.js";
 import type { OddCombat } from "../module/documents/combat.js";
+import type { DicePoolCard } from "../module/chat/dice-pool-card.js";
+import type { ChallengeState } from "../module/tracker/challenge-tracker.js";
 import type CharacterDataModel from "../module/data/actor/character.js";
 import type EasyCharacterDataModel from "../module/data/actor/easyCharacter.js";
 import type ArmorDataModel from "../module/data/item/armor.js";
@@ -57,12 +59,18 @@ declare module "fvtt-types/configuration" {
   interface SettingConfig {
     /** The ruleset whose document types the "Create" dialogs offer. */
     "odd-rpg.ruleset": RulesetKey;
+    /** The challenge tracker's Turn, Timer and Goals, shared by every client. */
+    "odd-rpg.challenge": ChallengeState;
   }
 
-  // Set by the initiative tracker when a combatant is parked in the Waiting column.
   interface FlagConfig {
+    // Set by the initiative tracker when a combatant is parked in the Waiting column.
     Combatant: {
       "odd-rpg": { waiting: boolean };
+    };
+    // A dice pool roll's card, kept so Pushing Yourself can re-render it.
+    ChatMessage: {
+      "odd-rpg": { dicePool: DicePoolCard };
     };
   }
 

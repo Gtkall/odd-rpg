@@ -10,6 +10,7 @@
 import type { CommonRollDef, RollResolution, RollSource } from "../config/rolls.js";
 import type { PoolEntry, RollingActor } from "../data/abstract/character-base.js";
 import { isDicePoolSource } from "../data/abstract/dice-pool-source.js";
+import { markHitches, renderDicePoolCard, type BreakdownEntry, type DicePoolCard } from "../chat/dice-pool-card.js";
 import { dieFaces, droppedPoolIndices, nextDieStep } from "../utils/dice-pool.js";
 import { updateByPath } from "../utils/update.js";
 
@@ -19,18 +20,6 @@ const { HandlebarsApplicationMixin } = foundry.applications.api;
 // HandlebarsApplicationMixin returns an opaque type; cast once here so class
 // declarations stay readable and type inference flows correctly throughout.
 const HandlebarsActorSheet = HandlebarsApplicationMixin(ActorSheetV2) as typeof ActorSheetV2;
-
-/** One die on a roll's chat card. */
-interface BreakdownEntry {
-  label: string;
-  die: string;
-  result: number | string;
-  discarded?: boolean;
-  hitch?: boolean;
-  fate?: boolean;
-  /** Subtracted from the total, so the card shows "−" before it. */
-  penalty?: boolean;
-}
 
 interface ResolvedRoll {
   entries: PoolEntry[];
@@ -579,15 +568,15 @@ export abstract class OddActorSheetBase extends HandlebarsActorSheet {
     const fateRolls = await this._rollHandOfFate(breakdown, resolution);
     finalTotal += fateRolls.reduce((sum, r) => sum + (r.total ?? 0), 0);
 
-    const content = await foundry.applications.handlebars.renderTemplate(
-      "systems/odd-rpg/templates/chat/dice-pool-roll.hbs",
-      { total: finalTotal, breakdown, isKeepHighest: resolution === "keepHighest", ...this._markHitches(breakdown, resolution) },
-    );
+    const card: DicePoolCard = {
+      total: finalTotal, breakdown, isKeepHighest: resolution === "keepHighest", ...markHitches(breakdown, resolution),
+    };
 
     await ChatMessage.create({
       speaker: this._speaker(),
-      content,
+      content: await renderDicePoolCard(card),
       rolls: [roll, ...fateRolls],
+      flags: { "odd-rpg": { dicePool: card } },
     });
 
     return finalTotal;
@@ -620,22 +609,6 @@ export abstract class OddActorSheetBase extends HandlebarsActorSheet {
       maxed = fateRoll.total === dieFaces(die);
     }
     return rolls;
-  }
-
-  /**
-   * Marks every Hitch (a 1 on a rolled Bonus die) and reports the count, and
-   * Snake Eyes when every Bonus die is a 1. A Penalty die's 1 is no Hitch; it
-   * works for the roller. Initiative has no Hitches.
-   */
-  private _markHitches(
-    breakdown: BreakdownEntry[],
-    resolution: RollResolution,
-  ): { hitches: number; snakeEyes: boolean } {
-    if (resolution !== "sum") return { hitches: 0, snakeEyes: false };
-    const bonusDice = breakdown.filter((d) => !d.discarded && !d.die.startsWith("-"));
-    for (const d of bonusDice) d.hitch = d.result === 1;
-    const hitches = bonusDice.filter((d) => d.hitch).length;
-    return { hitches, snakeEyes: hitches > 0 && hitches === bonusDice.length };
   }
 
   private _buildSumBreakdown(
